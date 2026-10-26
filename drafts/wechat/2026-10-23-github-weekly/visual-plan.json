@@ -1,0 +1,7 @@
+{
+  "template_id": "data-terminal",
+  "renderer": "pfa-content-generate-image",
+  "thesis": "Agent 正从工具调用走向可组合、可记忆、可验证的工程系统",
+  "canvas": {"blog": "1600x900", "wechat": "1080x460", "poster": "1080x1350", "infographics": ["1200x675", "1200x675"]},
+  "policy": "唯一竖版摘要海报；平台封面不插入正文；正文保留两张表达不同结论的信息图。"
+}

@@ -1,0 +1,94 @@
+<section style="font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Helvetica Neue',Arial,sans-serif;color:#1a1a1a;font-size:16px;line-height:1.85;background:#ffffff;padding:24px 16px;max-width:680px;margin:0 auto">
+<h1 style="font-family:'Noto Serif SC','Songti SC',Georgia,serif;font-size:28px;font-weight:700;color:#0f0f0f;letter-spacing:1px;line-height:1.4;margin:24px 0 16px">当 AI 学会排版：3 个开源工具的编排实践</h1>
+<blockquote style="background:#f7f7f7;border-left:3px solid #0f0f0f;padding:14px 18px;margin:18px 0;color:#222;font-family:'Noto Serif SC','Songti SC',Georgia,serif;font-size:16px;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">你将学到</strong>：如何将 3 个独立的 AI 工具组合成端到端的内容发布引擎——从选题研究到博客+平台双端同步，中间还定制了 6 套专属视觉风格。</blockquote>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">每次写完一篇技术文章，我都要重复三个痛苦步骤：调 Markdown 样式让它适配平台、手动上传图片到 OSS、再在后台粘贴排版。一篇文章光「搬砖」就要 40 分钟。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">更糟的是，市面上的工具要么只管渲染，要么只管发布，没有一个能从「选题 → 写稿 → 渲染 → 博客 → 发布」一条龙跑完。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">于是我决定：<strong style="color:#0f0f0f;font-weight:700">不造轮子，而是把轮子编成引擎</strong>。</p>
+<p style="text-align:center;color:#bdbdbd;letter-spacing:8px;margin:28px 0">· · ·</p>
+<h2 style="font-size:20px;font-weight:700;color:#0f0f0f;margin:32px 0 12px;padding-left:14px;border-left:4px solid #0f0f0f;line-height:1.4">一、三个轮子，三种哲学</h2>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">先介绍我手头的三个工具，它们各自擅长什么、又各自缺什么。</p>
+<h3 style="font-size:17px;font-weight:600;color:#1a1a1a;margin:20px 0 8px">— 1.1 渲染引擎</h3>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0"><strong style="color:#0f0f0f;font-weight:700">定位</strong>：Markdown → 平台 HTML 的"底层引擎"。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">这是一个 CLI 工具，核心能力是 inspect → preview → convert 三板斧。它有 <strong style="color:#0f0f0f;font-weight:700">52 个主题</strong>、<strong style="color:#0f0f0f;font-weight:700">43 个高级版式模块</strong>，还提供封面生成和信息图管线。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">它的设计哲学是<strong style="color:#0f0f0f;font-weight:700">发现驱动</strong>：不靠文档记忆能力，而是强制先跑发现命令拿最新事实，再选主题。这避免了"文档说有但实际已下架"的尴尬。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0"><strong style="color:#0f0f0f;font-weight:700">它不做的事</strong>：不写文章、不调平台接口、不关心你的博客。</p>
+<h3 style="font-size:17px;font-weight:600;color:#1a1a1a;margin:20px 0 8px">— 1.2 发布引擎</h3>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0"><strong style="color:#0f0f0f;font-weight:700">定位</strong>：已有文章后，专攻"推上平台"这最后一公里。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">这个工具强在工程化：<strong style="color:#0f0f0f;font-weight:700">4 种主题 + 13 种色板</strong>、<strong style="color:#0f0f0f;font-weight:700">多账号支持</strong>。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">还有<strong style="color:#0f0f0f;font-weight:700">三种发布通道</strong>（服务端接口 / 浏览器自动化 / 远程隧道），以及评论控制、原文链接等细节。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">它的哲学是<strong style="color:#0f0f0f;font-weight:700">参数驱动 + 工程化</strong>：把主题/颜色/账号/通道做成可配置矩阵，逻辑写在 TypeScript 里并有测试覆盖。</p>
+<h3 style="font-size:17px;font-weight:600;color:#1a1a1a;margin:20px 0 8px">— 1.3 编排器（我的）</h3>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0"><strong style="color:#0f0f0f;font-weight:700">定位</strong>：端到端总控，把上面两个和「写作 + 博客」绑在一起。</p>
+<p style="text-align:center;color:#bdbdbd;letter-spacing:8px;margin:28px 0">· · ·</p>
+<h2 style="font-size:20px;font-weight:700;color:#0f0f0f;margin:32px 0 12px;padding-left:14px;border-left:4px solid #0f0f0f;line-height:1.4">二、编排架构：不重造，只缝合</h2>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">核心思路：<strong style="color:#0f0f0f;font-weight:700">编排层不实现任何底层能力，只做三件事——调度、质控、降级兜底。</strong></p>
+<section style="margin:18px 0"><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/architecture-handdrawn.png" alt="三层技能编排架构" style="width:100%;max-width:100%;height:auto;display:block;border-radius:12px;border:0"><p style="text-align:center;color:#8a8a8a;font-size:13px;margin:6px 0 0">三层编排架构</p></section>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">架构分三层：</p>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a">
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">编排层</strong>：确定"谁来做"，维护全局 Quality Gate</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">渲染层</strong>：Markdown → 内联样式 HTML，发现主题、版式模块</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">发布层</strong>：接口/浏览器/远程三通道推平台</li>
+</ul>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">关键规则：<strong style="color:#0f0f0f;font-weight:700">编排器绝不重新实现底层工具已有的能力</strong>。渲染走渲染引擎，发布走发布引擎，编排器只管"什么时候调谁"和"过了质控才能发"。</p>
+<p style="text-align:center;color:#bdbdbd;letter-spacing:8px;margin:28px 0">· · ·</p>
+<h2 style="font-size:20px;font-weight:700;color:#0f0f0f;margin:32px 0 12px;padding-left:14px;border-left:4px solid #0f0f0f;line-height:1.4">三、8 步工作流</h2>
+<section style="margin:18px 0"><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/workflow-handdrawn.png" alt="8步编排工作流" style="width:100%;max-width:100%;height:auto;display:block;border-radius:12px;border:0"><p style="text-align:center;color:#8a8a8a;font-size:13px;margin:6px 0 0">8 步编排工作流</p></section>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">每一步都有明确的所有者：</p>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a">
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">Step 1: Intake</strong> — 识别用户意图</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">Step 2: Research</strong> — 搜索源事实，不编造数据</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">Step 3: Write</strong> — 编排器自研，短段落、清晰层级</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">Step 4: PicGo</strong> — 强制图片上传 OSS，失败则停</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">Step 5: Render</strong> — 委托渲染引擎，发现主题后渲染</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">Step 6: Gate</strong> — 6 项透明指标，不过即阻断</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">Step 7: Blog</strong> — 编排器自研，博客发布</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">Step 8: Draft</strong> — 委托发布引擎，默认只存草稿</li>
+</ul>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">其中 Step 6 质量门的 6 项指标：封面图远程、正文图远程、视觉节奏、内联样式、颜色层级、图片说明。</p>
+<p style="text-align:center;color:#bdbdbd;letter-spacing:8px;margin:28px 0">· · ·</p>
+<h2 style="font-size:20px;font-weight:700;color:#0f0f0f;margin:32px 0 12px;padding-left:14px;border-left:4px solid #0f0f0f;line-height:1.4">四、6 套专属风格系统</h2>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">我研究了 2025-2026 年主流视觉风格，结合自己的内容类型，定制了 6 套 Style Pack：</p>
+<section style="margin:18px 0"><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/style-packs-handdrawn.png" alt="6套专属风格系统" style="width:100%;max-width:100%;height:auto;display:block;border-radius:12px;border:0"><p style="text-align:center;color:#8a8a8a;font-size:13px;margin:6px 0 0">6 套专属 Style Pack</p></section>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a">
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">A 灰阶玻璃</strong> — 随笔/产品发布，零干扰</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">B 报刊编辑部</strong> — 深度评论/技术史，米黄底+衬线</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">C 光感卡片</strong> — 工具评测/教程，蓝色+数字徽章</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">D 暗夜终端</strong> — AI/Agent/源码，深色+霓虹</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">E 莫兰迪生活</strong> — 周记/阅读，奶油底+灰豆沙</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#0f0f0f;font-weight:700">F 冲击标题</strong> — 热点/大新闻，满底色+金色</li>
+</ul>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">每套 Pack 是完整的内联 CSS 视觉系统，输出 100% 内联样式 HTML。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0"><strong style="color:#0f0f0f;font-weight:700">双端联动</strong>：平台端直接渲染 HTML，博客端通过 CSS 作用域自动应用对应 Pack 的博客版样式。</p>
+<p style="text-align:center;color:#bdbdbd;letter-spacing:8px;margin:28px 0">· · ·</p>
+<h2 style="font-size:20px;font-weight:700;color:#0f0f0f;margin:32px 0 12px;padding-left:14px;border-left:4px solid #0f0f0f;line-height:1.4">五、三大设计原则</h2>
+<h3 style="font-size:17px;font-weight:600;color:#1a1a1a;margin:20px 0 8px">— 原则一：发现优先</h3>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">选择主题时必须先跑发现命令拿最新列表，<strong style="color:#0f0f0f;font-weight:700">不能从记忆猜测</strong>。52 个主题会随版本增删，硬编码升级后可能失效。</p>
+<h3 style="font-size:17px;font-weight:600;color:#1a1a1a;margin:20px 0 8px">— 原则二：硬阻断</h3>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">检查 readiness 不通过就停止，<strong style="color:#0f0f0f;font-weight:700">绝不能静默降级</strong>。有一次我跳过了封面检查，结果后台显示封面为空。</p>
+<h3 style="font-size:17px;font-weight:600;color:#1a1a1a;margin:20px 0 8px">— 原则三：幂等重跑</h3>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">每次运行写入 state.json，重跑时复用已有结果。没有幂等性时，每次重跑都重新上传图片和创建草稿。</p>
+<p style="text-align:center;color:#bdbdbd;letter-spacing:8px;margin:28px 0">· · ·</p>
+<h2 style="font-size:20px;font-weight:700;color:#0f0f0f;margin:32px 0 12px;padding-left:14px;border-left:4px solid #0f0f0f;line-height:1.4">六、踩坑与收获</h2>
+<h3 style="font-size:17px;font-weight:600;color:#1a1a1a;margin:20px 0 8px">— 坑 1：平台 HTML 兼容性</h3>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">平台编辑器会吃掉 style 块、class 选择器、自定义字体声明、JS、SVG——几乎所有"正常"网页的写法都不行。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0"><strong style="color:#0f0f0f;font-weight:700">结论</strong>：所有视觉必须靠内联 style 属性 + 颜色块 + 边框 + 字号字重做层级。</p>
+<h3 style="font-size:17px;font-weight:600;color:#1a1a1a;margin:20px 0 8px">— 坑 2：视觉节奏检查的误判</h3>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">初版用正则锚点检测视觉打断，在去除空格后的文本中永远不匹配，导致每篇都报"没有视觉打断"。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0"><strong style="color:#0f0f0f;font-weight:700">修复</strong>：在原始 Markdown 中定位打断点，映射到压缩坐标后再检查窗口。</p>
+<h3 style="font-size:17px;font-weight:600;color:#1a1a1a;margin:20px 0 8px">— 坑 3：浏览器乱码</h3>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">渲染器输出的 HTML 是裸片段，没有 charset 声明，浏览器默认 Latin-1 编码导致中文乱码。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0"><strong style="color:#0f0f0f;font-weight:700">修复</strong>：输出文件时包裹完整 HTML 壳。</p>
+<h3 style="font-size:17px;font-weight:600;color:#1a1a1a;margin:20px 0 8px">— 坑 4：内容安全风控</h3>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">提交草稿时遇到 45166 错误——文章被平台审核拦截，但没有任何具体原因提示。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0"><strong style="color:#0f0f0f;font-weight:700">教训</strong>：写稿时就要注意措辞，某些品牌词和技术术语会触发风控。建议采用双版本策略——博客版用完整术语，平台版需要安全替换。</p>
+<p style="text-align:center;color:#bdbdbd;letter-spacing:8px;margin:28px 0">· · ·</p>
+<h2 style="font-size:20px;font-weight:700;color:#0f0f0f;margin:32px 0 12px;padding-left:14px;border-left:4px solid #0f0f0f;line-height:1.4">七、开源地址与后续计划</h2>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a">
+<li style="margin:6px 0;line-height:1.8">渲染引擎：github.com/geekjourneyx/md2mp-skill</li>
+<li style="margin:6px 0;line-height:1.8">发布引擎：Skill 生态</li>
+<li style="margin:6px 0;line-height:1.8">编排器 + 6 套 Style Pack：随博客仓库开源</li>
+</ul>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">后续计划：Style Pack 可视化选配器、更多 Pack、测试覆盖、内容安全预检集成。</p>
+<section style="background:#0f0f0f;color:#fff;padding:18px 20px;border-radius:14px;margin:28px 0;font-size:15px;line-height:1.7"><strong style="display:block;margin-bottom:6px;font-size:16px;color:#fff">关注 · 持续记录</strong>如果今天这篇对你有触动，留个在看就好。</section>
+<p style="text-align:center;color:#8a8a8a;font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;font-size:12px;letter-spacing:1px;margin:32px 0 8px">© 小遨 · 2026</p>
+</section>

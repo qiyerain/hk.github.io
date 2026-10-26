@@ -1,0 +1,29 @@
+header.xa-page-head
+  span.xa-kicker S — SUBSCRIBE
+  h1 订阅
+  p 三种方式，让新文章自己来找你。
+section.xa-subscribe-grid
+  article.xa-subscribe-card.xa-glass-card
+    span.xa-kicker RSS · REAL TIME
+    h2 RSS 订阅
+    p 把博客加入你习惯的阅读器。没有算法排序，也没有通知轰炸。
+    .xa-copy-field
+      code#xa-feed-url= full_url_for('/rss.xml')
+      button(type="button" data-copy-target="#xa-feed-url") 复制
+    a.xa-primary-link(href=url_for('/rss.xml')) 打开原创 Feed ↗
+  article.xa-subscribe-card.xa-glass-card
+    span.xa-kicker EMAIL · WHEN NEEDED
+    h2 邮箱联系
+    p 目前不接入第三方群发服务。你可以直接给我写信，或用 RSS 接收更新。
+    a.xa-primary-link(href="mailto:17752683350@qq.com") 17752683350@qq.com ↗
+  article.xa-subscribe-card.xa-glass-card
+    span.xa-kicker WECHAT · WEEKLY
+    h2 微信公众号
+    p 在微信里阅读重新编排的版本，也会看到博客之外的短内容。
+    img.xa-subscribe-qr(src=url_for('/img/wechat/qrcode.jpg') alt="小遨公众号二维码" loading="lazy")
+    a.xa-primary-link(href=url_for('/wechat/')) 前往公众号页 ↗
+section.xa-subscribe-note
+  span.xa-kicker A SMALL PROMISE
+  h2 不卖邮箱，不做广告，也不会为了更新频率牺牲内容。
+  p GitHub趋势使用独立 Feed，不会占据原创文章订阅。
+  a.xa-text-link(href=url_for('/github-trends/rss.xml')) 单独订阅 GitHub趋势 ↗

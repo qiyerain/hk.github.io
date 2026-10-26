@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub 周报：Agent 开始比拼证据链、隔离与恢复</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f4ef;
+      --panel: #fffdf7;
+      --ink: #1f1f1f;
+      --muted: #5f5a52;
+      --border: #ddd6c7;
+      --warn: #8c5c00;
+      --error: #9b1c1c;
+      --info: #1f5d8a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Georgia, "Noto Serif SC", serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #efede5 0%, #f9f7f1 100%);
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      gap: 24px;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 12px 32px rgba(59, 43, 17, 0.08);
+    }
+    h1, h2, h3 { margin: 0 0 12px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-top: 24px; }
+    .meta-row { margin-bottom: 14px; }
+    .meta-label { font-size: 12px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.08em; }
+    .meta-value { font-size: 16px; margin-top: 4px; word-break: break-word; }
+    .meta-source { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+      background: #fbf8f0;
+    }
+    .check {
+      border-left: 4px solid var(--border);
+      padding: 10px 12px;
+      background: #fcfaf4;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+    .check.warn { border-color: var(--warn); }
+    .check.error { border-color: var(--error); }
+    .check.info { border-color: var(--info); }
+    .check-code { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .article-shell {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 16px 40px rgba(40, 33, 18, 0.10);
+    }
+    .banner {
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 18px;
+      background: #faf6ec;
+      color: var(--muted);
+    }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #f6f3eb;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      overflow: auto;
+    }
+    @media (max-width: 960px) {
+      .shell { grid-template-columns: 1fr; }
+      .article-shell { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="panel">
+      <h1>Publish Preview</h1>
+      <div class="meta-source">source/_posts/每周GitHub趋势/2026-10-23-GitHub趋势.md</div>
+
+      <h2>Resolved Metadata</h2>
+      <div class="meta-row">
+        <div class="meta-label">Title</div>
+        <div class="meta-value">GitHub 周报：Agent 开始比拼证据链、隔离与恢复</div>
+        <div class="meta-source">frontmatter.title · 29 / 32</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Author</div>
+        <div class="meta-value">—</div>
+        <div class="meta-source">fallback.empty · 0 / 16</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Digest</div>
+        <div class="meta-value">Agent 项目不再只比工具数量，证据链、隔离执行、状态恢复和权限边界正在成为工程化新门槛。</div>
+        <div class="meta-source">frontmatter.description · 46 / 128</div>
+      </div>
+
+      <h2>Context</h2>
+      <span class="pill">mode: ai</span>
+      <span class="pill">theme: autumn-warm</span>
+      <span class="pill">font: medium</span>
+      <span class="pill">background: none</span>
+      <span class="pill">preview: degraded</span>
+
+      <h2>Structure</h2>
+      <div class="meta-row">
+        <div class="meta-label">Body H1</div>
+        <div class="meta-value">—</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Images</div>
+        <div class="meta-value">3 total · 0 local · 3 remote · 0 ai</div>
+      </div>
+
+      <h2>Checks</h2>
+      
+        
+          <div class="check info">
+            <div class="check-code">info · DIGEST_METADATA_ONLY</div>
+            <div>Digest affects draft metadata, not body HTML rendering</div>
+            <div class="meta-source">use body content or theme behavior to control visible article summary inside the HTML</div>
+          </div>
+        
+          <div class="check info">
+            <div class="check-code">info · AI_MODE_ACTION_REQUIRED</div>
+            <div>AI mode produces a prompt/request instead of final HTML until an external model completes the flow</div>
+            <div class="meta-source">use --mode api for exact preview or complete the AI prompt externally</div>
+          </div>
+        
+      
+    </aside>
+
+    <main class="panel">
+      <div class="article-shell">
+        
+          <div class="banner">Preview degraded: AI mode currently yields a prompt/request instead of final HTML.</div>
+        
+        
+        
+          <h1 style="margin-bottom:12px;">GitHub 周报：Agent 开始比拼证据链、隔离与恢复</h1>
+          
+          <p style="color:#666;">Agent 项目不再只比工具数量，证据链、隔离执行、状态恢复和权限边界正在成为工程化新门槛。</p>
+          <h2 style="margin-top:24px;">Markdown Body</h2>
+          <pre>&gt; **一句话结论：Agent 正从会调用工具，走向可审计的工程系统。**
+
+本周真正值得看的，不是又多了多少插件和 Agent，而是项目开始正面处理四个过去容易被演示掩盖的问题：**证据能否复核、状态能否恢复、并发是否隔离、权限是否可控**。读完这期，你会得到三样东西：本周榜单、三个项目的落地边界，以及一张可以直接用于试用决策的选择矩阵。
+
+![2026 年第 43 周 GitHub TOP 5 项目与本周新增 Star 摘要](https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-poster-v2-1080x1350.png)
+
+&gt; 图注：唯一竖版首屏摘要海报。排名沿用 GitHub Trending weekly 页面顺序，不按周增 Star 重新排序。
+
+## 本周概览
+
+2026-10-23 的 weekly 页面共显示 15 个项目。`morluto/rea` 继续位列第一，`VoiceStudio`、`stablyai/orca`、`anomalyco/opencode` 的周增 Star 也很突出；但这些数字不能直接当作“成熟度排名”。
+
+这里有一个容易误读的地方：**GitHub Trending 的页面顺序并不是按本周新增 Star 从高到低排列。** Trending 还会综合一段时间内的关注变化等信号，GitHub 没有公开完整排序公式。因此，排第 4 的 `android/skills` 周增 &#43;1,384，而排第 10 的 `VoiceStudio` 周增 &#43;13,581，并不矛盾。本文保留页面原始顺序，同时把 Star 只当作关注度证据。
+
+![Agent 从能力入口走向证据验证的工程链路](https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-agent-chain-1080x720.png)
+
+&gt; 图注：本周项目不是四个孤立标签，而是一条工程链：工具进入任务，状态被编排，并发在隔离环境中执行，最终结果回到证据与人工复核。
+
+## TOP 5 快览
+
+**1. [morluto/rea](https://github.com/morluto/rea)**：TypeScript；369,571 Stars；本周新增 **&#43;106,341**。把行为观察、专业分析工具和证据输出接进同一条反向工程链路。
+
+**2. [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)**：Python；44,005 Stars；本周新增 **&#43;5,649**。Anthropic 官方维护的 Claude Code 插件目录。
+
+**3. [ruvnet/ruflo](https://github.com/ruvnet/ruflo)**：TypeScript；78,612 Stars；本周新增 **&#43;3,708**。覆盖多 Agent 编排、记忆、RAG 与扩展能力的 Agent harness。
+
+**4. [android/skills](https://github.com/android/skills)**：Kotlin；9,309 Stars；本周新增 **&#43;1,384**。Trending 页面未提供描述，本文不根据仓库名补写能力。
+
+**5. [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills)**：Python；54,043 Stars；本周新增 **&#43;3,967**。面向科研工作流的 Skills 与科学数据库入口。
+
+## 三个项目，三个工程问题
+
+### rea：回答不够，必须返回证据
+
+**它解决什么：** `rea` 把应用行为观察、Hopper、Ghidra、IDA 等分析工具，以及 JavaScript/Electron、.NET、网站和原生二进制目标放进同一套 Agent 工作流。它最有价值的不是“自动逆向”，而是输出包含证据和结论限制，让分析可以继续复现和质疑。
+
+**可用性与成本：** 项目采用 MIT License，2026-10-18 发布 `rea-agents-6.7.0`。它在本地运行，但真正成本不在安装命令，而在专业分析工具、目标环境和人工复核时间。没有逆向经验的团队，很容易把模型解释误当成事实。
+
+**风险边界：** 官方安全说明明确指出它不是沙箱。打开不可信二进制时，底层分析工具仍以当前用户权限运行。合法授权、隔离环境、只读样例和快照恢复应当先于任何自动化分析。
+
+**替代与判断：** 只需要静态分析框架时，直接使用 `ghidra` 更简单；需要把多种分析工具串成可追溯 Agent 流程时，`rea` 才体现价值。**我的判断：方向先进，但属于高门槛专业工具，不适合因为 Star 高就直接装进日常开发机。**
+
+### ruflo：能力很多，治理成本也会一起上升
+
+**它解决什么：** `ruflo` 把 swarm、多 Agent 协调、记忆、RAG 和扩展模块放在一套 harness 中，试图解决复杂任务里的分工、共享状态和跨运行时衔接。
+
+**可用性与成本：** 项目采用 MIT License，2026-10-23 发布 `v3.60.1`。官方同时提供插件路径和完整 CLI 路径，两者能力面并不相同。评估时必须先确认自己安装的是哪一条路径，不能把 README 中所有能力都视为默认可用。多 Agent 还会放大模型调用、并发冲突、上下文同步和失败恢复成本。
+
+**风险边界：** 官方说明 Mods 使用用户账号权限运行且不提供沙箱，安装前需要审查代码。Claude 控制默认是 `read &#43; ask`，提升权限由用户选择；网络、花费和破坏性动作仍需要确认。这些约束比“支持多少 Agent”更值得先读。
+
+**替代与判断：** 只需要单 Agent 编码入口时，`opencode` 的决策面更小；重点是多 Agent 隔离和结果比较时，`orca` 更聚焦。**我的判断：ruflo 最适合观察 Agent 平台化，但首个试点应当是可回滚的小任务，并明确成本上限和失败恢复。**
+
+### orca：先隔离执行，再比较谁做得更好
+
+**它解决什么：** `orca` 让不同 Agent 在独立 Git worktree 中并行工作，再通过差异审阅、行级批注和合并流程比较结果。它把“多开几个 Agent”变成了有隔离边界的工程协作。
+
+**可用性与成本：** 项目采用 MIT License，2026-10-23 发布 `v1.4.238`。它支持桌面端、移动伴侣和 SSH 远程 worktree，也提供 CLI 自动化。代价是团队必须理解 worktree 生命周期、分支合并和冲突处理；仓库越大，并行环境的磁盘与依赖成本越明显。
+
+**风险边界：** worktree 隔离的是代码工作区，不等于隔离凭证、网络和底层 Agent 权限。项目包含匿名 telemetry，可通过设置、`DO_NOT_TRACK=1` 或 `ORCA_TELEMETRY_DISABLED=1` 关闭；官方声明不采集文件内容、提示词、Agent 输出、仓库名、路径和终端输出。
+
+**替代与判断：** 单 Agent 工作流用 `opencode` 更直接；需要共享记忆、RAG 与复杂编排时看 `ruflo`。**我的判断：对已经在并行使用多个编码 Agent 的团队，orca 比“再加一个编排框架”更容易形成可验证收益。**
+
+## 与上周相比：热度在迁移到哪里
+
+这不是 GitHub 官方的周环比，而是 10 月 16 日和 10 月 23 日两次 weekly 页面快照对照。由于窗口滚动、抓取时点和排序算法都可能影响结果，只能用来看方向，不能计算严格增速。
+
+**持续上榜：** `rea` 连续两周位列第一，但周增从 &#43;239,477 回落到 &#43;106,341，说明爆发仍在延续，斜率已经下降。`hyperframes` 从 &#43;5,318 到 &#43;5,669，热度相对稳定；`ghidra` 从 &#43;6,614 到 &#43;4,892，仍受关注但增量放缓；`cursor/plugins` 从 &#43;1,214 到 &#43;2,046，插件分发层的注意力在增强。
+
+**新进入本周视野：** `ruflo`、`ai-memory`、`context-mode` 和 `orca` 同时出现，把榜单重心从上周的“专业能力可复用”，推向本周的“状态如何保存、任务如何编排、并发如何隔离”。
+
+**值得警惕：** `android/skills` 虽位列 TOP 5，但 Trending 页面缺少描述，公开信息不足以支撑深度判断，因此只保留在快览中。周报的重点位置应当让给资料完整、边界可核验的项目，而不是机械跟随排名。
+
+## 其他热门项目
+
+**开发者工具：** [anomalyco/opencode](https://github.com/anomalyco/opencode) 周增 &#43;6,750，提供开源编码 Agent；[HKUDS/CLI-Anything](https://github.com/HKUDS/CLI-Anything) 周增 &#43;3,275，尝试用 CLI 让现有软件更容易被 Agent 调用；[mksglu/context-mode](https://github.com/mksglu/context-mode) 周增 &#43;2,271，聚焦工具输出隔离、会话记忆和上下文路由。
+
+**模型与内容工具链：** [debpalash/VoiceStudio](https://github.com/debpalash/VoiceStudio) 周增 &#43;13,581，覆盖本地语音克隆、配音和转写；[Comfy-Org/ComfyUI](https://github.com/Comfy-Org/ComfyUI) 周增 &#43;4,375，继续代表节点式生成模型工作流；[heygen-com/hyperframes](https://github.com/heygen-com/hyperframes) 周增 &#43;5,669，把 HTML 表达接到 Agent 视频渲染链路。
+
+**安全与知识：** [NationalSecurityAgency/ghidra](https://github.com/NationalSecurityAgency/ghidra) 周增 &#43;4,892，是成熟的逆向工程基础设施；[K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) 把科研方法和数据库入口包装为可复用 Skills，但落地仍要核对数据更新、引用链和专家复核。
+
+## 本周最值得看
+
+如果只选一个项目研究，我会选 **orca**，不是因为它排名或 Star 最高，而是它把一个具体的工程痛点处理得最清楚：多个编码 Agent 不应在同一工作区互相覆盖，而应隔离执行、比较差异、人工选择后再合并。这个价值更容易用真实任务验证。
+
+如果你的目标不同：安全研究和证据链看 `rea`；多 Agent 平台能力看 `ruflo`；单 Agent 编码入口看 `opencode`。不要从“最热项目”出发，先从你愿意承担的权限、成本和恢复复杂度出发。
+
+![Agent 项目接入成本与工程成熟度选择矩阵](https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-decision-matrix-1080x720.png)
+
+&gt; 图注：横轴为接入成本，纵轴为工程成熟度。位置是本文基于安装路径、权限边界、Release 状态和工作流完整度做的相对判断，不是官方评级。
+
+## 趋势观察
+
+第一，**Agent 的竞争指标正在从工具数量转向工程闭环。** 能调用工具只解决了入口问题；状态、隔离、证据和恢复决定它能否进入真实团队流程。
+
+第二，**“本地运行”不等于“低风险”。** `rea` 和 `ruflo` 都明确提醒某些执行路径不提供沙箱；`orca` 的 worktree 也只隔离代码目录。权限、网络、凭证和花费仍要单独治理。
+
+第三，**项目选择会越来越像基础设施选型。** 未来深度读者真正需要的不是更多仓库简介，而是能力边界、部署成本、维护节奏、退出方案和同类替代品。
+
+## 来源
+
+&gt; 复核提示：Star、Release 和仓库说明会持续变化；试用前请以对应项目的最新官方页面为准。
+
+**榜单与数字：** [GitHub Trending weekly](https://github.com/trending?since=weekly)，抓取于 2026-10-23 18:17（北京时间）。项目名、链接、语言、总 Star 和本周新增 Star 均按该时点页面记录；缺失信息写“未提供”。
+
+**rea：** [README](https://github.com/morluto/rea)、[rea-agents-6.7.0 Release](https://github.com/morluto/rea/releases/tag/rea-agents-6.7.0)、[Security](https://github.com/morluto/rea/blob/main/SECURITY.md)。
+
+**ruflo：** [README](https://github.com/ruvnet/ruflo)、[v3.60.1 Release](https://github.com/ruvnet/ruflo/releases/tag/v3.60.1)、[Security](https://github.com/ruvnet/ruflo/blob/main/SECURITY.md)。
+
+**orca：** [README](https://github.com/stablyai/orca)、[v1.4.238 Release](https://github.com/stablyai/orca/releases/tag/v1.4.238)、[Telemetry](https://github.com/stablyai/orca/blob/main/docs/site/content/docs/telemetry.mdx)。
+
+**上周对照：** 本站 2026-10-16 weekly 快照。两次快照仅用于观察榜单结构变化，不代表 GitHub 官方周环比。
+
+&gt; 方法边界：本文提供的是趋势判断与试用线索，不替代项目自身的安全审查、许可证核对和生产验证。</pre>
+        
+      </div>
+    </main>
+  </div>
+</body>
+</html>

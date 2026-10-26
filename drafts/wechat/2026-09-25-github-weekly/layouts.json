@@ -1,0 +1,1070 @@
+{
+  "success": true,
+  "code": "LAYOUT_SHOWN",
+  "message": "layout modules",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "count": 43,
+    "modules": [
+      {
+        "body_format": "fields",
+        "category": "judgment",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "report",
+          "announcement"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "audience-fit",
+        "serves": [
+          "attention",
+          "readability"
+        ],
+        "tags": [
+          "judgment",
+          "audience",
+          "fit",
+          "targeting"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "brand",
+        "content_types": [
+          "opinion",
+          "announcement",
+          "brand"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "author-card",
+        "serves": [
+          "memorability",
+          "conversion"
+        ],
+        "tags": [
+          "brand",
+          "author",
+          "profile",
+          "identity",
+          "bio"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "judgment",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "bridge",
+        "serves": [
+          "readability"
+        ],
+        "tags": [
+          "judgment",
+          "bridge",
+          "transition",
+          "context"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "sprint4",
+        "content_types": [
+          "tutorial",
+          "report",
+          "announcement"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "callout",
+        "serves": [
+          "attention",
+          "readability"
+        ],
+        "tags": [
+          "sprint4",
+          "callout",
+          "tip",
+          "warning",
+          "alert",
+          "info"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "opening",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "report",
+          "announcement"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "cards",
+        "serves": [
+          "attention",
+          "readability"
+        ],
+        "tags": [
+          "opening",
+          "cards",
+          "overview",
+          "structure"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "conversion",
+        "content_types": [
+          "report",
+          "announcement",
+          "brand",
+          "product-launch"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "cases",
+        "serves": [
+          "conversion",
+          "attention"
+        ],
+        "tags": [
+          "conversion",
+          "cases",
+          "results",
+          "testimonial",
+          "social-proof"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "json_object",
+        "category": "sprint4",
+        "content_types": [
+          "announcement",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "changelog",
+        "serves": [
+          "readability",
+          "memorability"
+        ],
+        "tags": [
+          "sprint4",
+          "changelog",
+          "release-notes",
+          "version",
+          "updates"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "conversion",
+        "content_types": [
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "checklist",
+        "serves": [
+          "readability",
+          "conversion"
+        ],
+        "tags": [
+          "conversion",
+          "checklist",
+          "todo",
+          "verification",
+          "review"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "infographic",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "report",
+          "announcement"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "compare",
+        "serves": [
+          "readability",
+          "attention"
+        ],
+        "tags": [
+          "infographic",
+          "compare",
+          "contrast",
+          "before-after",
+          "options"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "json_object",
+        "category": "sprint4",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "comparison-table",
+        "serves": [
+          "readability",
+          "attention"
+        ],
+        "tags": [
+          "sprint4",
+          "comparison-table",
+          "pros-cons",
+          "tradeoff",
+          "evaluation"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "conversion",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "announcement",
+          "product-launch"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "cta",
+        "serves": [
+          "conversion"
+        ],
+        "tags": [
+          "conversion",
+          "cta",
+          "action",
+          "closing",
+          "engagement"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "json_object",
+        "category": "sprint4",
+        "content_types": [
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "definition",
+        "serves": [
+          "readability"
+        ],
+        "tags": [
+          "sprint4",
+          "definition",
+          "term",
+          "glossary",
+          "concept"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "conversion",
+        "content_types": [
+          "tutorial",
+          "announcement",
+          "product-launch"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "faq",
+        "serves": [
+          "conversion",
+          "readability"
+        ],
+        "tags": [
+          "conversion",
+          "faq",
+          "questions",
+          "objections",
+          "support"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "opening",
+        "content_types": [
+          "opinion",
+          "announcement",
+          "manifesto",
+          "product-launch"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "hero",
+        "serves": [
+          "attention",
+          "readability"
+        ],
+        "tags": [
+          "opening",
+          "hero",
+          "first-screen"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "evidence",
+        "content_types": [
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "image-annotate",
+        "serves": [
+          "readability",
+          "attention"
+        ],
+        "tags": [
+          "evidence",
+          "image",
+          "annotation",
+          "callout",
+          "highlight"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "evidence",
+        "content_types": [
+          "tutorial",
+          "report",
+          "announcement",
+          "product-launch"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "image-compare",
+        "serves": [
+          "attention",
+          "readability"
+        ],
+        "tags": [
+          "evidence",
+          "image",
+          "before-after",
+          "compare",
+          "ab-test"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "evidence",
+        "content_types": [
+          "tutorial"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "image-steps",
+        "serves": [
+          "readability"
+        ],
+        "tags": [
+          "evidence",
+          "image",
+          "steps",
+          "tutorial",
+          "how-to"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "evidence",
+        "content_types": [
+          "tutorial",
+          "report",
+          "announcement"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "image-text",
+        "serves": [
+          "readability"
+        ],
+        "tags": [
+          "evidence",
+          "image",
+          "image-text",
+          "layout",
+          "figure"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "infographic",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "report",
+          "announcement",
+          "product-launch"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "infographic",
+        "serves": [
+          "attention",
+          "memorability"
+        ],
+        "tags": [
+          "infographic",
+          "visual",
+          "statement",
+          "data",
+          "flow",
+          "contrast"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "opening",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "label-title",
+        "serves": [
+          "readability"
+        ],
+        "tags": [
+          "opening",
+          "label",
+          "section-header",
+          "lightweight"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "conversion",
+        "content_types": [
+          "announcement",
+          "brand",
+          "product-launch"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "logos",
+        "serves": [
+          "conversion",
+          "memorability"
+        ],
+        "tags": [
+          "conversion",
+          "logos",
+          "brands",
+          "partners",
+          "clients"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "judgment",
+        "content_types": [
+          "opinion",
+          "announcement",
+          "manifesto"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "manifesto",
+        "serves": [
+          "attention",
+          "memorability"
+        ],
+        "tags": [
+          "judgment",
+          "manifesto",
+          "brand",
+          "belief",
+          "position"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "infographic",
+        "content_types": [
+          "report",
+          "announcement",
+          "product-launch"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "metrics",
+        "serves": [
+          "attention",
+          "memorability"
+        ],
+        "tags": [
+          "infographic",
+          "metrics",
+          "data",
+          "numbers",
+          "kpi"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "judgment",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "announcement"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "myth-fact",
+        "serves": [
+          "attention",
+          "readability"
+        ],
+        "tags": [
+          "judgment",
+          "myth",
+          "fact",
+          "correction",
+          "misconception"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "conversion",
+        "content_types": [
+          "tutorial",
+          "report",
+          "announcement"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "notice",
+        "serves": [
+          "readability",
+          "attention"
+        ],
+        "tags": [
+          "conversion",
+          "notice",
+          "disclaimer",
+          "conditions",
+          "warning"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "opening",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "part",
+        "serves": [
+          "readability"
+        ],
+        "tags": [
+          "opening",
+          "part",
+          "section",
+          "chapter"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "brand",
+        "content_types": [
+          "announcement",
+          "brand",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "people",
+        "serves": [
+          "memorability",
+          "readability"
+        ],
+        "tags": [
+          "brand",
+          "people",
+          "team",
+          "roles",
+          "contributors"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "conversion",
+        "content_types": [
+          "announcement",
+          "product-launch",
+          "brand"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "pricing",
+        "serves": [
+          "conversion"
+        ],
+        "tags": [
+          "conversion",
+          "pricing",
+          "plans",
+          "packages",
+          "tiers"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "json_array",
+        "category": "sprint4",
+        "content_types": [
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "question",
+        "serves": [
+          "readability",
+          "conversion"
+        ],
+        "tags": [
+          "sprint4",
+          "question",
+          "qa",
+          "faq-inline",
+          "interactive"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "evidence",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "report",
+          "announcement"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "quote",
+        "serves": [
+          "attention",
+          "memorability"
+        ],
+        "tags": [
+          "evidence",
+          "quote",
+          "pullquote",
+          "citation"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "json_object",
+        "category": "sprint4",
+        "content_types": [
+          "opinion",
+          "announcement",
+          "brand"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "quote-card",
+        "serves": [
+          "attention",
+          "memorability"
+        ],
+        "tags": [
+          "sprint4",
+          "quote-card",
+          "pullquote",
+          "cover-quote",
+          "featured"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "json_array",
+        "category": "sprint4",
+        "content_types": [
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "resource-list",
+        "serves": [
+          "readability",
+          "conversion"
+        ],
+        "tags": [
+          "sprint4",
+          "resource-list",
+          "links",
+          "references",
+          "reading-list"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "brand",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "brand"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "series",
+        "serves": [
+          "memorability",
+          "conversion"
+        ],
+        "tags": [
+          "brand",
+          "series",
+          "newsletter",
+          "episode",
+          "sequence"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "conversion",
+        "content_types": [
+          "report",
+          "announcement",
+          "product-launch"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "specs",
+        "serves": [
+          "readability",
+          "conversion"
+        ],
+        "tags": [
+          "conversion",
+          "specs",
+          "parameters",
+          "config",
+          "technical"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "json_array",
+        "category": "sprint4",
+        "content_types": [
+          "report",
+          "announcement",
+          "product-launch"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "stat-row",
+        "serves": [
+          "attention",
+          "memorability"
+        ],
+        "tags": [
+          "sprint4",
+          "stat-row",
+          "statistics",
+          "kpi",
+          "metrics-inline"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "infographic",
+        "content_types": [
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "steps",
+        "serves": [
+          "readability"
+        ],
+        "tags": [
+          "infographic",
+          "steps",
+          "process",
+          "workflow",
+          "how-to"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "brand",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "announcement",
+          "brand"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "subscribe",
+        "serves": [
+          "conversion",
+          "memorability"
+        ],
+        "tags": [
+          "brand",
+          "subscribe",
+          "follow",
+          "cta",
+          "closing"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "conversion",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "summary",
+        "serves": [
+          "memorability",
+          "readability"
+        ],
+        "tags": [
+          "conversion",
+          "summary",
+          "conclusion",
+          "highlight",
+          "closing"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "infographic",
+        "content_types": [
+          "report",
+          "announcement",
+          "tutorial"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "timeline",
+        "serves": [
+          "readability"
+        ],
+        "tags": [
+          "infographic",
+          "timeline",
+          "history",
+          "phases",
+          "evolution"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "opening",
+        "content_types": [
+          "opinion",
+          "tutorial",
+          "report",
+          "announcement"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "toc",
+        "serves": [
+          "readability"
+        ],
+        "tags": [
+          "opening",
+          "toc",
+          "navigation",
+          "outline"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "rows",
+        "category": "conversion",
+        "content_types": [
+          "tutorial",
+          "report"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "toolbox",
+        "serves": [
+          "conversion",
+          "readability"
+        ],
+        "tags": [
+          "conversion",
+          "toolbox",
+          "resources",
+          "tools",
+          "links"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "json_object",
+        "category": "sprint4",
+        "content_types": [
+          "opinion",
+          "announcement"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "tweet",
+        "serves": [
+          "attention",
+          "memorability"
+        ],
+        "tags": [
+          "sprint4",
+          "tweet",
+          "social",
+          "citation",
+          "viral"
+        ],
+        "version": "1.0.0"
+      },
+      {
+        "body_format": "fields",
+        "category": "judgment",
+        "content_types": [
+          "opinion",
+          "report",
+          "announcement"
+        ],
+        "industry": [
+          "general"
+        ],
+        "name": "verdict",
+        "serves": [
+          "attention",
+          "memorability"
+        ],
+        "tags": [
+          "judgment",
+          "verdict",
+          "conclusion",
+          "standpoint"
+        ],
+        "version": "1.0.0"
+      }
+    ]
+  }
+}

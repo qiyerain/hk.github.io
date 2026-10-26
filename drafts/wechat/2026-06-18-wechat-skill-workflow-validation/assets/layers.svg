@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620">
+  <rect width="1000" height="620" rx="32" fill="#f4efe6"/>
+  <text x="64" y="78" fill="#1f2926" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="36" font-weight="800">能力分层：先保证内容，再保证阅读</text>
+  <g font-family="PingFang SC, Microsoft YaHei, Arial">
+    <rect x="90" y="132" width="820" height="104" rx="28" fill="#39786e"/>
+    <text x="132" y="195" fill="#fffaf3" font-size="30" font-weight="800">内容层</text>
+    <text x="286" y="195" fill="#fffaf3" font-size="25">调研、事实、观点、结构、续写</text>
+    <rect x="90" y="270" width="820" height="104" rx="28" fill="#d59c47"/>
+    <text x="132" y="333" fill="#211f1b" font-size="30" font-weight="800">表现层</text>
+    <text x="286" y="333" fill="#211f1b" font-size="25">海报、配图、颜色、重点块、手机阅读</text>
+    <rect x="90" y="408" width="820" height="104" rx="28" fill="#8f3f2f"/>
+    <text x="132" y="471" fill="#fffaf3" font-size="30" font-weight="800">发布层</text>
+    <text x="286" y="471" fill="#fffaf3" font-size="25">博客沉淀、本地预览、公众号草稿、确认发布</text>
+  </g>
+  <path d="M500 238v28M500 376v28" stroke="#6f472f" stroke-width="8" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,34 @@
+/* Style Pack A — 灰阶玻璃 Mono Glass
+ * Identity layer. Pack A is the default site brand; the real visual system
+ * lives in /custom/xiaoao-redesign.css. This file is intentionally light
+ * so [data-style-pack="A"] can coexist with the default branding.
+ *
+ * Apply via:  <body data-style-pack="A"> OR <meta name="style-pack" content="A">
+ * Loaded by:  /js/style-pack-loader.js
+ */
+
+body[data-style-pack="A"] #article-container {
+  --xpack-accent: #0f0f0f;
+  --xpack-muted: #8a8a8a;
+}
+
+body[data-style-pack="A"] #article-container h2 {
+  border-left: 4px solid #0f0f0f;
+  padding-left: 14px;
+}
+
+body[data-style-pack="A"] #article-container blockquote {
+  background: #f7f7f7;
+  border-left: 3px solid #0f0f0f;
+  font-family: "Noto Serif SC", "Songti SC", Georgia, serif;
+}
+
+body[data-style-pack="A"] #article-container hr {
+  border: 0;
+  text-align: center;
+  letter-spacing: 8px;
+  color: #bdbdbd;
+}
+body[data-style-pack="A"] #article-container hr::before {
+  content: "· · ·";
+}

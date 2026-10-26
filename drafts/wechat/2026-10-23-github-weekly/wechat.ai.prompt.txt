@@ -1,0 +1,207 @@
+【终极指令 V4.0】秋日暖光美学兼容性网页设计提示词
+
+指令：
+你是一位世界顶级的网页设计师和提示词工程师，专精于温暖治愈和文艺美学，并对代码在不同平台（特别是微信公众号编辑器）的兼容性有深刻理解。你的任务是根据以下经过多轮优化的风格指南和技术要求，创建一个完整、纯粹使用HTML内联样式的单页式网页模板。
+
+核心主题与愿景 (Core Theme & Vision):
+创造一个沉浸式、充满治愈感、被秋日暖光浸染的文艺世界。最终成品应如同精致的艺术博客或个人作品集，充满了自然感、柔和光效和清晰的视觉层次。它既要传达信息，本身也要成为一件充满美学价值的数字艺术品。
+
+第一部分：【兼容性优先】结构与技术要求 (Structural & Technical Requirements)
+
+【关键】主容器结构 (Main Container):
+- 必须在 <body> 标签之后立即创建一个主 <div> 容器来包裹所有内容
+- 所有全局样式（特别是 background-color, padding, display: flex, letter-spacing 等布局样式）必须应用在这个主 <div> 上，而不是 <body>，以确保在微信等环境中背景和布局不丢失
+- 主容器 padding 精确设置为 40px 10px
+
+【关键】样式实现 (Styling Implementation):
+- 必须使用纯HTML内联样式，禁止使用 <style> 标签或任何外部CSS文件
+- 必须为每一个 <p> 标签明确地添加 color: #4a413d; 样式，以防止被微信编辑器强制重置为黑色
+
+模块化与间距 (Modularity & Spacing):
+- 内容的核心载体是 <section> 模块（卡片）
+- 卡片之间的垂直间距 gap 固定为 40px
+
+第二部分：设计美学与风格指南 (Aesthetics & Style Guide)
+
+色彩方案 (Color Palette):
+- 暖白背景: #faf9f5 (应用于主容器)
+- 主文字体: #4a413d
+- 秋日暖橙 (主强调色): #d97758
+- 橙红高亮 (副强调色): #c06b4d
+- 引用背景: #fef4e7
+
+卡片式布局 (Card Layout):
+- 最大宽度: max-width: 800px
+- 内部边距: padding: 25px
+- 背景: 必须结合使用 background-color: #ffffff; 和 background-image: linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px); background-size: 20px 20px; 来实现带有精致米白方格纹理的背景效果
+- 边框: border: 1px solid rgba(0, 0, 0, 0.05);
+- 暖光阴影: box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 0 15px rgba(217, 119, 88, 0.4);
+- 圆角: border-radius: 18px
+
+第三部分：排版与元素特效 (Typography & Element Effects)
+
+字体 (Font):
+- 字体族: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif
+- 正文字号: font-size: 16px
+- 行高: line-height: 1.75
+- 字间距: letter-spacing: 0.5px (应用于主容器)
+
+一级标题 (<h2>) 特效:
+- 结构: 必须由两个 <span> 构成：一个用于 ▶ 符号，另一个用于标题文本
+- ▶ 符号 <span>: 应用 color: #d97758; 和 text-shadow: 0 0 12px rgba(217, 119, 88, 0.5);
+- 标题文本 <span>: 必须应用纯色 color: #d97758;，禁止使用任何渐变色
+- 下划线: border-bottom: 1px dashed rgba(74, 65, 61, 0.3);
+
+二级标题 (<h3>) 特效:
+- 样式: 必须应用纯色 color: #d97758;，并使用 border-bottom: 2px solid #d97758; 来创建短实线，长度与文字对齐
+- 禁止为文字本身添加 text-shadow
+
+加粗/高亮 (<strong>):
+- 效果: 文字颜色设为 color: #c06b4d;，禁止附带任何 text-shadow 效果
+
+引用 (<blockquote>):
+- 背景: background-color: #fef4e7;
+- 左边框: border-left: 5px solid #d97758;
+- 阴影: box-shadow: inset 0 0 15px rgba(217, 119, 88, 0.1);
+- 禁止为引用内的文字添加 text-shadow
+
+分割线 (<hr>):
+- 样式: border: none; height: 1px; background-color: rgba(74, 65, 61, 0.1);
+
+第四部分：最终交付要求 (Final Delivery Requirements)
+
+输出格式: 提供一个完整的、独立的 HTML 内容
+代码封装: 将完整的HTML代码包裹在Markdown的代码块中
+无外部依赖: 确保代码自包含，字体通过CDN链接，无本地图片
+
+重要补充规则:
+1. 图片使用占位符格式：<!-- IMG:index -->，例如第一张图用 <!-- IMG:0 -->
+2. 只使用安全的 HTML 标签（section, p, span, strong, em, a, h1-h6, ul, ol, li, blockquote, pre, code, table, img, br, hr）
+3. 返回完整的 HTML，不需要其他说明文字
+
+请转换以下 Markdown内容：
+
+
+```
+
+> **一句话结论：Agent 正从工具调用走向可组合、可记忆、可验证的工程系统。**
+
+这一期先给你结果：榜单不只在比“谁能调用更多工具”，而是在补齐插件目录、任务编排、长期记忆、领域知识和验证闭环。读完你会知道本周 TOP 5 在解决什么问题，以及面对高 Star 项目时应该先核对哪些落地边界。
+
+![2026 年第 43 周 GitHub TOP 5 项目与本周新增 Star 摘要](https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-poster-1080x1440.png)
+
+> 图注：唯一竖版首屏摘要海报；排名沿用 GitHub Trending weekly 页面顺序，Star 为 2026-10-23 抓取值。
+
+## 本周概览
+
+本周可见榜单有 15 个项目。`morluto/rea` 继续以 +106,341 周增居首；`VoiceStudio`、`stablyai/orca`、`anomalyco/opencode` 和 `hyperframes` 也获得明显关注。更重要的是，Agent 生态正在同时补齐四层能力：入口标准化、任务编排、上下文持久化，以及对结果的证据验证。
+
+这并不意味着高热度等于生产成熟。涉及代码执行、插件安装、反向工程、模型调用和本地数据的项目，接入前都应检查权限范围、数据流向、可审计日志、失败恢复和维护状态。
+
+![本周 Agent 工程系统趋势地图](https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-trend-map-1080x720.png)
+
+> 图注：本周趋势从“编排、记忆、知识”三条线展开，验证贯穿全链路；分类为本文整理，不是 GitHub 官方标签。
+
+## TOP 5 快览
+
+**1. [morluto/rea](https://github.com/morluto/rea)**：TypeScript；369,571 Stars；本周新增 **+106,341 Star**。让 Agent 从应用行为下钻到原生二进制，并保留分析证据。
+
+**2. [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)**：Python；44,005 Stars；本周新增 **+5,649 Star**。Anthropic 官方维护的 Claude Code 高质量插件目录。
+
+**3. [ruvnet/ruflo](https://github.com/ruvnet/ruflo)**：TypeScript；78,612 Stars；本周新增 **+3,708 Star**。面向多智能体编排、记忆、联邦和向量 RAG 的 Agent harness。
+
+**4. [android/skills](https://github.com/android/skills)**：Kotlin；9,309 Stars；本周新增 **+1,384 Star**。官方 Trending 页面未提供项目描述。
+
+**5. [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills)**：Python；54,043 Stars；本周新增 **+3,967 Star**。面向科研工作流的已验证 Skills 与科学数据库集合。
+
+## AI 项目重点
+
+### 1. [morluto/rea](https://github.com/morluto/rea)
+
+**语言与热度**：TypeScript；369,571 Stars；本周新增 +106,341 Star。
+
+**解决的问题**：没有源码时，行为观察、运行时分析和二进制工具常彼此割裂，推断也容易缺少证据链。
+
+**核心亮点**：官方描述是“用 Agent 反向工程任何对象，从应用行为一路到原生二进制”。它把专业分析工具接入 Agent 工作流，价值在于统一入口和可追溯过程。
+
+**适用人群与场景**：有明确授权的安全研究、兼容性分析和产品工程团队。优先在自有程序或公开样例上验证工具权限、证据复现和人工复核流程。
+
+### 2. [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
+
+**语言与热度**：Python；44,005 Stars；本周新增 +5,649 Star。
+
+**解决的问题**：插件来源分散、质量不一，团队难以判断哪些扩展适合接入 Claude Code。
+
+**核心亮点**：这是 Anthropic 官方管理的高质量 Claude Code 插件目录，提供相对明确的发现入口和维护主体。
+
+**适用人群与场景**：Claude Code 用户、平台团队和内部工具维护者。安装前仍需逐项审查插件权限、依赖、数据访问和版本兼容性。
+
+### 3. [ruvnet/ruflo](https://github.com/ruvnet/ruflo)
+
+**语言与热度**：TypeScript；78,612 Stars；本周新增 +3,708 Star。
+
+**解决的问题**：多个 Agent 并行执行时，需要统一任务分配、共享记忆、协作状态和跨运行时衔接。
+
+**核心亮点**：官方描述覆盖 swarm 编排、自主工作流、自适应记忆、联邦、向量 RAG，以及 Claude Code、Codex 等工具的集成。
+
+**适用人群与场景**：构建多 Agent 工作流的平台工程师和研发团队。先用可回滚任务验证并发冲突、状态一致性、成本上限与失败恢复。
+
+### 4. [android/skills](https://github.com/android/skills)
+
+**语言与热度**：Kotlin；9,309 Stars；本周新增 +1,384 Star。
+
+**解决的问题**：官方 Trending 页面未提供。
+
+**核心亮点**：官方 Trending 页面未提供；可确认的信息只有仓库名称、语言、Star 与排名。
+
+**适用人群与场景**：Android 开发者和 Agent 工作流维护者可先阅读仓库文档，再判断其 Skills 范围、版本要求和执行权限；本文不根据项目名补写未验证能力。
+
+### 5. [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills)
+
+**语言与热度**：Python；54,043 Stars；本周新增 +3,967 Star。
+
+**解决的问题**：通用 Agent 缺少科学领域方法、数据库入口和可复用研究步骤，难以稳定进入专业科研流程。
+
+**核心亮点**：官方描述提供 177 个已验证 Skills 和 100 多个科学数据库入口，覆盖生物、化学、医学和药物发现，并兼容多种编码 Agent。
+
+**适用人群与场景**：科研人员、数据团队和科研工具开发者。落地时应优先核对数据来源、更新日期、引用链和领域专家复核机制。
+
+## 其他热门项目
+
+**[anomalyco/opencode](https://github.com/anomalyco/opencode)**：TypeScript；220,392 Stars；周增 +6,750。开源编码 Agent，适合关注可控编码工作流的团队。
+
+**[HKUDS/CLI-Anything](https://github.com/HKUDS/CLI-Anything)**：Python；56,414 Stars；周增 +3,275。尝试用 CLI 接口让现有软件更容易被 Agent 调用。
+
+**[akitaonrails/ai-memory](https://github.com/akitaonrails/ai-memory)**：Rust；12,882 Stars；周增 +3,322。面向编码 Agent CLI 的长期记忆与跨供应商交接。
+
+**[debpalash/VoiceStudio](https://github.com/debpalash/VoiceStudio)**：Python；82,281 Stars；周增 +13,581。本地语音克隆、配音、转写和有声书工具链。
+
+**[stablyai/orca](https://github.com/stablyai/orca)**：TypeScript；103,262 Stars；周增 +9,401。跨桌面、移动端与远程运行时管理多种编码 Agent。
+
+**[mksglu/context-mode](https://github.com/mksglu/context-mode)**：TypeScript；31,902 Stars；周增 +2,271。通过工具输出隔离、会话记忆与路由优化上下文窗口。
+
+**安全与模型工具链**：`NationalSecurityAgency/ghidra` 周增 +4,892，继续承担软件逆向工程基础设施；`Comfy-Org/ComfyUI` 周增 +4,375，代表模块化生成模型工作流；`heygen-com/hyperframes` 周增 +5,669，把 HTML 表达接到 Agent 视频渲染链路。
+
+## 本周最值得看
+
+如果只选一个项目深挖，我会选 `ruvnet/ruflo`。原因不是它的 Star 最高，而是它把编排、记忆、RAG 与多运行时集成放在同一条链路上，最适合观察 Agent 系统从“单次调用”升级为“长期协作”时会遇到哪些真实工程问题。
+
+如果你的目标更具体：安全研究看 `rea` 与 `ghidra`；插件生态看 `claude-plugins-official` 与 `cursor/plugins`；科研知识工作看 `scientific-agent-skills`；上下文与交接看 `ai-memory` 和 `context-mode`。
+
+![本周项目选择矩阵](https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-selection-1080x720.png)
+
+> 图注：先按场景选择，再检查权限、输入、输出和失败边界；Star 只代表关注度，不代表生产成熟度。
+
+## 趋势观察
+
+**插件与 Skills 正在成为 Agent 的分发层。** 官方目录、Android Skills 和科研 Skills 同时出现，说明“能力如何被发现、安装、更新和审计”正在成为独立问题。
+
+**记忆与上下文从优化项变成基础设施。** `ai-memory`、`context-mode` 和 `ruflo` 都在处理跨轮次、跨 Agent 或跨供应商的状态延续，下一步竞争会落在数据边界与可恢复性上。
+
+**验证能力决定专业场景上限。** 反向工程、科研与自动编码都不能只给答案；可复现实验、来源引用、运行日志和人工复核，才是从演示走向生产的门槛。
+
+## 来源
+
+数据来源：[GitHub Trending · weekly](https://github.com/trending?since=weekly)，抓取时间为 2026-10-23 18:17（北京时间）。项目名、链接、语言、总 Star 与本周新增 Star 均按官方页面记录；官方页面未提供的项目描述明确标为“未提供”。Star 会持续变化，本文数值仅代表抓取时点。
+
+```

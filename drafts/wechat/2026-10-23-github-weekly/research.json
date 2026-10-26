@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-10-23T18:17:34+08:00",
+  "source": "https://github.com/trending?since=weekly",
+  "scope": "GitHub Trending weekly page, 15 visible repositories",
+  "thesis": "Agent 正从工具调用走向可组合、可记忆、可验证的工程系统",
+  "repositories": [
+    {"rank": 1, "repo": "morluto/rea", "url": "https://github.com/morluto/rea", "language": "TypeScript", "total_stars": 369571, "weekly_stars": 106341, "description": "Reverse engineer anything with agents, from app behavior down to native binaries."},
+    {"rank": 2, "repo": "anthropics/claude-plugins-official", "url": "https://github.com/anthropics/claude-plugins-official", "language": "Python", "total_stars": 44005, "weekly_stars": 5649, "description": "Official, Anthropic-managed directory of high quality Claude Code Plugins."},
+    {"rank": 3, "repo": "ruvnet/ruflo", "url": "https://github.com/ruvnet/ruflo", "language": "TypeScript", "total_stars": 78612, "weekly_stars": 3708, "description": "Agent harness for swarms, autonomous workflows, memory, federation and vector RAG integration."},
+    {"rank": 4, "repo": "android/skills", "url": "https://github.com/android/skills", "language": "Kotlin", "total_stars": 9309, "weekly_stars": 1384},
+    {"rank": 5, "repo": "K-Dense-AI/scientific-agent-skills", "url": "https://github.com/K-Dense-AI/scientific-agent-skills", "language": "Python", "total_stars": 54043, "weekly_stars": 3967, "description": "Validated scientific agent skills and databases for research workflows."},
+    {"rank": 6, "repo": "anomalyco/opencode", "url": "https://github.com/anomalyco/opencode", "language": "TypeScript", "total_stars": 220392, "weekly_stars": 6750, "description": "The open source coding agent."},
+    {"rank": 7, "repo": "HKUDS/CLI-Anything", "url": "https://github.com/HKUDS/CLI-Anything", "language": "Python", "total_stars": 56414, "weekly_stars": 3275, "description": "Making all software agent-native through CLI interfaces."},
+    {"rank": 8, "repo": "cursor/plugins", "url": "https://github.com/cursor/plugins", "language": "TypeScript", "total_stars": 13694, "weekly_stars": 2046, "description": "Cursor plugin specification and official plugins."},
+    {"rank": 9, "repo": "akitaonrails/ai-memory", "url": "https://github.com/akitaonrails/ai-memory", "language": "Rust", "total_stars": 12882, "weekly_stars": 3322, "description": "Long-term memory and handoff for agent coding CLIs."},
+    {"rank": 10, "repo": "debpalash/VoiceStudio", "url": "https://github.com/debpalash/VoiceStudio", "language": "Python", "total_stars": 82281, "weekly_stars": 13581, "description": "Fully-local voice cloning, dubbing, transcription and audiobook creation."},
+    {"rank": 11, "repo": "heygen-com/hyperframes", "url": "https://github.com/heygen-com/hyperframes", "language": "TypeScript", "total_stars": 70321, "weekly_stars": 5669, "description": "Write HTML. Render video. Built for agents."},
+    {"rank": 12, "repo": "NationalSecurityAgency/ghidra", "url": "https://github.com/NationalSecurityAgency/ghidra", "language": "Java", "total_stars": 93363, "weekly_stars": 4892, "description": "Ghidra is a software reverse engineering framework."},
+    {"rank": 13, "repo": "stablyai/orca", "url": "https://github.com/stablyai/orca", "language": "TypeScript", "total_stars": 103262, "weekly_stars": 9401, "description": "Work with a fleet of coding agents across desktop, mobile and remote runtimes."},
+    {"rank": 14, "repo": "Comfy-Org/ComfyUI", "url": "https://github.com/Comfy-Org/ComfyUI", "language": "Python", "total_stars": 142167, "weekly_stars": 4375, "description": "Modular diffusion model GUI, API and backend with graph/nodes."},
+    {"rank": 15, "repo": "mksglu/context-mode", "url": "https://github.com/mksglu/context-mode", "language": "TypeScript", "total_stars": 31902, "weekly_stars": 2271, "description": "Context optimization, session memory and routing for AI coding agents."}
+  ],
+  "verification_note": "项目名、链接、语言、总 Star 与本周新增 Star 来自 GitHub 官方 Trending 页面；缺失描述保留为未提供。"
+}

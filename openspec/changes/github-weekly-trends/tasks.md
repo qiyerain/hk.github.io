@@ -1,0 +1,5 @@
+- [x] Update trend category constants, front matter, filters, audits, RSS metadata, and channel copy.
+- [x] Keep the public trend routes stable and verify generated output.
+- [x] Wire the homepage search CTA to local search and prevent duplicate PJAX listeners.
+- [x] Build, browser-test trend and search flows, and run repository audits.
+- [x] Write execution-report.md with validation results and rollback notes.

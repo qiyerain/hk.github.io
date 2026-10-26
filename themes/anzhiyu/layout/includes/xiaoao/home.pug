@@ -1,0 +1,113 @@
+- const xaPosts = featured_posts(site.posts, { limit: 0 })
+- const xaFeaturedPosts = xaPosts.filter(function (post) { return post.featured === true })
+- const xaLead = xaFeaturedPosts[0] || xaPosts[0]
+- const xaLatest = xaPosts.filter(function (post) { return !xaLead || post.path !== xaLead.path }).slice(0, 8)
+- const xaAgentPosts = xaPosts.filter(function (post) { return post.source.indexOf('_posts/agent/') === 0 })
+- const xaBackendPosts = xaPosts.filter(function (post) { return post.source.indexOf('_posts/后端/') === 0 })
+- const xaInterviewPosts = xaPosts.filter(function (post) { return post.source.indexOf('_posts/面试/') === 0 })
+- const xaGrowthPosts = xaPosts.filter(function (post) { return post.source.indexOf('_posts/agent/') !== 0 && post.source.indexOf('_posts/后端/') !== 0 && post.source.indexOf('_posts/面试/') !== 0 })
+- const xaSeriesPosts = xaPosts.filter(function (post) { return post.series }).sort(function (a, b) { return (a.series_order || 999) - (b.series_order || 999) }).slice(0, 4)
+-
+  const xaRoutes = [
+    { icon: 'anzhiyu-icon-wand-magic-sparkles', label: 'AI 与 Agent', hint: '智能体、工具调用与工程落地', path: '/directory/agent/', count: xaAgentPosts.length },
+    { icon: 'anzhiyu-icon-code', label: 'Java 与后端', hint: '基础、并发、框架与工程手册', path: '/directory/后端/', count: xaBackendPosts.length },
+    { icon: 'anzhiyu-icon-clipboard-question', label: '面试专题', hint: '高频原理题与可复查答案', path: '/directory/面试/', count: xaInterviewPosts.length },
+    { icon: 'anzhiyu-icon-screwdriver-wrench', label: '成长与工具', hint: '效率工具、写作与实践复盘', path: '/dirs/', count: xaGrowthPosts.length }
+  ]
+
+section.xa-knowledge-paths(aria-label="知识专题")
+  .xa-content-shell
+    .xa-knowledge-paths__grid
+      each route in xaRoutes
+        a.xa-knowledge-path(href=url_for(route.path))
+          i.anzhiyufont(class=route.icon aria-hidden="true")
+          div
+            h3= route.label
+            p= route.hint
+          span #{route.count} 篇
+
+main.xa-home-main#articles
+  .xa-content-shell.xa-home-grid
+    .xa-home-feed
+      if xaLead
+        - const leadCover = xaLead.cover || '/img/covers/home/agent-basics.svg'
+        - const leadSummary = strip_html(xaLead.description || xaLead.excerpt || xaLead.content || '').replace(/\s+/g, ' ').slice(0, 150)
+        article.xa-featured-story(data-analytics-article-id=xaLead.article_id)
+          a.xa-featured-story__cover(href=url_for(xaLead.path))
+            img.nolazyload(src=url_for(leadCover) alt=(xaLead.cover_alt || xaLead.title) width="1200" height="675" loading="eager" fetchpriority="high" decoding="async" style=`object-position:${xaLead.cover_position || '50% 50%'}` data-xa-fallback=url_for('/img/covers/home/agent-basics.svg'))
+          .xa-featured-story__body
+            span.xa-section-kicker 主推阅读
+            h2
+              a(href=url_for(xaLead.path))= xaLead.title
+            if leadSummary
+              p= leadSummary
+            .xa-story-meta
+              time= date(xaLead.date, 'YYYY.MM.DD')
+              if xaLead.min2read
+                span #{xaLead.min2read} 分钟阅读
+              span.xa-article-views(data-analytics-views hidden aria-live="polite")
+      .xa-feed-heading
+        div
+          span.xa-section-kicker 最近更新
+          h2 最新原创
+        a(href=url_for('/archives/')) 查看全部
+      .xa-story-list
+        each article, index in xaLatest
+          - const cover = article.cover || `/img/covers/cover-${(index % 8) + 1}.webp`
+          - const summary = strip_html(article.description || article.excerpt || article.content || '').replace(/\s+/g, ' ').slice(0, 100)
+          article.xa-story-card(data-analytics-article-id=article.article_id)
+            a.xa-story-card__cover(href=url_for(article.path))
+              img(src=url_for(cover) alt=(article.cover_alt || article.title) width="1200" height="675" loading="lazy" decoding="async" style=`object-position:${article.cover_position || '50% 50%'}` data-xa-fallback=url_for('/img/covers/home/agent-basics.svg'))
+            .xa-story-card__body
+              .xa-story-meta
+                time= date(article.date, 'YYYY.MM.DD')
+                if article.categories && article.categories.data.length
+                  span= article.categories.data[article.categories.data.length - 1].name
+                span.xa-article-views(data-analytics-views hidden aria-live="polite")
+              h3
+                a(href=url_for(article.path))= article.title || _p('no_title')
+              if summary
+                p= summary
+    aside.xa-home-rail(aria-label="博客信息")
+      section.xa-rail-section.xa-author-brief
+        img(src=url_for(theme.avatar.img) alt="小遨头像" loading="lazy")
+        div
+          span.xa-section-kicker 关于作者
+          h2 小遨
+        p 在复杂系统里寻找确定性，持续分享 AI Agent、后端工程和好用的生产力工具。
+        a(href=url_for('/about/')) 了解更多
+      section.xa-rail-section.xa-site-analytics(data-site-analytics aria-label="站点统计" hidden)
+        span.xa-section-kicker 站点数据
+        .xa-site-analytics__grid
+          div
+            strong(data-site-page-views) 0
+            span 总访问量
+          div
+            strong(data-site-reading-time) 0 分钟
+            span 总阅读时间
+          div
+            strong(data-site-today-views) 0
+            span 今日访问量
+      section.xa-rail-section
+        .xa-rail-heading
+          span.xa-section-kicker 推荐系列
+          a(href=url_for('/archives/')) 全部文章
+        if xaSeriesPosts.length
+          ol.xa-series-list
+            each article in xaSeriesPosts
+              li
+                a(href=url_for(article.path))
+                  span= String(article.series_order || 1).padStart(2, '0')
+                  strong= article.title
+        else
+          p.xa-rail-empty 系列文章正在整理中。
+      section.xa-rail-section.xa-wechat-brief
+        div
+          span.xa-section-kicker 公众号
+          h2 小遨的技术笔记
+          p 获取新文章和阶段性专题整理。
+          a(href=url_for('/wechat/')) 查看公众号
+        img(src=url_for('/img/wechat/qrcode.jpg') alt="小遨的微信公众号二维码" loading="lazy")
+      a.xa-trends-link(href=url_for('/github-trends/'))
+        span GitHub趋势
+        small 独立周度频道

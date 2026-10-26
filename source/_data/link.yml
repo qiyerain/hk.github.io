@@ -1,0 +1,63 @@
+- class_name: AI 生态
+  class_desc: 持续关注的模型平台、编程助手、Agent 框架与开发者基础设施。
+  flink_style: glass
+  link_list:
+    - name: GitHub
+      link: https://github.com/
+      avatar: /img/friends/github.svg
+      descr: 开源项目、开发协作与工程知识最重要的公共入口。
+      category: 开源
+      tag: Developer Platform
+    - name: 火山引擎方舟
+      link: https://www.volcengine.com/product/ark
+      avatar: /img/friends/bytedance.svg
+      descr: 字节跳动旗下的大模型服务平台，提供模型调用、评测与应用开发能力。
+      category: 平台
+      tag: Model Platform
+    - name: 百度智能云千帆
+      link: https://cloud.baidu.com/product/wenxinworkshop
+      avatar: /img/friends/baidu.svg
+      descr: 面向企业的大模型与 Agent 开发平台，覆盖模型、知识库和应用编排。
+      category: 平台
+      tag: Enterprise AI
+    - name: Claude Code
+      link: https://docs.anthropic.com/en/docs/claude-code/overview
+      avatar: /img/friends/anthropic.svg
+      descr: Anthropic 的终端编程助手，擅长理解代码库、修改工程和自动化开发流程。
+      category: 编程助手
+      tag: Coding Agent
+    - name: Harness
+      link: https://www.harness.io/
+      avatar: /img/friends/harness.png
+      descr: 覆盖持续交付、工程效能、云成本与软件交付智能化的开发者平台。
+      category: DevOps
+      tag: Software Delivery
+    - name: LangChain
+      link: https://www.langchain.com/
+      avatar: /img/friends/langchain.svg
+      descr: 构建上下文感知 Agent、工具调用和可观测工作流的开发框架与平台。
+      category: Agent
+      tag: Agent Framework
+    - name: Hugging Face
+      link: https://huggingface.co/
+      avatar: /img/friends/huggingface.svg
+      descr: 模型、数据集、Demo 与开源机器学习协作社区。
+      category: 开源
+      tag: Open Models
+    - name: Vercel AI SDK
+      link: https://ai-sdk.dev/
+      avatar: /img/friends/vercel.svg
+      descr: 面向 TypeScript 的 AI 应用工具包，统一模型接入、流式 UI 与工具调用。
+      category: Agent
+      tag: AI SDK
+    - name: Docker
+      link: https://www.docker.com/products/docker-desktop/
+      avatar: /img/friends/docker.svg
+      descr: 本地开发、容器运行与可复现工程环境的基础工具。
+      category: DevOps
+      tag: Container
+
+- class_name: 个人友链
+  class_desc: 留给持续创作、有明确署名和稳定访问地址的个人站点。
+  flink_style: glass
+  link_list: []

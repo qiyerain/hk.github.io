@@ -1,0 +1,28 @@
+#local-search
+  .search-dialog
+    nav.search-nav
+      span.search-dialog-title= _p('search.title')
+      span#loading-status
+      button.search-close-button
+        i.anzhiyufont.anzhiyu-icon-xmark
+
+    #loading-database.is-center
+      i.anzhiyufont.anzhiyu-icon-spinner.anzhiyu-pulse-icon
+      span= '  ' + _p("search.load_data")
+
+    .search-wrap
+      #local-search-input
+        .local-search-box
+          input(placeholder=_p("search.local_search.input_placeholder") type="text").local-search-box--input
+        .search-hot-tags
+          span.search-hot-tags-label 热门:
+          a.search-hot-tag(href="javascript:void(0)" data-keyword="Java") Java
+          a.search-hot-tag(href="javascript:void(0)" data-keyword="MySQL") MySQL
+          a.search-hot-tag(href="javascript:void(0)" data-keyword="Redis") Redis
+          a.search-hot-tag(href="javascript:void(0)" data-keyword="Spring") Spring
+          a.search-hot-tag(href="javascript:void(0)" data-keyword="面试") 面试
+          a.search-hot-tag(href="javascript:void(0)" data-keyword="JVM") JVM
+      hr
+      #local-search-results
+
+  #search-mask

@@ -1,0 +1,30 @@
+{
+  "template_id": "github-weekly-warm-paper-v1",
+  "template_name": "GitHub 周榜暖白纸张母版",
+  "renderer": "html-svg",
+  "aspect": "cover",
+  "canvas": {
+    "width": 1080,
+    "height": 460,
+    "ratio": "2.35:1"
+  },
+  "score": 100,
+  "reasons": [
+    "GitHub weekly series override; warm-paper master is exclusive to this series"
+  ],
+  "prompt": "Six separately composed canvases: warm-white grid paper, ink-black heavy headline, GitHub green emphasis, restrained orange weekly stars, hand-drawn engineering marks and browser frames. Empty rank, project, date, title, deck and source slots in the base layer; exact Chinese and verified project data are overlaid afterward. No fake brands, text, numbers, logos or watermarks in the base layer. Keep a seven-percent safe margin and export each canvas at native size.",
+  "overlay_contract": {
+    "base_has_readable_text": false,
+    "text_added_after_base": true,
+    "required_slots": [
+      "title",
+      "deck",
+      "section-title",
+      "body",
+      "caption",
+      "source"
+    ],
+    "safe_margin_percent": 7,
+    "html_svg_slot_attribute": "data-slot"
+  }
+}

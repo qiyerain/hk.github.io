@@ -1,0 +1,78 @@
+{
+  "run_id": "2026-09-13-github-weekly",
+  "updated_at": "2026-09-15T20:14:55+0800",
+  "markdown_path": "source/_posts/每周GitHub趋势/2026-09-13-GitHub趋势.md",
+  "markdown_sha256": "0e16b9d62e23369795bb3dd66e794bee73170f824726f402ac2c0083fe6c325a",
+  "wechat_html_path": "drafts/wechat/2026-09-13-github-weekly/wechat.html",
+  "wechat_html_sha256": "fa537254917cf0de57a084e8a084a539ee46239fef7d0e20e084209a10e62b82",
+  "theme": "github-readme",
+  "style_pack": "C",
+  "assets": [
+    {
+      "sha256": "95a9c1f6be924a78288274a9fb5baabbd57a143bd56d1cf24fb3271fad8d6618",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-cover-1600x900.png"
+    },
+    {
+      "sha256": "3afadac867b5aea930510f35760791994c6941eac8a069e694f6d20b54f1ff6c",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-first-place-1200x675.png"
+    },
+    {
+      "sha256": "7303c7281cbc880d241514e3db63ce28bfa56111d686f63298d9997beea14522",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-poster-1080x1350.png"
+    },
+    {
+      "sha256": "d4cb77c97a26f61f8b33b7f7e95d42e3aac8a793f95ad19b868a9149375e2d85",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-action-matrix-1200x675.png"
+    },
+    {
+      "sha256": "da289d9146537c9f383fb4366798173510c58529534c7565b16819aca5c79561",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-trend-map-1200x675.png"
+    },
+    {
+      "sha256": "fc850151e17360c16238d5912fcb99e042bcac9f32036caf9d49ae7f8eb3b36e",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-wechat-cover-1080x460.png"
+    }
+  ],
+  "stages": {
+    "research": {
+      "ok": true,
+      "source": "https://github.com/trending?since=weekly",
+      "captured_at": "2026-09-13T20:43:00+0800"
+    },
+    "oss_upload": {
+      "ok": true
+    },
+    "inspect": {
+      "ok": true,
+      "draft_target": "ready",
+      "blockers": []
+    },
+    "convert": {
+      "ok": false,
+      "provider": "md2wechat-api",
+      "error": "401 Invalid API Key format",
+      "fallback": "inline style pack C"
+    },
+    "experience_validation": {
+      "ok": true
+    },
+    "draft": {
+      "ok": true,
+      "media_id": "zdr76s0MQZwqyFoO5jodPGI10tt1Do5xvGgeRj_m6btWnP10qqZB6itB5F0Ffqm4",
+      "thumb_media_id": "zdr76s0MQZwqyFoO5jodPBEIxn5QGJkPeBGLESLd2c7Xn--AVzM-wZygdEnQtJyf",
+      "created_at": "2026-09-15T20:14:55+0800",
+      "method": "api",
+      "api_error": null,
+      "browser_error": "dedicated Chrome profile is not logged in; macOS Accessibility preflight failed",
+      "payload_dry_run": "passed",
+      "payload_content_length": 18891
+    },
+    "collection": {
+      "name": "每周 GitHub",
+      "album_id": "4695616659267780619",
+      "url": "https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MjM5NTY1Nzc3OA==&action=getalbum&album_id=4695616659267780619#wechat_redirect",
+      "archived": false,
+      "reason": "draft created; current publisher has no album_id support, so collection assignment must happen after publication in the WeChat backend"
+    }
+  }
+}

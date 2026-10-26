@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>归档 · 小遨的个人博客</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="common.css" />
+<style>
+.page-head .glow-a{width:28vw;height:28vw;left:-6vw;top:8vh}
+.page-head .glow-b{width:22vw;height:22vw;right:-4vw;top:0}
+.tabs{position:relative;max-width:1200px;margin:48px auto 0;padding:0 var(--pad-x);display:flex;gap:8px;border-bottom:1px solid var(--border)}
+.tab{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-dim);padding:14px 20px;background:none;border:none;cursor:pointer;position:relative;transition:color .25s ease}
+.tab:hover{color:var(--fg-soft)}
+.tab.active{color:var(--fg)}
+.tab-bar{position:absolute;bottom:-1px;height:2px;background:var(--accent);transition:left .28s var(--ease-out),width .28s var(--ease-out)}
+.tab-panel{display:none;max-width:1200px;margin:0 auto;padding:clamp(48px,8vh,80px) var(--pad-x) 0}
+.tab-panel.active{display:block;animation:fade .5s var(--ease-out)}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.year{margin-bottom:56px}
+.year-h{font-family:var(--serif);font-weight:700;font-size:clamp(32px,4vw,56px);line-height:1;display:flex;align-items:baseline;gap:14px;margin-bottom:24px}
+.year-h .cnt{font-family:var(--mono);font-size:13px;color:var(--fg-dim);letter-spacing:.1em;font-weight:400}
+.month-block{margin-bottom:32px}
+.month-h{font-family:var(--mono);font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-soft);padding:10px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between}
+.month-h .mc{color:var(--fg-dim);font-size:11px}
+.month-art{padding:18px 0 18px 20px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;cursor:pointer;transition:padding .28s ease,background .28s ease;text-decoration:none;color:inherit}
+.month-art:hover{padding-left:28px;background:var(--muted)}
+.month-art .mt{font-family:var(--serif);font-weight:600;font-size:clamp(18px,2vw,24px)}
+.month-art .me{font-family:var(--mono);font-size:11px;color:var(--fg-dim);letter-spacing:.08em}
+.month-art .marrow{color:var(--fg-dim);transition:transform .3s var(--ease-out),color .25s}
+.month-art:hover .marrow{transform:rotate(-45deg);color:var(--fg)}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:56px;padding-bottom:40px;border-bottom:1px solid var(--border)}
+.tag-cloud a{font-family:var(--mono);padding:8px 18px;border-radius:var(--radius-pill);background:var(--tag-bg);color:var(--tag-fg);transition:background .25s,color .25s,transform .25s;cursor:pointer}
+.tag-cloud a:hover{background:var(--fg);color:var(--bg);transform:translateY(-2px)}
+.tag-cloud a.active{background:var(--fg);color:var(--bg)}
+.tag-selected-h{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:24px}
+.tag-selected-h b{color:var(--fg);font-weight:500}
+.dir-layout{display:grid;grid-template-columns:300px 1fr;gap:clamp(32px,4vw,56px)}
+.dir-tree{font-family:var(--mono);font-size:13px;position:sticky;top:90px;align-self:start;max-height:calc(100vh-110px);overflow-y:auto}
+.dir-tree ul{list-style:none;padding-left:18px;position:relative}
+.dir-tree>ul{padding-left:0}
+.dir-tree ul::before{content:"";position:absolute;left:6px;top:0;bottom:8px;width:1px;background:var(--dir-line)}
+.dir-tree>ul::before{display:none}
+.dir-tree li{position:relative;padding:4px 0}
+.dir-tree ul li::before{content:"";position:absolute;left:-12px;top:14px;width:10px;height:1px;background:var(--dir-line)}
+.dir-tree .folder{cursor:pointer;color:var(--fg-soft);display:flex;align-items:center;gap:8px;user-select:none;padding:4px 8px;border-radius:6px;transition:background .2s,color .2s}
+.dir-tree .folder:hover{color:var(--fg);background:var(--muted)}
+.dir-tree .folder.active{color:var(--fg);background:var(--muted)}
+.dir-tree .folder .tri{font-size:9px;transition:transform .24s var(--ease-out);color:var(--fg-dim);width:8px}
+.dir-tree .folder.open .tri{transform:rotate(90deg)}
+.dir-tree .leaf{cursor:pointer;color:var(--fg-dim);padding:4px 8px 4px 22px;border-radius:6px;transition:color .2s}
+.dir-tree .leaf:hover{color:var(--fg)}
+.dir-tree ul ul{display:none}
+.dir-tree ul li.open>ul{display:block}
+.alist{display:flex;flex-direction:column}
+.alist .row{position:relative;display:grid;grid-template-columns:1fr auto;align-items:center;gap:20px;padding:22px 8px;border-top:1px solid var(--border);cursor:pointer;transition:background .28s,padding .28s;text-decoration:none;color:inherit}
+.alist .row:last-child{border-bottom:1px solid var(--border)}
+.alist .row:hover{background:var(--muted)}
+.alist .row .rmeta{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:8px;display:flex;gap:14px}
+.alist .row .rt{font-family:var(--serif);font-weight:600;font-size:clamp(18px,2vw,26px);transition:transform .34s var(--ease-out)}
+.alist .row:hover .rt{transform:translateX(10px)}
+.alist .row .re{color:var(--fg-soft);font-size:14px;margin-top:8px;max-width:60ch}
+.alist .row .rarrow{color:var(--fg-dim);transition:transform .3s var(--ease-out),color .25s}
+.alist .row:hover .rarrow{transform:rotate(-45deg);color:var(--fg)}
+@media (max-width:860px){.dir-layout{grid-template-columns:1fr}.dir-tree{position:relative;top:0;max-height:none;margin-bottom:32px}}
+</style>
+</head>
+<body>
+<nav class="nav" id="nav">
+  <div class="nav-brand" onclick="location.href='index.html'">小遨的个人博客</div>
+  <ul class="nav-center">
+    <li class="nav-item">
+      <button class="nav-link active">文章 <span class="caret">▾</span></button>
+      <ul class="nav-drop">
+        <li><a href="archive.html">全部文章 <span>All</span></a></li>
+        <li><a href="archive.html#month">按月份 <span>By Month</span></a></li>
+        <li><a href="archive.html#tag">按标签 <span>By Tag</span></a></li>
+        <li><a href="archive.html#dir">按目录 <span>By Dir</span></a></li>
+      </ul>
+    </li>
+    <li class="nav-item"><a class="nav-link" href="albums.html">相册</a></li>
+    <li class="nav-item"><a class="nav-link" href="friends.html">友链</a></li>
+    <li class="nav-item"><a class="nav-link" href="wechat.html">公众号</a></li>
+    <li class="nav-item"><a class="nav-link" href="about.html">关于</a></li>
+  </ul>
+  <div class="nav-tools">
+    <button class="icon-btn" aria-label="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+    <button class="icon-btn" id="dirBtn" aria-label="目录树"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/><path d="M3 11h18"/></svg></button>
+    <button class="icon-btn theme-toggle" id="themeToggle" aria-label="切换深浅主题">
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></svg>
+    </button>
+    <button class="icon-btn nav-burger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</nav>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="dir-drawer" id="dirDrawer" aria-hidden="true">
+  <div class="dir-drawer-head"><span class="ttl">目录树 · Directory</span><button class="dir-close" id="dirClose" aria-label="关闭">✕</button></div>
+  <div class="dir-tree">
+    <ul>
+      <li class="open"><div class="folder open"><span class="tri">▶</span>工具系列</div>
+        <ul>
+          <li><div class="folder open"><span class="tri">▶</span>把工具用旧</div>
+            <ul><li><a class="leaf" href="post.html">当一支笔被使用三年</a></li><li><div class="leaf">六年的剪刀</div></li></ul>
+          </li>
+          <li><div class="leaf">工具的弧度</div></li>
+        </ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>写作随笔</div>
+        <ul><li><a class="leaf" href="post.html">夜里改掉的一个词</a></li><li><div class="leaf">承认一句话不需要被连起来</div></li></ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>城市</div>
+        <ul><li><div class="leaf">广州的雨有它自己的语法</div></li><li><div class="leaf">北方的秋天</div></li></ul>
+      </li>
+    </ul>
+  </div>
+  <div class="dir-drawer-foot">查看完整目录 ↗</div>
+</aside>
+
+<header class="page-head">
+  <span class="glow glow-a"></span><span class="glow glow-b"></span>
+  <div class="ph-inner">
+    <div class="crumbs"><a href="index.html">首页</a><span>/</span><span>归档</span></div>
+    <h1 class="ph-title">归档</h1>
+    <div class="ph-en">/ Archive · Tags · Directory</div>
+  </div>
+</header>
+
+<div class="tabs" id="tabs">
+  <button class="tab active" data-tab="month">按月份 · Month</button>
+  <button class="tab" data-tab="tag">按标签 · Tag</button>
+  <button class="tab" data-tab="dir">按目录 · Directory</button>
+  <span class="tab-bar" id="tabBar"></span>
+</div>
+
+<div class="tab-panel active" id="panel-month">
+  <div class="year">
+    <div class="year-h">2026 <span class="cnt">28 篇</span></div>
+    <div class="month-block">
+      <div class="month-h">06 月 · June <span class="mc">4 篇</span></div>
+      <a class="month-art" href="post.html"><div><div class="mt">把工具用旧</div><div class="me">06/12 · 随笔 · 工具</div></div><span class="marrow">↗</span></a>
+      <a class="month-art" href="post.html"><div><div class="mt">夜里改掉的一个词</div><div class="me">06/03 · 写作 · 日常</div></div><span class="marrow">↗</span></a>
+      <a class="month-art" href="post.html"><div><div class="mt">剪刀用了六年</div><div class="me">06/01 · 工具 · 随笔</div></div><span class="marrow">↗</span></a>
+    </div>
+    <div class="month-block">
+      <div class="month-h">05 月 · May <span class="mc">6 篇</span></div>
+      <a class="month-art" href="post.html"><div><div class="mt">广州的雨有它自己的语法</div><div class="me">05/21 · 城市 · 随笔</div></div><span class="marrow">↗</span></a>
+      <a class="month-art" href="post.html"><div><div class="mt">承认一句话不需要被连起来</div><div class="me">05/10 · 写作</div></div><span class="marrow">↗</span></a>
+    </div>
+  </div>
+  <div class="year">
+    <div class="year-h">2025 <span class="cnt">41 篇</span></div>
+    <div class="month-block">
+      <div class="month-h">12 月 · December <span class="mc">5 篇</span></div>
+      <a class="month-art" href="post.html"><div><div class="mt">北方的秋天</div><div class="me">12/15 · 城市 · 随笔</div></div><span class="marrow">↗</span></a>
+      <a class="month-art" href="post.html"><div><div class="mt">年终的一支笔</div><div class="me">12/28 · 工具</div></div><span class="marrow">↗</span></a>
+    </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="panel-tag">
+  <div class="tag-cloud" id="tagCloud">
+    <a data-tag="随笔">随笔 24</a><a data-tag="工具">工具 18</a><a data-tag="写作">写作 15</a><a data-tag="城市">城市 12</a>
+    <a data-tag="日常">日常 11</a><a data-tag="代码">代码 9</a><a data-tag="阅读">阅读 8</a><a data-tag="摄影">摄影 7</a>
+    <a data-tag="广州">广州 6</a><a data-tag="排版">排版 5</a><a data-tag="夜读">夜读 4</a><a data-tag="文心雕龙">文心雕龙 3</a>
+  </div>
+  <div class="tag-selected-h" id="tagSelH">选中标签：<b>随笔</b> · 24 篇</div>
+  <div class="alist">
+    <a class="row" href="post.html"><div><div class="rmeta"><span>2026/06/12</span><span>7 分钟</span></div><div class="rt">把工具用旧</div><div class="re">当一支笔被使用三年，它才开始成为你的笔。</div></div><span class="rarrow">↗</span></a>
+    <a class="row" href="post.html"><div><div class="rmeta"><span>2026/05/21</span><span>9 分钟</span></div><div class="rt">广州的雨有它自己的语法</div><div class="re">它先停一句，再补一段。</div></div><span class="rarrow">↗</span></a>
+    <a class="row" href="post.html"><div><div class="rmeta"><span>2025/12/15</span><span>6 分钟</span></div><div class="rt">北方的秋天</div><div class="re">秋天在北方是一下子来的。</div></div><span class="rarrow">↗</span></a>
+    <a class="row" href="post.html"><div><div class="rmeta"><span>2025/12/28</span><span>5 分钟</span></div><div class="rt">年终的一支笔</div><div class="re">年末，给笔做一次清洗。</div></div><span class="rarrow">↗</span></a>
+  </div>
+</div>
+
+<div class="tab-panel" id="panel-dir">
+  <div class="dir-layout">
+    <div class="dir-tree" id="dirTree">
+      <ul>
+        <li class="open"><div class="folder open active"><span class="tri">▶</span>工具系列</div>
+          <ul>
+            <li class="open"><div class="folder open"><span class="tri">▶</span>把工具用旧</div>
+              <ul><li><a class="leaf" href="post.html">当一支笔被使用三年</a></li><li><a class="leaf" href="post.html">剪刀用了六年</a></li></ul>
+            </li>
+            <li><div class="folder"><span class="tri">▶</span>工具的弧度</div>
+              <ul><li><div class="leaf">那道弧</div></li><li><div class="leaf">错位的笔尖</div></li></ul>
+            </li>
+          </ul>
+        </li>
+        <li><div class="folder"><span class="tri">▶</span>写作随笔</div>
+          <ul><li><a class="leaf" href="post.html">夜里改掉的一个词</a></li><li><div class="leaf">承认一句话不需要被连起来</div></li></ul>
+        </li>
+        <li><div class="folder"><span class="tri">▶</span>城市</div>
+          <ul><li><div class="leaf">广州的雨有它自己的语法</div></li><li><div class="leaf">北方的秋天</div></li></ul>
+        </li>
+      </ul>
+    </div>
+    <div class="dir-side" id="dirSide">
+      <div class="tag-selected-h">当前目录：<b>工具系列 / 把工具用旧</b> · 2 篇</div>
+      <div class="alist">
+        <a class="row" href="post.html"><div><div class="rmeta"><span>2026/06/12</span><span>7 分钟</span></div><div class="rt">当一支笔被使用三年</div><div class="re">工具的价值不在新，而在被磨损出的那道弧。</div></div><span class="rarrow">↗</span></a>
+        <a class="row" href="post.html"><div><div class="rmeta"><span>2026/06/01</span><span>6 分钟</span></div><div class="rt">剪刀用了六年</div><div class="re">六年的剪刀，只认一只手。</div></div><span class="rarrow">↗</span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="page-foot">
+  <span>© 2026 小遨</span>
+  <span><a href="subscribe.html">RSS</a> · <a href="index.html">回到首页</a></span>
+</footer>
+
+<script src="common.js"></script>
+<script>
+/* Tab 切换 */
+(function(){
+  var tabs=document.querySelectorAll('.tab'),bar=document.getElementById('tabBar');
+  function moveBar(t){var r=t.getBoundingClientRect();var pr=t.parentElement.getBoundingClientRect();bar.style.left=(r.left-pr.left)+'px';bar.style.width=r.width+'px'}
+  function activate(t){
+    tabs.forEach(function(x){x.classList.remove('active')});
+    t.classList.add('active');moveBar(t);
+    var id='panel-'+t.dataset.tab;
+    document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
+    document.getElementById(id).classList.add('active');
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(){activate(t)})});
+  moveBar(document.querySelector('.tab.active'));
+  window.addEventListener('resize',function(){moveBar(document.querySelector('.tab.active'))});
+  /* hash 定位 tab */
+  var h=location.hash.replace('#','');if(h&&h!==''){var m=document.querySelector('[data-tab="'+h+'"]');if(m)activate(m)}
+})();
+/* 标签云选中 */
+(function(){
+  var cloud=document.getElementById('tagCloud'),h=document.getElementById('tagSelH');
+  cloud.addEventListener('click',function(e){
+    var a=e.target.closest('a[data-tag]');if(!a)return;
+    cloud.querySelectorAll('a').forEach(function(x){x.classList.remove('active')});
+    a.classList.add('active');
+    h.innerHTML='选中标签：<b>'+a.dataset.tag+'</b> · '+a.textContent.trim().split(' ')[1]+' 篇';
+  });
+})();
+/* 目录树折叠 */
+(function(){
+  var tree=document.getElementById('dirTree');
+  tree.addEventListener('click',function(e){
+    var f=e.target.closest('.folder');if(!f)return;
+    var li=f.closest('li');if(!li)return;
+    li.classList.toggle('open');f.classList.toggle('open');
+  });
+})();
+</script>
+</body>
+</html>

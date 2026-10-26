@@ -1,0 +1,151 @@
+{
+  "success": true,
+  "code": "INSPECT_COMPLETED",
+  "message": "Inspect completed",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "source_file": "/Users/pengfanao/code/wwrtpfa.github.io/source/_posts/每周GitHub趋势/2026-10-23-GitHub趋势.md",
+    "source_dir": "/Users/pengfanao/code/wwrtpfa.github.io/source/_posts/每周GitHub趋势",
+    "context": {
+      "mode": "ai",
+      "theme": "autumn-warm",
+      "font_size": "medium",
+      "background_type": "none",
+      "upload": false,
+      "draft": true
+    },
+    "metadata": {
+      "title": {
+        "value": "GitHub 周报：Agent 开始比拼证据链、隔离与恢复",
+        "source": "frontmatter.title",
+        "limit": 32,
+        "length": 29,
+        "valid": true
+      },
+      "author": {
+        "value": "",
+        "source": "fallback.empty",
+        "limit": 16,
+        "length": 0,
+        "valid": true
+      },
+      "digest": {
+        "value": "Agent 项目不再只比工具数量，证据链、隔离执行、状态恢复和权限边界正在成为工程化新门槛。",
+        "source": "frontmatter.description",
+        "limit": 128,
+        "length": 46,
+        "valid": true
+      }
+    },
+    "structure": {
+      "body_h1": {
+        "present": false
+      },
+      "duplicate_title_risk": false,
+      "headings": [
+        {
+          "level": 2,
+          "text": "本周概览"
+        },
+        {
+          "level": 2,
+          "text": "TOP 5 快览"
+        },
+        {
+          "level": 2,
+          "text": "三个项目，三个工程问题"
+        },
+        {
+          "level": 3,
+          "text": "rea：回答不够，必须返回证据"
+        },
+        {
+          "level": 3,
+          "text": "ruflo：能力很多，治理成本也会一起上升"
+        },
+        {
+          "level": 3,
+          "text": "orca：先隔离执行，再比较谁做得更好"
+        },
+        {
+          "level": 2,
+          "text": "与上周相比：热度在迁移到哪里"
+        },
+        {
+          "level": 2,
+          "text": "其他热门项目"
+        },
+        {
+          "level": 2,
+          "text": "本周最值得看"
+        },
+        {
+          "level": 2,
+          "text": "趋势观察"
+        },
+        {
+          "level": 2,
+          "text": "来源"
+        }
+      ],
+      "images": {
+        "total": 3,
+        "local": 0,
+        "remote": 3,
+        "ai": 0
+      }
+    },
+    "assets": [
+      {
+        "index": 0,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-poster-v2-1080x1350.png",
+        "exists": true
+      },
+      {
+        "index": 1,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-agent-chain-1080x720.png",
+        "exists": true
+      },
+      {
+        "index": 2,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-decision-matrix-1080x720.png",
+        "exists": true
+      }
+    ],
+    "readiness": {
+      "convert_ready": true,
+      "upload_ready": true,
+      "draft_ready": true,
+      "preview_fidelity": "degraded",
+      "schema_version": "v1",
+      "targets": {
+        "preview": "degraded",
+        "convert": "ready",
+        "upload": "ready",
+        "draft": "ready"
+      },
+      "blockers": []
+    },
+    "checks": [
+      {
+        "level": "info",
+        "code": "DIGEST_METADATA_ONLY",
+        "message": "Digest affects draft metadata, not body HTML rendering",
+        "field": "digest",
+        "suggested_fix": "use body content or theme behavior to control visible article summary inside the HTML"
+      },
+      {
+        "level": "info",
+        "code": "AI_MODE_ACTION_REQUIRED",
+        "message": "AI mode produces a prompt/request instead of final HTML until an external model completes the flow",
+        "field": "mode",
+        "suggested_fix": "use --mode api for exact preview or complete the AI prompt externally"
+      }
+    ]
+  }
+}

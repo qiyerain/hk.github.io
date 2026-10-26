@@ -1,0 +1,152 @@
+{
+  "run_id": "2026-10-23-github-weekly",
+  "execution_id": "github-20261023T180308+0800",
+  "updated_at": "2026-10-25T00:39:18+08:00",
+  "markdown_path": "source/_posts/每周GitHub趋势/2026-10-23-GitHub趋势.md",
+  "markdown_sha256": "817d113e68141bebf17c3f1013181d116ac04c3d7f391bc0be341b254ea76197",
+  "wechat_html_path": "drafts/wechat/2026-10-23-github-weekly/wechat.html",
+  "wechat_html_sha256": "35d813d07cb94f2e3bbbd1cdffccb34a56b09183570ad8ae6e887f570c1fb916",
+  "stages": {
+    "research": {
+      "ok": true,
+      "status": "completed",
+      "source": "https://github.com/trending?since=weekly",
+      "captured_at": "2026-10-23T18:17:34+08:00",
+      "visible_repository_count": 15,
+      "snapshot": "drafts/wechat/2026-10-23-github-weekly/research.json"
+    },
+    "visuals": {
+      "ok": true,
+      "status": "completed",
+      "visual_plan": "drafts/wechat/2026-10-23-github-weekly/visual-plan.json",
+      "template": "data-terminal",
+      "renderer": "pfa-content-generate-image",
+      "canvas_count": 5,
+      "dimension_check": "native 1600x900 blog cover, native 1080x460 WeChat cover, 1080x1350 portrait poster, two 1080x720 infographics",
+      "visual_review": "passed previous-issue comparison and dimension checks; WeChat cover now contains three content-backed icon cards for evidence, isolation, and recovery; no stretched cover, clipping, overlap, garbled text, or icon fallback"
+    },
+    "oss_upload": {
+      "ok": true,
+      "status": "completed",
+      "script": "scripts_py/picgo_upload.py",
+      "image_count": 6,
+      "completed_at": "2026-10-25T00:21:09+08:00"
+    },
+    "blog": {
+      "ok": true,
+      "status": "local_verified",
+      "built": true,
+      "audit_passed": true,
+      "pushed": false,
+      "previous_commit": "bd508b0f2a11a6a15dfa6c0a24a6dc7698a85edb",
+      "preview_url": "http://localhost:4017/2026/10/23/每周GitHub趋势/2026-10-23-GitHub趋势/",
+      "live_url": "https://blog.pengfanao.top/2026/10/23/每周GitHub趋势/2026-10-23-GitHub趋势/",
+      "browser_verification": {
+        "style_pack": "A",
+        "body_background": "rgb(255, 255, 255)",
+        "layout_background": "rgb(255, 255, 255)",
+        "text_color": "rgb(15, 15, 15)",
+        "mobile_viewport": "489x650@2x",
+        "desktop_screenshot": "1440x900",
+        "image_dimensions": [
+          "1080x1350 -> 417x521",
+          "1080x720 -> 417x279",
+          "1080x720 -> 417x279"
+        ],
+        "max_ratio_delta": 0.0036
+      }
+    },
+    "wechat_render": {
+      "ok": true,
+      "status": "completed",
+      "theme": "autumn-warm",
+      "md2wechat_mode": "ai",
+      "md2wechat_result": "inspect completed; API preview degraded because the configured key format is invalid; final snippet rendered deterministically with project Style Pack C",
+      "fallback": "project Style Pack C with platform cover excluded",
+      "experience_validation": true,
+      "ul_count": 0,
+      "li_count": 0,
+      "ol_count": 0,
+      "image_count": 3,
+      "anchor_count": 23,
+      "content_safety_hits": [],
+      "experience_validation_note": "唯一竖版摘要海报 + 两张不同结论的正文信息图；博客和微信平台封面均未插入正文；width:100% and height:auto verified; 23 clickable anchors, no visible Markdown links or raw URLs, five TOP entries aligned at paragraph start."
+    },
+    "draft": {
+      "ok": true,
+      "status": "completed",
+      "operation": "draft/update",
+      "media_id": "zdr76s0MQZwqyFoO5jodPMNex5L83YT2JAHXQobLTi5iO-SWjm7UyVKnkT7wUE4n",
+      "updated_at": "2026-10-25T00:35:39+08:00",
+      "verification": {
+        "title": "GitHub 周报：Agent 开始比拼证据链、隔离与恢复",
+        "digest": "Agent 项目不再只比工具数量，证据链、隔离执行、状态恢复和权限边界正在成为工程化新门槛。",
+        "thumb_media_id": "zdr76s0MQZwqyFoO5jodPGevipgQTcqs_br_Djr3nmxwX0jqi73rAUjh-0mLiup7",
+        "content_source_url": "https://blog.pengfanao.top/2026/10/23/每周GitHub趋势/2026-10-23-GitHub趋势/",
+        "img_count": 3,
+        "ul_count": 0,
+        "li_count": 0,
+        "anchor_count": 0,
+        "visible_markdown_links": false,
+        "visible_raw_urls": false,
+        "top5_count": 5,
+        "link_fallback": "WeChat stripped external body anchors; content_source_url remains the clickable path to the blog",
+        "verified_at": "2026-10-25T00:35:40+08:00"
+      }
+    }
+  },
+  "collection": {
+    "name": "GitHub趋势",
+    "archived": true,
+    "status": "local_verified",
+    "category": "GitHub周周趋势",
+    "url": "http://localhost:4017/github-trends/",
+    "title_present": true,
+    "latest_snapshot": "2026 / 10 / 23"
+  },
+  "wechat_token_precheck": {
+    "ok": true,
+    "checked_at": "2026-10-25T00:39:18+08:00",
+    "expires_in": 7200,
+    "action": "verified existing draft, performed one draft/update, then confirmed remote link fallback with draft/get"
+  },
+  "md2wechat_readiness": {
+    "overall": "ready",
+    "format_api": false,
+    "advanced_layout": false,
+    "draft": true,
+    "default_mode": "ai"
+  },
+  "assets": [
+    {
+      "role": "blog_cover",
+      "path": ".cache/github-weekly-2026-10-23/visuals-v2/final/github-weekly-2026-10-23-cover-v3-1600x900.png",
+      "sha256": "94366a38f5abd1f92b0fc8bcb5e3a28988e406a357b96a7f9164cd9eb74772e4",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-cover-v3-1600x900.png"
+    },
+    {
+      "role": "portrait_poster",
+      "path": ".cache/github-weekly-2026-10-23/visuals-v2/final/github-weekly-2026-10-23-poster-v2-1080x1350.png",
+      "sha256": "45e93656a81164407d2cdfffe350b4bea97bc28df67597875c934d84707d1550",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-poster-v2-1080x1350.png"
+    },
+    {
+      "role": "selection_infographic",
+      "path": ".cache/github-weekly-2026-10-23/visuals-v2/final/github-weekly-2026-10-23-decision-matrix-1080x720.png",
+      "sha256": "987318e79e8f277cc80538f75a920f9f599573b3eb3eca719ba60460f0d4e3f9",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-decision-matrix-1080x720.png"
+    },
+    {
+      "role": "trend_infographic",
+      "path": ".cache/github-weekly-2026-10-23/visuals-v2/final/github-weekly-2026-10-23-agent-chain-1080x720.png",
+      "sha256": "6076ef54ccc980cd5def445db975566314fbf4519c6f8ce63765433513e61f28",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-agent-chain-1080x720.png"
+    },
+    {
+      "role": "wechat_cover",
+      "path": ".cache/github-weekly-2026-10-23/visuals-v3/github-weekly-2026-10-23-wechat-cover-v3-1080x460.png",
+      "sha256": "d0a1a5ebef12974b248031486be60b37a621b6671694126aa8d224a2d4b6cae3",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-wechat-cover-v3-1080x460.png"
+    }
+  ]
+}

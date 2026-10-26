@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>小遨的个人博客 · 首页</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="common.css" />
+<style>
+/* 首页专属 */
+.hero{position:relative;min-height:100vh;display:flex;align-items:flex-end;padding:0 var(--pad-x) clamp(80px,12vh,140px);overflow:hidden}
+.hero-video{position:absolute;inset:0;z-index:0;overflow:hidden}
+.hero-video video{width:100%;height:100%;object-fit:cover;transform:scale(1.04);will-change:filter,transform}
+.hero-veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,var(--veil-top) 0%,transparent 30%,transparent 45%,var(--veil-bottom) 100%),radial-gradient(120% 80% at 70% 20%,transparent 0%,rgba(0,0,0,.25) 100%)}
+.hero .glow{z-index:2}
+.glow-a{width:46vw;height:46vw;left:-8vw;top:8vh}
+.glow-b{width:38vw;height:38vw;right:-6vw;top:4vh}
+.glow-c{width:30vw;height:30vw;right:18vw;bottom:-6vh}
+.hero-inner{position:relative;z-index:3;width:100%;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:clamp(24px,3vw,40px);align-items:end}
+.hero-title-card{padding:clamp(32px,4vw,56px)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--fg-dim);display:flex;align-items:center;gap:10px}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--fg)}
+.hero-title{font-family:var(--serif);font-weight:700;font-size:clamp(48px,9vw,132px);line-height:0.96;letter-spacing:-0.02em;margin:22px 0 0}
+.hero-title .line{display:block;overflow:hidden}
+.hero-title .line span{display:block;transform:translateY(110%);transition:transform 1.1s var(--ease-rev)}
+.hero-title.is-in .line span{transform:translateY(0)}
+.hero-title .line:nth-child(2) span{transition-delay:.14s}
+.hero-sub{margin-top:28px;font-family:var(--mono);font-size:clamp(13px,1.1vw,15px);color:var(--fg-soft);letter-spacing:.02em;opacity:0;transform:translateY(12px);transition:opacity .8s ease .5s,transform .8s var(--ease-out) .5s}
+.hero-title.is-in ~ .hero-sub{opacity:1;transform:none}
+.hero-side{display:flex;flex-direction:column;gap:16px;padding-bottom:6px}
+.side-card{padding:22px 24px;display:flex;flex-direction:column;gap:14px;cursor:pointer;transition:transform .4s var(--ease-out),background .4s ease}
+.side-card:hover{transform:translateY(-3px)}
+.side-card .tag{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--fg-dim)}
+.side-card .ttl{font-size:18px;font-weight:600;line-height:1.35}
+.side-card .arrow{align-self:flex-end;font-family:var(--mono);font-size:14px;color:var(--fg-soft);transition:transform .3s var(--ease-out)}
+.side-card:hover .arrow{transform:translate(4px,-4px)}
+.side-card .row-list{display:flex;flex-direction:column;gap:10px;margin-top:2px}
+.side-card .row-list .it{font-size:13px;color:var(--fg-soft);display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid var(--line)}
+.side-card .row-list .it:first-child{border-top:none}
+.side-card .row-list .it b{font-weight:500;color:var(--fg)}
+.side-card .row-list .it span{font-family:var(--mono);font-size:11px;color:var(--fg-dim)}
+.qr-mini{width:30px;height:30px;border-radius:6px;background:var(--muted);display:inline-grid;place-items:center;font-size:9px;color:var(--fg-dim);font-family:var(--mono);vertical-align:middle;margin-right:6px}
+.scroll-hint{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:4;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--fg-soft);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.85}
+.scroll-hint .pip{width:5px;height:5px;border-radius:50%;background:var(--fg);animation:pip 1.8s ease-in-out infinite}
+@keyframes pip{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(8px);opacity:1}}
+.articles{display:flex;flex-direction:column;max-width:1200px;margin:0 auto}
+.art-row{position:relative;display:grid;grid-template-columns:1fr auto;align-items:center;gap:24px;padding:clamp(28px,4vh,44px) 8px;border-top:1px solid var(--border);cursor:pointer;transition:background .28s ease,padding .28s ease}
+.art-row:last-child{border-bottom:1px solid var(--border)}
+.art-row:hover{background:var(--muted)}
+.art-meta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-dim);display:flex;gap:16px;margin-bottom:14px}
+.art-title{font-family:var(--serif);font-weight:600;font-size:clamp(24px,3vw,40px);line-height:1.15;transition:transform .34s var(--ease-out)}
+.art-row:hover .art-title{transform:translateX(12px)}
+.art-excerpt{margin-top:12px;color:var(--fg-soft);font-size:15px;max-width:62ch}
+.art-tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.art-arrow{font-family:var(--mono);font-size:22px;color:var(--fg-dim);transition:transform .34s var(--ease-out),color .28s ease}
+.art-row:hover .art-arrow{transform:rotate(-45deg) scale(1.15);color:var(--fg)}
+.art-cover{position:absolute;right:clamp(40px,8vw,120px);top:50%;width:260px;height:168px;border-radius:14px;overflow:hidden;transform:translateY(-50%) translateX(24px);opacity:0;pointer-events:none;transition:opacity .34s var(--ease-out),transform .44s var(--ease-out);box-shadow:0 18px 50px rgba(0,0,0,.5);border:1px solid var(--glass-border)}
+.art-cover img{width:100%;height:100%;object-fit:cover}
+.art-row:hover .art-cover{opacity:1;transform:translateY(-50%) translateX(0)}
+.now-grid{display:grid;grid-template-columns:5fr 7fr;gap:clamp(32px,5vw,80px);max-width:1200px;margin:0 auto}
+.now-lead{font-size:clamp(18px,1.6vw,22px);line-height:1.8;color:var(--fg-soft)}
+.now-list{display:flex;flex-direction:column}
+.now-item{display:grid;grid-template-columns:120px 1fr;gap:24px;padding:26px 0;border-top:1px solid var(--border)}
+.now-item:last-child{border-bottom:1px solid var(--border)}
+.now-item .k{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-dim);padding-top:4px}
+.now-item .v{font-size:16px;line-height:1.6}
+.archive-grid{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:clamp(32px,4vw,64px);max-width:1200px;margin:0 auto}
+.col-h{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:20px}
+.years{display:flex;flex-direction:column}
+.year-row{display:flex;align-items:baseline;justify-content:space-between;padding:18px 0;border-top:1px solid var(--border);font-family:var(--serif);font-weight:600;font-size:clamp(26px,3.4vw,42px);cursor:pointer;transition:padding .3s var(--ease-out)}
+.year-row:last-of-type{border-bottom:1px solid var(--border)}
+.year-row .cnt{font-family:var(--mono);font-size:12px;color:var(--fg-dim);letter-spacing:.1em;opacity:0;transform:translateX(-8px);transition:all .3s var(--ease-out)}
+.year-row:hover{padding-left:16px}
+.year-row:hover .cnt{opacity:1;transform:none}
+.year-row .tri{font-size:11px;color:var(--fg-dim);transition:transform .24s var(--ease-out)}
+.year-row.open .tri{transform:rotate(90deg)}
+.month-list{display:none;padding:6px 0 14px 16px;border-bottom:1px solid var(--border)}
+.year-row.open + .month-list{display:block}
+.month-list a{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-family:var(--mono);font-size:13px;color:var(--fg-soft);transition:color .2s ease,padding .2s ease}
+.month-list a:hover{color:var(--fg);padding-left:6px}
+.month-list a span{font-size:11px;color:var(--fg-dim)}
+.dir-mini{font-family:var(--mono);font-size:13px;color:var(--fg-soft)}
+.dir-mini ul{list-style:none;padding-left:16px;position:relative;border-left:1px solid var(--dir-line)}
+.dir-mini li{padding:5px 0 5px 12px;position:relative}
+.dir-mini li::before{content:"";position:absolute;left:-1px;top:14px;width:10px;height:1px;background:var(--dir-line)}
+.dir-mini .folder{color:var(--fg-soft);display:flex;gap:6px;align-items:center}
+.dir-mini .leaf{color:var(--fg-dim)}
+.dir-mini-more{margin-top:16px;display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--fg-soft);cursor:pointer}
+.dir-mini-more:hover{color:var(--fg)}
+.friends-mini{display:grid;grid-template-columns:1fr;gap:10px}
+.friend-mini{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-card);transition:background .3s ease,transform .3s var(--ease-out)}
+.friend-mini:hover{background:var(--muted);transform:translateY(-2px)}
+.friend-mini .fn{font-size:15px;font-weight:600}
+.friend-mini .fd{font-family:var(--mono);font-size:11px;color:var(--fg-dim)}
+.footer{position:relative;z-index:5;background:var(--bg);border-top:1px solid var(--border);padding:70px var(--pad-x) 50px;display:flex;flex-direction:column;gap:32px}
+.tag-cloud-h{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:14px}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:10px}
+.tag-cloud a{font-family:var(--mono);padding:6px 14px;border-radius:var(--radius-pill);background:var(--tag-bg);color:var(--tag-fg);font-size:13px;transition:background .25s ease,color .25s ease,transform .25s ease}
+.tag-cloud a:hover{background:var(--fg);color:var(--bg);transform:translateY(-2px)}
+.foot-links{display:flex;gap:28px;flex-wrap:wrap}
+.foot-links a{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-soft);position:relative}
+.foot-links a::after{content:"";position:absolute;left:0;bottom:-3px;height:1px;width:0;background:var(--fg);transition:width .26s var(--ease-out)}
+.foot-links a:hover::after{width:100%}
+.foot-copy{font-family:var(--mono);font-size:11px;color:var(--fg-dim);letter-spacing:.08em}
+@media (max-width:980px){.archive-grid{grid-template-columns:1fr;gap:48px}}
+@media (max-width:860px){.hero-inner{grid-template-columns:1fr;gap:20px}.hero-side{flex-direction:row}.side-card{flex:1}.now-grid{grid-template-columns:1fr}.friends-mini{grid-template-columns:1fr}.art-cover{display:none}.art-row:hover .art-title{transform:none}.glow{filter:blur(60px)}}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav-brand" onclick="location.href='index.html'">小遨的个人博客</div>
+  <ul class="nav-center">
+    <li class="nav-item">
+      <button class="nav-link">文章 <span class="caret">▾</span></button>
+      <ul class="nav-drop">
+        <li><a href="archive.html">全部文章 <span>All</span></a></li>
+        <li><a href="archive.html#month">按月份 <span>By Month</span></a></li>
+        <li><a href="archive.html#tag">按标签 <span>By Tag</span></a></li>
+        <li><a href="archive.html#dir">按目录 <span>By Dir</span></a></li>
+      </ul>
+    </li>
+    <li class="nav-item"><a class="nav-link" href="albums.html">相册</a></li>
+    <li class="nav-item"><a class="nav-link" href="friends.html">友链</a></li>
+    <li class="nav-item"><a class="nav-link" href="wechat.html">公众号</a></li>
+    <li class="nav-item"><a class="nav-link" href="about.html">关于</a></li>
+  </ul>
+  <div class="nav-tools">
+    <button class="icon-btn" aria-label="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+    <button class="icon-btn" id="dirBtn" aria-label="目录树"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/><path d="M3 11h18"/></svg></button>
+    <button class="icon-btn theme-toggle" id="themeToggle" aria-label="切换深浅主题">
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></svg>
+    </button>
+    <button class="icon-btn nav-burger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</nav>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="dir-drawer" id="dirDrawer" aria-hidden="true">
+  <div class="dir-drawer-head"><span class="ttl">目录树 · Directory</span><button class="dir-close" id="dirClose" aria-label="关闭">✕</button></div>
+  <div class="dir-tree">
+    <ul>
+      <li class="open"><div class="folder open"><span class="tri">▶</span>工具系列</div>
+        <ul>
+          <li><div class="folder"><span class="tri">▶</span>把工具用旧</div>
+            <ul><li><a class="leaf" href="post.html">当一支笔被使用三年</a></li><li><div class="leaf">六年的剪刀</div></li></ul>
+          </li>
+          <li><div class="leaf">工具的弧度</div></li>
+        </ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>写作随笔</div>
+        <ul><li><a class="leaf" href="post.html">夜里改掉的一个词</a></li><li><div class="leaf">承认一句话不需要被连起来</div></li></ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>城市</div>
+        <ul><li><div class="leaf">广州的雨有它自己的语法</div></li><li><div class="leaf">北方的秋天</div></li></ul>
+      </li>
+    </ul>
+  </div>
+  <div class="dir-drawer-foot">查看完整目录 ↗</div>
+</aside>
+
+<header class="hero" id="hero">
+  <div class="hero-video">
+    <video id="heroVideo" autoplay muted loop playsinline preload="metadata" poster="https://picsum.photos/seed/xiaoao-hero/1600/900">
+      <source src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/Video/flower_person_loop_downloadable.mp4" type="video/mp4" />
+    </video>
+  </div>
+  <div class="hero-veil"></div>
+  <span class="glow glow-a"></span><span class="glow glow-b"></span><span class="glow glow-c"></span>
+  <div class="hero-inner">
+    <div class="glass hero-title-card">
+      <div class="eyebrow"><span class="dot"></span> XIAO AO · 个人博客 · 2026</div>
+      <h1 class="hero-title" id="heroTitle">
+        <span class="line"><span>小遨的</span></span>
+        <span class="line"><span>个人博客</span></span>
+      </h1>
+      <p class="hero-sub">广州 · 正在写《把工具用旧》系列 · 2026 / 06</p>
+    </div>
+    <div class="hero-side">
+      <a class="glass side-card" href="post.html">
+        <div class="tag">最新 · Latest</div>
+        <div class="ttl">把工具用旧</div>
+        <div class="row-list">
+          <div class="it"><b>当一支笔被使用三年</b><span>06/12</span></div>
+          <div class="it"><b>夜里改掉的一个词</b><span>06/03</span></div>
+        </div>
+        <div class="arrow">↗</div>
+      </a>
+      <a class="glass side-card" href="subscribe.html">
+        <div class="tag">订阅 · Subscribe</div>
+        <div class="ttl">每周一封，关于工具与写作</div>
+        <div class="row-list">
+          <div class="it"><b>RSS</b><span>/feed.xml</span></div>
+          <div class="it"><b><span class="qr-mini">QR</span>公众号</b><span>xiaoao</span></div>
+        </div>
+        <div class="arrow">↗</div>
+      </a>
+    </div>
+  </div>
+  <div class="scroll-hint"><span>Scroll</span><span class="pip"></span></div>
+</header>
+
+<section class="section" id="articles">
+  <div class="sec-head reveal"><span class="sec-num">S — 01</span><h2 class="sec-title">最新文章</h2><span class="sec-en">/ Recent</span></div>
+  <div class="articles reveal-stagger">
+    <a class="art-row" href="post.html">
+      <div>
+        <div class="art-meta"><span>01 — 2026 / 06 / 12</span><span>阅读 7 分钟</span></div>
+        <h3 class="art-title">把工具用旧</h3>
+        <p class="art-excerpt">当一支笔被使用三年，它才开始成为你的笔。工具的价值不在新，而在被磨损出的那道弧。</p>
+        <div class="art-tags"><span class="tag-pill">随笔</span><span class="tag-pill">工具</span></div>
+      </div>
+      <div class="art-arrow">↗</div>
+      <div class="art-cover"><img src="https://picsum.photos/seed/xiaoao-tools/520/340" alt="" loading="lazy" /></div>
+    </a>
+    <a class="art-row" href="post.html">
+      <div>
+        <div class="art-meta"><span>02 — 2026 / 06 / 03</span><span>阅读 5 分钟</span></div>
+        <h3 class="art-title">夜里改掉的一个词</h3>
+        <p class="art-excerpt">凌晨两点把"因此"删掉，换成空格。写作有时就是承认一句话不需要被连起来。</p>
+        <div class="art-tags"><span class="tag-pill">写作</span><span class="tag-pill">日常</span></div>
+      </div>
+      <div class="art-arrow">↗</div>
+      <div class="art-cover"><img src="https://picsum.photos/seed/xiaoao-night/520/340" alt="" loading="lazy" /></div>
+    </a>
+    <a class="art-row" href="post.html">
+      <div>
+        <div class="art-meta"><span>03 — 2026 / 05 / 21</span><span>阅读 9 分钟</span></div>
+        <h3 class="art-title">广州的雨有它自己的语法</h3>
+        <p class="art-excerpt">它先停一句，再补一段。像不愿意一次说完的人，把整座城市拖进它的停顿里。</p>
+        <div class="art-tags"><span class="tag-pill">城市</span><span class="tag-pill">随笔</span></div>
+      </div>
+      <div class="art-arrow">↗</div>
+      <div class="art-cover"><img src="https://picsum.photos/seed/xiaoao-rain/520/340" alt="" loading="lazy" /></div>
+    </a>
+  </div>
+</section>
+
+<section class="section" id="now">
+  <div class="sec-head reveal"><span class="sec-num">S — 02</span><h2 class="sec-title">正在 / Now</h2><span class="sec-en">/ Current</span></div>
+  <div class="now-grid">
+    <p class="now-lead reveal">六月，把博客重做了一遍。想让它更像一间可以反复回去的房间，而不是一面贴满通知的墙。在写《把工具用旧》系列，在重新读《文心雕龙》。</p>
+    <div class="now-list reveal-stagger">
+      <div class="now-item"><div class="k">在读</div><div class="v">《文心雕龙》刘勰 —— 慢，但每一句都值得停。</div></div>
+      <div class="now-item"><div class="k">在写</div><div class="v">《把工具用旧》系列，第三篇关于一把用了六年的剪刀。</div></div>
+      <div class="now-item"><div class="k">在做</div><div class="v">把博客的阅读体验调成"夜读"优先，玻璃与光晕是新的骨架。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="archives">
+  <div class="sec-head reveal"><span class="sec-num">S — 03</span><h2 class="sec-title">归档 & 目录 & 友链</h2><span class="sec-en">/ Archive · Dirs · Links</span></div>
+  <div class="archive-grid">
+    <div class="reveal">
+      <div class="col-h">按月份 · By Month</div>
+      <div class="years">
+        <div class="year-row" data-year>2026 <span><span class="tri">▸</span> <span class="cnt">28 篇</span></span></div>
+        <div class="month-list">
+          <a href="archive.html#month"><span>06 月</span><span>4 篇</span></a>
+          <a href="archive.html#month"><span>05 月</span><span>6 篇</span></a>
+          <a href="archive.html#month"><span>04 月</span><span>5 篇</span></a>
+          <a href="archive.html#month"><span>03 月</span><span>7 篇</span></a>
+          <a href="archive.html#month"><span>02 月</span><span>4 篇</span></a>
+          <a href="archive.html#month"><span>01 月</span><span>2 篇</span></a>
+        </div>
+        <div class="year-row" data-year>2025 <span><span class="tri">▸</span> <span class="cnt">41 篇</span></span></div>
+        <div class="month-list">
+          <a href="archive.html#month"><span>12 月</span><span>5 篇</span></a>
+          <a href="archive.html#month"><span>11 月</span><span>3 篇</span></a>
+          <a href="archive.html#month"><span>10 月</span><span>4 篇</span></a>
+        </div>
+        <div class="year-row" data-year>2024 <span><span class="tri">▸</span> <span class="cnt">33 篇</span></span></div>
+        <div class="month-list">
+          <a href="archive.html#month"><span>12 月</span><span>4 篇</span></a>
+          <a href="archive.html#month"><span>09 月</span><span>6 篇</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="reveal" id="dirs">
+      <div class="col-h">按目录 · By Directory</div>
+      <div class="dir-mini">
+        <ul>
+          <li><div class="folder">▶ 工具系列</div></li>
+          <li><div class="folder">▶ 写作随笔</div></li>
+          <li><div class="folder">▶ 城市</div></li>
+          <li><div class="leaf">北方的秋天</div></li>
+          <li><div class="leaf">夜里改掉的一个词</div></li>
+        </ul>
+      </div>
+      <a class="dir-mini-more" id="dirMiniMore">查看完整目录 ↗</a>
+    </div>
+    <div class="reveal" id="friends">
+      <div class="col-h">友链 · Links</div>
+      <div class="friends-mini">
+        <a class="friend-mini" href="friends.html"><span class="fn">友邻甲</span><span class="fd">写代码与做饭</span></a>
+        <a class="friend-mini" href="friends.html"><span class="fn">慢半拍</span><span class="fd">关于慢的实践</span></a>
+        <a class="friend-mini" href="friends.html"><span class="fn">北窗</span><span class="fd">摄影与文字</span></a>
+        <a class="friend-mini" href="friends.html"><span class="fn">字与灰</span><span class="fd">排版实验笔记</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer" id="about">
+  <div>
+    <div class="tag-cloud-h">标签 · Tags</div>
+    <div class="tag-cloud">
+      <a href="archive.html#tag">随笔 24</a><a href="archive.html#tag">工具 18</a><a href="archive.html#tag">写作 15</a><a href="archive.html#tag">城市 12</a>
+      <a href="archive.html#tag">日常 11</a><a href="archive.html#tag">代码 9</a><a href="archive.html#tag">阅读 8</a><a href="archive.html#tag">摄影 7</a>
+      <a href="archive.html#tag">广州 6</a><a href="archive.html#tag">排版 5</a><a href="archive.html#tag">夜读 4</a><a href="archive.html#tag">文心雕龙 3</a>
+    </div>
+  </div>
+  <div class="foot-links">
+    <a href="mailto:xiaoao@example.com">写信给我</a>
+    <a href="wechat.html">公众号</a>
+    <a href="subscribe.html">RSS</a>
+    <a href="index.html">站点地图</a>
+    <a href="#hero">回到顶部</a>
+  </div>
+  <div class="foot-copy">© 2026 小遨 · 用文字与代码，把每天活成一篇随笔。</div>
+</footer>
+
+<script src="common.js"></script>
+<script>
+/* Hero 标题揭幕 */
+(function(){var t=document.getElementById('heroTitle');if(t)requestAnimationFrame(function(){setTimeout(function(){t.classList.add('is-in')},150)})})();
+/* Hero 滚动联动：视频模糊+压暗 */
+(function(){
+  var hero=document.getElementById('hero'),video=document.getElementById('heroVideo');
+  var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!hero||!video||reduced)return;
+  var ticking=false;
+  window.addEventListener('scroll',function(){
+    if(ticking)return;ticking=true;
+    requestAnimationFrame(function(){
+      var p=Math.min(Math.max(window.scrollY/hero.offsetHeight,0),1);
+      video.style.filter='blur('+(p*14).toFixed(2)+'px) brightness('+(1-p*0.55).toFixed(3)+')';
+      video.style.transform='scale('+(1.04+p*0.06).toFixed(3)+')';
+      hero.style.opacity=(1-p*0.4).toFixed(3);
+      ticking=false;
+    });
+  },{passive:true});
+})();
+/* 年份展开月份 */
+(function(){document.querySelectorAll('.year-row[data-year]').forEach(function(row){row.addEventListener('click',function(){var ml=row.nextElementSibling;if(ml&&ml.classList.contains('month-list'))row.classList.toggle('open')})})})();
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "kind": "diagram",
+  "title": "Agent 工程链路",
+  "headline": "会调用工具，只是起点",
+  "deck": "能力入口、执行状态、隔离协作和证据验证正在连成系统",
+  "date": "2026-10-23",
+  "date_label": "2026 年第 43 周",
+  "captured_at": "2026-10-23T18:17:34+08:00",
+  "channel": "blog-wechat",
+  "aspect": "inline",
+  "template_id": "data-terminal",
+  "source_label": "项目 README / Release / Security 文档",
+  "source_urls": ["https://github.com/anthropics/claude-plugins-official", "https://github.com/ruvnet/ruflo", "https://github.com/stablyai/orca", "https://github.com/morluto/rea"],
+  "source_files": ["source/_posts/每周GitHub趋势/2026-10-23-GitHub趋势.md"],
+  "cta": "真正的门槛：权限可控、状态可恢复、结果可复核",
+  "items": [
+    {"id":"entry","name":"能力入口","description":"插件与 CLI 暴露工具","category":"plugins / CLI-Anything","icon_key":"plugin-cursor"},
+    {"id":"orchestration","name":"编排与状态","description":"任务、记忆、RAG","category":"ruflo / ai-memory","icon_key":"agent-radar"},
+    {"id":"isolation","name":"隔离与比较","description":"独立 worktree 并行","category":"orca","icon_key":"ui-window"},
+    {"id":"evidence","name":"证据与复核","description":"工具证据、限制、人工验证","category":"rea / ghidra","icon_key":"reverse-engineering-chip"}
+  ],
+  "edges": [
+    {"from":"entry","to":"orchestration","label":"能力进入任务"},
+    {"from":"orchestration","to":"isolation","label":"并发执行不互相污染"},
+    {"from":"isolation","to":"evidence","label":"比较输出并保留证据"}
+  ]
+}

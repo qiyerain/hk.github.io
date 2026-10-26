@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="600" viewBox="0 0 2400 600" role="img" aria-label="AI Agent、Java 后端与工程实践知识结构图">
+  <defs><pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#aecdc7" stroke-opacity=".1"/></pattern></defs>
+  <rect width="2400" height="600" fill="#102026"/><rect width="2400" height="600" fill="url(#grid)"/>
+  <path d="M1160 300 H1400 L1490 150 H1530 M1400 300 L1490 475 H1530" fill="none" stroke="#95adaf" stroke-opacity=".65" stroke-width="5"/>
+  <circle cx="1400" cy="300" r="24" fill="#83e2bd"/><circle cx="1530" cy="150" r="14" fill="#83e2bd"/><circle cx="1530" cy="475" r="14" fill="#9ecfe8"/>
+  <rect x="1530" y="74" width="360" height="98" rx="8" fill="#1b3036" stroke="#83e2bd" stroke-width="3"/><text x="1558" y="137" fill="#f6faf7" font-size="38" font-weight="700" font-family="Arial,sans-serif">AI Agent</text><rect x="1530" y="250" width="360" height="98" rx="8" fill="#1b3036" stroke="#ffbd7e" stroke-width="3"/><text x="1558" y="313" fill="#f6faf7" font-size="38" font-weight="700" font-family="Arial,sans-serif">Java · Backend</text><rect x="1530" y="426" width="360" height="98" rx="8" fill="#1b3036" stroke="#9ecfe8" stroke-width="3"/><text x="1558" y="489" fill="#f6faf7" font-size="38" font-weight="700" font-family="Arial,sans-serif">Tools · Practice</text>
+  <path d="M1900 150 H2320 M1900 300 H2320 M1900 445 H2320" stroke="#81a29d" stroke-opacity=".35" stroke-width="3" stroke-dasharray="8 12"/>
+</svg>

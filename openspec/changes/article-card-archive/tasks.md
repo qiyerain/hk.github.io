@@ -1,0 +1,5 @@
+- [x] Remove duplicate `专题` header navigation
+- [x] Enable 12-item newest-first archive pagination
+- [x] Replace article stream with responsive cover cards
+- [x] Replace oversized topic page with compact directory archive
+- [x] Verify desktop/mobile cards, pagination, links, build, and audits

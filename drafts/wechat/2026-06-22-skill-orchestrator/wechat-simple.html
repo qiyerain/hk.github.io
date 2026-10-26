@@ -1,0 +1,23 @@
+<section style="font-family:sans-serif;color:#1a1a1a;font-size:16px;line-height:1.85;padding:24px 16px;max-width:680px;margin:0 auto">
+<h1 style="font-size:28px;font-weight:700;color:#0f0f0f;margin:24px 0 16px">当 AI 学会排版：3 个开源工具的编排实践</h1>
+<blockquote style="background:#f7f7f7;border-left:3px solid #0f0f0f;padding:14px 18px;margin:18px 0;color:#222;font-size:16px;line-height:1.8">你将学到：如何将 3 个独立的工具组合成端到端的内容发布引擎。</blockquote>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">每次写完一篇技术文章，我都要重复三个痛苦步骤：调样式让它适配平台、手动上传图片、再在后台粘贴排版。一篇文章光搬砖就要 40 分钟。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">更糟的是，市面上的工具要么只管渲染，要么只管发布，没有一个能一条龙跑完。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">于是我决定：<strong style="color:#0f0f0f;font-weight:700">不造轮子，而是把轮子编成引擎</strong>。</p>
+<h2 style="font-size:20px;font-weight:700;color:#0f0f0f;margin:32px 0 12px;padding-left:14px;border-left:4px solid #0f0f0f;line-height:1.4">三个工具，三种哲学</h2>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">第一个工具是渲染引擎，负责把 Markdown 转成平台可用的 HTML。它有 52 个主题和 43 个版式模块，设计哲学是发现驱动——不靠记忆猜测能力，先跑命令拿最新事实。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">第二个工具是发布引擎，专攻推上平台这最后一公里。它有三种发布通道和评论控制，工程化做得很好。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">第三个是我自己的编排器，把上面两个和写作+博客绑在一起。它不重新实现底层能力，只做调度、质控和降级兜底。</p>
+<h2 style="font-size:20px;font-weight:700;color:#0f0f0f;margin:32px 0 12px;padding-left:14px;border-left:4px solid #0f0f0f;line-height:1.4">编排架构：不重造，只缝合</h2>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">架构分三层：编排层确定谁来做，渲染层负责 Markdown 转 HTML，发布层负责推到平台。关键规则是编排器绝不重新实现底层工具已有的能力。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">8 步工作流：接单 → 研究 → 写稿 → 图片上传 → 渲染 → 质量门 → 博客发布 → 平台草稿。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">其中质量门有 6 项硬阻断指标：封面图远程、正文图远程、视觉节奏、内联样式、颜色层级、图片说明。</p>
+<h2 style="font-size:20px;font-weight:700;color:#0f0f0f;margin:32px 0 12px;padding-left:14px;border-left:4px solid #0f0f0f;line-height:1.4">6 套专属风格系统</h2>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">我研究了 2025-2026 年主流视觉风格，定制了 6 套 Style Pack：灰阶玻璃、报刊编辑部、光感卡片、暗夜终端、莫兰迪生活、冲击标题。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">每套 Pack 是完整的内联 CSS 视觉系统，输出 100% 内联样式 HTML，直接粘贴进编辑器零适配。</p>
+<h2 style="font-size:20px;font-weight:700;color:#0f0f0f;margin:32px 0 12px;padding-left:14px;border-left:4px solid #0f0f0f;line-height:1.4">三大设计原则</h2>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">原则一：发现优先。选择主题时必须先跑发现命令拿最新列表，不能从记忆猜测。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">原则二：硬阻断。检查不通过就停止，绝不能静默降级。</p>
+<p style="font-size:16px;line-height:1.85;color:#1a1a1a;margin:14px 0">原则三：幂等重跑。每次运行写入状态文件，重跑时复用已有结果。</p>
+<p style="text-align:center;color:#8a8a8a;font-size:12px;letter-spacing:1px;margin:32px 0 8px">© 小遨 · 2026</p>
+</section>

@@ -1,0 +1,32 @@
+{
+  "template_id": "tech-blueprint-system",
+  "template_name": "科技蓝图系统",
+  "renderer": "html-svg",
+  "aspect": "cover",
+  "canvas": {
+    "width": 1080,
+    "height": 460,
+    "ratio": "2.35:1"
+  },
+  "score": 16,
+  "reasons": [
+    "track:AI",
+    "track:编程",
+    "keyword:AI"
+  ],
+  "prompt": "A sophisticated technical-system infographic base on off-white drafting paper, combining Swiss editorial order with fine blueprint linework. Reserve a bold empty title zone. Compose a central architecture diagram with four modular layers, terminal-window silhouettes, server racks, model nodes, API-like connectors represented only by abstract ports, and a small exploded mechanical component. Use precise grids, numbered-position placeholders without actual numerals, thin cyan rules and one safety-orange accent. Palette: ink navy, cool gray, cyan, white and orange. Spacious, credible, engineering-focused, not cyberpunk neon. Exact canvas: 1080 x 460 pixels (2.35:1). Return one standalone HTML file that renders the visual base at the exact canvas size. Use semantic sections, inline CSS, and inline SVG only; no external assets, scripts, fonts, canvas, or network requests. Put every future copy area in an absolutely positioned element with a stable data-slot attribute, but leave it empty or fill it with neutral placeholder bars. Use vector groups for illustrations and keep them editable. Do not include readable language, letters, numbers, logos, signatures, QR codes, or watermarks. The page must be deterministic and screenshot-ready with overflow hidden.",
+  "overlay_contract": {
+    "base_has_readable_text": false,
+    "text_added_after_base": true,
+    "required_slots": [
+      "title",
+      "deck",
+      "section-title",
+      "body",
+      "caption",
+      "source"
+    ],
+    "safe_margin_percent": 7,
+    "html_svg_slot_attribute": "data-slot"
+  }
+}

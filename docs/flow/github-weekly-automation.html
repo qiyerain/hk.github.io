@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GitHub 周报自动化流程</title>
+  <meta name="description" content="从 GitHub Trending 到 Hexo 博客和微信公众号草稿的完整自动化流程。">
+  <style>
+    :root {
+      --ink: #10251d;
+      --muted: #66746d;
+      --paper: #fbfaf5;
+      --panel: #ffffff;
+      --line: #dce6de;
+      --green: #168447;
+      --green-dark: #0c5c32;
+      --mint: #e2f5e9;
+      --orange: #e76228;
+      --red: #a9432e;
+      --shadow: 0 18px 50px rgba(16, 37, 29, .08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.65;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+    .hero { padding: 68px 0 52px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #eff9f1 0%, var(--paper) 88%); }
+    .eyebrow { color: var(--green-dark); font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { max-width: 850px; margin: 14px 0 18px; font-size: clamp(38px, 6vw, 76px); line-height: 1.05; letter-spacing: -.035em; }
+    .hero p { max-width: 720px; margin: 0; color: var(--muted); font-size: 18px; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .chip { display: inline-flex; align-items: center; min-height: 34px; padding: 6px 12px; border: 1px solid #b9d7c3; border-radius: 999px; color: var(--green-dark); background: rgba(255,255,255,.72); font-size: 13px; font-weight: 700; }
+    .toc { position: sticky; top: 0; z-index: 5; border-bottom: 1px solid var(--line); background: rgba(251,250,245,.88); backdrop-filter: blur(16px); }
+    .toc-inner { display: flex; gap: 20px; overflow-x: auto; padding: 13px 0; white-space: nowrap; }
+    .toc a { color: var(--muted); font-size: 13px; text-decoration: none; }
+    .toc a:hover { color: var(--green-dark); }
+    section { padding: 70px 0; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+    h2 { margin: 0; font-size: clamp(28px, 4vw, 46px); line-height: 1.1; letter-spacing: -.025em; }
+    .section-head p { max-width: 450px; margin: 0; color: var(--muted); }
+    .lead-card { display: grid; grid-template-columns: 1.2fr .8fr; gap: 26px; padding: 30px; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); box-shadow: var(--shadow); }
+    .lead-card h3 { margin: 0 0 10px; font-size: 26px; }
+    .lead-card p { margin: 0; color: var(--muted); }
+    .stat-stack { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .stat { padding: 16px; border-radius: 14px; background: var(--mint); }
+    .stat strong { display: block; color: var(--green-dark); font-size: 25px; line-height: 1; }
+    .stat span { display: block; margin-top: 7px; color: var(--muted); font-size: 12px; }
+    .flow-shell { padding: 20px; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); box-shadow: var(--shadow); overflow-x: auto; }
+    .flow { min-width: 930px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; align-items: stretch; }
+    .flow-step { position: relative; min-height: 142px; padding: 17px 14px; border: 1px solid #c8dfce; border-radius: 14px; background: #f4fbf6; }
+    .flow-step:not(:last-child)::after { content: "→"; position: absolute; right: -17px; top: 50%; z-index: 2; transform: translateY(-50%); color: var(--green); font-size: 24px; font-weight: 800; }
+    .flow-no { color: var(--orange); font-size: 12px; font-weight: 800; }
+    .flow-step h3 { margin: 12px 0 7px; font-size: 16px; line-height: 1.25; }
+    .flow-step p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .layers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .layer { min-height: 210px; padding: 22px; border-top: 4px solid var(--green); border-radius: 14px; background: var(--panel); box-shadow: 0 10px 30px rgba(16,37,29,.05); }
+    .layer:nth-child(2) { border-color: #4e83d7; }
+    .layer:nth-child(3) { border-color: var(--orange); }
+    .layer:nth-child(4) { border-color: #8b6dc5; }
+    .layer .index { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .layer h3 { margin: 14px 0 8px; font-size: 20px; }
+    .layer p { margin: 0; color: var(--muted); font-size: 14px; }
+    .layer code, code { padding: 2px 5px; border-radius: 5px; background: #eef3ef; color: var(--green-dark); font-size: .9em; }
+    .visual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .visual-card { padding: 22px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+    .visual-card h3 { margin: 0 0 16px; font-size: 20px; }
+    .poster { display: grid; gap: 9px; padding: 20px; border: 1px solid #bdd9c5; border-radius: 13px; background: #f4fbf5; }
+    .poster-label { color: var(--green-dark); font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+    .poster-title { font-size: 28px; font-weight: 900; line-height: 1; }
+    .poster-sub { color: var(--muted); font-size: 13px; }
+    .rank { display: grid; grid-template-columns: 28px 1fr auto; gap: 9px; align-items: center; padding: 8px 0; border-top: 1px solid #d6e8da; font-size: 13px; }
+    .rank b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; color: #fff; background: var(--green); }
+    .rank strong { font-size: 12px; }
+    .rank em { color: var(--orange); font-size: 12px; font-style: normal; font-weight: 800; }
+    .path { display: grid; gap: 11px; }
+    .path-row { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: center; }
+    .path-row span:first-child { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .path-bar { position: relative; height: 12px; border-radius: 99px; background: #e6eee8; overflow: hidden; }
+    .path-bar i { display: block; height: 100%; border-radius: inherit; background: var(--green); }
+    .path-bar i.orange { background: var(--orange); }
+    .path-bar i.blue { background: #4e83d7; }
+    .exclusive { padding: 24px; border: 1px solid #f0d1a9; border-radius: 16px; background: #fff8ed; }
+    .exclusive h3 { margin: 0 0 9px; color: #894b18; font-size: 21px; }
+    .exclusive p { margin: 0; color: #765d42; }
+    .checks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .check { padding: 20px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+    .check h3 { margin: 0 0 8px; font-size: 17px; }
+    .check p { margin: 0; color: var(--muted); font-size: 14px; }
+    .stop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .stop { padding: 19px; border-left: 4px solid var(--red); border-radius: 12px; background: #fff; box-shadow: 0 8px 24px rgba(169,67,46,.06); }
+    .stop strong { display: block; margin-bottom: 6px; color: var(--red); }
+    .stop span { color: var(--muted); font-size: 14px; }
+    .reader { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    details { padding: 18px 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    summary { cursor: pointer; color: var(--green-dark); font-weight: 800; }
+    details p { color: var(--muted); }
+    footer { padding: 34px 0 50px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    @media (max-width: 820px) {
+      .wrap { width: min(100% - 28px, 680px); }
+      .hero { padding-top: 44px; }
+      .lead-card, .reader { grid-template-columns: 1fr; }
+      .layers, .checks, .stop-grid { grid-template-columns: 1fr 1fr; }
+      .visual-grid { grid-template-columns: 1fr; }
+      .section-head { display: block; }
+      .section-head p { margin-top: 12px; }
+    }
+    @media (max-width: 520px) {
+      h1 { font-size: 44px; }
+      section { padding: 52px 0; }
+      .lead-card { padding: 22px; }
+      .layers, .checks, .stop-grid { grid-template-columns: 1fr; }
+      .stat-stack { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">GitHub Weekly · Automation Flow</div>
+      <h1>一篇 GitHub 周报，如何自动从榜单走到读者面前？</h1>
+      <p>每周五 18:00，系统从 GitHub Trending Weekly 开始，完成选题、核验、配图、Hexo 构建和微信公众号草稿。机器负责重复工作，质量门槛负责决定能不能继续。</p>
+      <div class="hero-meta">
+        <span class="chip">每周五 18:00（北京时间）</span>
+        <span class="chip">GitHub Trending Weekly</span>
+        <span class="chip">博客 + 微信草稿</span>
+        <span class="chip">不自动发布 / 不群发</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc"><div class="wrap toc-inner">
+    <a href="#overview">先看结论</a><a href="#flow">主流程</a><a href="#layers">四层协作</a><a href="#visual">视觉系统</a><a href="#wechat">公众号 Skill</a><a href="#guardrails">停止条件</a>
+  </div></nav>
+
+  <main>
+    <section id="overview"><div class="wrap">
+      <div class="section-head"><h2>先看结论</h2><p>这不是一个“按按钮写文章”的脚本，而是一条有输入、有输出、有质检、有止损的内容流水线。</p></div>
+      <div class="lead-card">
+        <div><h3>机器把原料整理成可审阅的成品</h3><p>它读取榜单，找出本周主线，制作“总览到分项”的阅读路径，再分别输出博客封面、微信封面、TOP 5 摘要海报和正文信息图。最终发布前仍保留人工判断。</p></div>
+        <div class="stat-stack"><div class="stat"><strong>7</strong><span>主流程阶段</span></div><div class="stat"><strong>4</strong><span>协作层次</span></div><div class="stat"><strong>3</strong><span>视觉重点尺寸</span></div><div class="stat"><strong>0</strong><span>自动群发权限</span></div></div>
+      </div>
+    </div></section>
+
+    <section id="flow"><div class="wrap">
+      <div class="section-head"><h2>主流程：从榜单到草稿</h2><p>每一步都产出下一步需要的结果；关键检查失败，就在当前节点停止。</p></div>
+      <div class="flow-shell"><div class="flow">
+        <article class="flow-step"><div class="flow-no">01 / TRIGGER</div><h3>定时触发</h3><p>每周五 18:00，在本地项目目录启动任务。</p></article>
+        <article class="flow-step"><div class="flow-no">02 / RESEARCH</div><h3>抓取与核验</h3><p>读取 Weekly 榜单，校验项目、链接、语言和 Star。</p></article>
+        <article class="flow-step"><div class="flow-no">03 / EDIT</div><h3>提炼主线</h3><p>形成一句核心判断，选出 TOP 5 和逐项目分析。</p></article>
+        <article class="flow-step"><div class="flow-no">04 / VISUAL</div><h3>生成视觉</h3><p>为博客、微信和正文分别排版，年份必须可见。</p></article>
+        <article class="flow-step"><div class="flow-no">05 / PUBLISH</div><h3>写入与上传</h3><p>图片上传 OSS，写入 Hexo Markdown 与微信 HTML。</p></article>
+        <article class="flow-step"><div class="flow-no">06 / QA</div><h3>质量门槛</h3><p>检查 readiness、图片、移动端可读性和构建。</p></article>
+        <article class="flow-step"><div class="flow-no">07 / OUTPUT</div><h3>提交与草稿</h3><p>push 博客，创建微信草稿，记录 media_id 和状态。</p></article>
+      </div></div>
+    </div></section>
+
+    <section id="layers"><div class="wrap">
+      <div class="section-head"><h2>四层协作，不互相越界</h2><p>总控 Skill 负责编排，底层工具各自完成擅长的事情。</p></div>
+      <div class="layers">
+        <article class="layer"><div class="index">01 · DATA</div><h3>数据层</h3><p>读取 GitHub Trending Weekly，保留能验证的项目、链接、语言、总 Star 和本周新增 Star。</p></article>
+        <article class="layer"><div class="index">02 · EDIT</div><h3>编辑层</h3><p>把榜单变成观点：一句核心判断、TOP 5、项目价值、适用人群与落地场景。</p></article>
+        <article class="layer"><div class="index">03 · VISUAL</div><h3>视觉层</h3><p>统一暖白、黑字、GitHub 绿和橙红重点；底图与准确文字分开生成。</p></article>
+        <article class="layer"><div class="index">04 · DELIVERY</div><h3>发布层</h3><p>Hexo 负责博客，md2wechat 负责排版，baoyu 负责创建草稿，PicGo 负责 OSS。</p></article>
+      </div>
+    </div></section>
+
+    <section id="visual"><div class="wrap">
+      <div class="section-head"><h2>视觉系统：先给全貌，再带读者下钻</h2><p>参考热榜视频的“总 → 分”节奏：先知道有哪些项目，再理解它们为什么值得看。</p></div>
+      <div class="visual-grid">
+        <article class="visual-card"><h3>封面信息层级</h3><div class="poster"><div class="poster-label">2026 · WEEK 37</div><div class="poster-title">GITHUB<br>本周开源热榜</div><div class="poster-sub">本周主线：Agent 能力正在变成可复用的工程资产</div><div class="rank"><b>1</b><strong>project-one · Agent 工具</strong><em>+12.4k ★</em></div><div class="rank"><b>2</b><strong>project-two · 开发者工具</strong><em>+8.7k ★</em></div><div class="rank"><b>3</b><strong>project-three · 本地 AI</strong><em>+6.1k ★</em></div><div class="rank"><b>4</b><strong>project-four · 数据工具</strong><em>+4.9k ★</em></div><div class="rank"><b>5</b><strong>project-five · 安全项目</strong><em>+3.8k ★</em></div></div></article>
+        <article class="visual-card"><h3>文章阅读路径</h3><div class="path"><div class="path-row"><span>1 · 先看主线</span><div class="path-bar"><i style="width: 100%"></i></div></div><div class="path-row"><span>2 · 浏览 TOP 5</span><div class="path-bar"><i class="blue" style="width: 78%"></i></div></div><div class="path-row"><span>3 · 读项目分析</span><div class="path-bar"><i class="orange" style="width: 58%"></i></div></div><div class="path-row"><span>4 · 看落地场景</span><div class="path-bar"><i style="width: 40%"></i></div></div><div class="path-row"><span>5 · 得出行动</span><div class="path-bar"><i class="blue" style="width: 24%"></i></div></div></div><p style="margin:22px 0 0;color:var(--muted);font-size:14px">图片先承担“先读版”功能，正文再补充背景、机制、边界和使用方法。</p></article>
+      </div>
+      <div class="exclusive" style="margin-top:18px"><h3>这是 GitHub 周报的专属能力</h3><p>项目列表、排名、Star 数、TOP 5 海报和这套“总览到分项”的阅读路径，只在每周 GitHub 趋势系列启用。其他博客按照自己的主题选择封面、配图和文章结构，不会被强行套用。</p></div>
+    </div></section>
+
+    <section id="wechat"><div class="wrap">
+      <div class="section-head"><h2>微信公众号 Skill 怎么接上来？</h2><p>博客与公众号共用内容判断，但不共用网页渲染方式。</p></div>
+      <div class="checks">
+        <article class="check"><h3>总控：wechat-article-generator</h3><p>负责调研、写作、图片规划、质量门槛和整个流程的编排。</p></article>
+        <article class="check"><h3>排版：md2wechat</h3><p>负责主题发现、inspect、预览和生成微信兼容 HTML。</p></article>
+        <article class="check"><h3>发布：baoyu-post-to-wechat</h3><p>负责上传微信图片、封面素材和创建草稿，不自动群发。</p></article>
+        <article class="check"><h3>托管：PicGo / OSS</h3><p>博客 Markdown 只使用真实 OSS URL，上传失败就停止。</p></article>
+        <article class="check"><h3>状态：state.json</h3><p>保存哈希、图片和 media_id，重试时避免重复创建草稿。</p></article>
+        <article class="check"><h3>合集：每周 GitHub</h3><p>当前能创建草稿；如果没有可验证的 album_id，就报告待后台归档。</p></article>
+      </div>
+    </div></section>
+
+    <section id="guardrails"><div class="wrap">
+      <div class="section-head"><h2>可靠的关键，是知道什么时候停</h2><p>自动化不追求“无论如何发出去”，而是把错误拦在发布之前。</p></div>
+      <div class="stop-grid">
+        <article class="stop"><strong>数据不可信</strong><span>不编造 Star，不把 Daily 快照冒充 Weekly 历史。</span></article>
+        <article class="stop"><strong>图片不一致</strong><span>日期、年份、项目名或 Star 与文章不一致，就重新生成。</span></article>
+        <article class="stop"><strong>OSS 失败</strong><span>不提交本地图片路径，不回退到无关默认封面。</span></article>
+        <article class="stop"><strong>微信 readiness 失败</strong><span>缺封面、凭据、主题或 IP 白名单时，不创建草稿。</span></article>
+        <article class="stop"><strong>构建失败</strong><span>Hexo 或仓库审计未通过，就不 push。</span></article>
+        <article class="stop"><strong>合集无证据</strong><span>没有 album_id 或后台操作证据，就不报告已归档。</span></article>
+      </div>
+    </div></section>
+
+    <section><div class="wrap">
+      <div class="section-head"><h2>给读者的一句话版本</h2><p>如果只想快速理解这套系统，可以记住下面这句话。</p></div>
+      <div class="reader">
+        <details open><summary>它到底做什么？</summary><p>每周五，系统把 GitHub 热榜整理成一篇“先看全貌、再读重点”的周报：先列出项目和 Star，再解释主线项目为什么值得关注，最后分别生成博客和公众号版本。</p></details>
+        <details open><summary>它为什么不直接发布？</summary><p>因为数据、图片、平台审核和合集归档都可能出问题。系统负责把内容准备成可审阅草稿，真正发布前保留一次人工确认。</p></details>
+      </div>
+    </div></section>
+  </main>
+
+  <footer><div class="wrap">GitHub 周报自动化流程 · 2026-09-15 · 项目专属的榜单视觉模式不适用于其他主题博客。</div></footer>
+</body>
+</html>

@@ -1,0 +1,27 @@
+- title: 闲言碎语
+  subTitle: 记录日常的点点滴滴
+  tips: 随便写写，想到什么说什么
+  top_background: /img/covers/cover-1.webp
+  buttonLink: /about/
+  buttonText: 了解更多
+  limit: 10
+  essay_list:
+    - content: 今天把博客的性能优化了一波，从卡顿到丝滑，关键就是把 backdrop-filter、background-attachment:fixed 和 shadowBlur 这三个滚动性能杀手移除了。
+      date: 2026-05-19
+      from: 博客优化
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-01.webp
+    - content: 最近在用 Claude Code 写代码，体验真的很棒。它可以理解整个项目上下文，直接帮你改代码、写测试、甚至部署。感觉开发效率提升了好几倍。
+      date: 2026-05-15
+      from: 工具分享
+    - content: 新买了机械键盘，青轴的声音太治愈了。写代码更有动力了，虽然室友可能不这么想。
+      date: 2026-05-10
+      from: 日常
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/technology-32.jpg
+    - content: 周末把 Docker 和 Docker Compose 重新学了一遍，终于搞清楚了 network 和 volume 的区别。以前都是复制粘贴，现在是真理解了。
+      date: 2026-05-05
+      from: 学习笔记
+    - content: 上了 Cloudflare CDN 之后，国内访问博客的速度明显快了很多。免费的果然香。
+      date: 2026-05-01
+      from: 建站

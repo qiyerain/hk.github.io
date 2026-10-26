@@ -1,0 +1,24 @@
+banner_img: https://static.zkqiang.cn/example.jpg
+
+static_prefix:
+  # ...
+  jquery: https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/
+
+
+about:
+  icons:  # 不要把 icon 注释掉，否则无法覆盖配置
+    # - { class: 'iconfont icon-github-fill', link: 'https://github.com' }
+    # - { class: 'iconfont icon-wechat-fill', qrcode: '/img/favicon.png' }
+
+lazyload:
+  enable: true
+  loading_img: /img/loading.gif
+  onlypost: false
+  offset_factor: 2
+
+dark_mode:
+  enable: true
+  default: auto
+
+# 代码颜色
+highlight_theme: darker

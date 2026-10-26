@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>相册 · 小遨的个人博客</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="common.css" />
+<style>
+.page-head .glow-a{width:28vw;height:28vw;left:-6vw;top:8vh}
+.page-head .glow-b{width:22vw;height:22vw;right:-4vw;top:0}
+.albums{max-width:1200px;margin:0 auto;padding:clamp(48px,8vh,80px) var(--pad-x) 60px}
+.album-block{margin-bottom:72px}
+.album-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.album-h .at{font-family:var(--serif);font-weight:600;font-size:clamp(24px,3vw,36px)}
+.album-h .am{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--fg-dim)}
+.grid{column-count:3;column-gap:14px}
+@media(max-width:860px){.grid{column-count:2}}
+@media(max-width:560px){.grid{column-count:1}}
+.photo{break-inside:avoid;margin-bottom:14px;border-radius:12px;overflow:hidden;position:relative;cursor:pointer;border:1px solid var(--border);transition:transform .4s var(--ease-out),border-color .3s}
+.photo:hover{transform:translateY(-4px);border-color:var(--glass-border)}
+.photo img{width:100%;height:auto;display:block;transition:transform .6s var(--ease-out)}
+.photo:hover img{transform:scale(1.04)}
+.photo .cap{position:absolute;left:0;right:0;bottom:0;padding:14px 16px 12px;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-family:var(--mono);font-size:12px;letter-spacing:.04em;opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s var(--ease-out)}
+.photo:hover .cap{opacity:1;transform:none}
+.lightbox{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);backdrop-filter:blur(8px)}
+.lightbox.open{display:flex}
+.lb-glow{position:absolute;width:40vw;height:40vw;border-radius:50%;background:var(--glow-a);filter:blur(120px);opacity:.25;pointer-events:none}
+.lb-img{max-width:88vw;max-height:80vh;border-radius:8px;transform:scale(1.02);transition:transform .32s var(--ease-out);box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.lightbox.open .lb-img{transform:scale(1)}
+.lb-bar{position:fixed;bottom:0;left:0;right:0;padding:20px var(--pad-x);display:flex;justify-content:space-between;align-items:center;background:var(--glass-bg-strong);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid var(--glass-border);color:var(--fg)}
+.lb-cap{font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:var(--fg-soft)}
+.lb-ctrl{display:flex;gap:10px}
+.lb-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--glass-border);background:var(--glass-bg);color:var(--fg);font-size:18px;cursor:pointer;display:grid;place-items:center;transition:background .25s,transform .25s}
+.lb-btn:hover{background:var(--muted);transform:scale(1.05)}
+.lb-close{position:fixed;top:20px;right:24px;width:44px;height:44px;border-radius:50%;border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:blur(20px);color:var(--fg);font-size:22px;cursor:pointer;display:grid;place-items:center;z-index:101;transition:background .25s}
+.lb-close:hover{background:var(--muted)}
+</style>
+</head>
+<body>
+<nav class="nav" id="nav">
+  <div class="nav-brand" onclick="location.href='index.html'">小遨的个人博客</div>
+  <ul class="nav-center">
+    <li class="nav-item">
+      <button class="nav-link">文章 <span class="caret">▾</span></button>
+      <ul class="nav-drop">
+        <li><a href="archive.html">全部文章 <span>All</span></a></li>
+        <li><a href="archive.html#month">按月份 <span>By Month</span></a></li>
+        <li><a href="archive.html#tag">按标签 <span>By Tag</span></a></li>
+        <li><a href="archive.html#dir">按目录 <span>By Dir</span></a></li>
+      </ul>
+    </li>
+    <li class="nav-item"><a class="nav-link active" href="albums.html">相册</a></li>
+    <li class="nav-item"><a class="nav-link" href="friends.html">友链</a></li>
+    <li class="nav-item"><a class="nav-link" href="wechat.html">公众号</a></li>
+    <li class="nav-item"><a class="nav-link" href="about.html">关于</a></li>
+  </ul>
+  <div class="nav-tools">
+    <button class="icon-btn" aria-label="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+    <button class="icon-btn" id="dirBtn" aria-label="目录树"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/><path d="M3 11h18"/></svg></button>
+    <button class="icon-btn theme-toggle" id="themeToggle" aria-label="切换深浅主题">
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></svg>
+    </button>
+    <button class="icon-btn nav-burger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</nav>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="dir-drawer" id="dirDrawer" aria-hidden="true">
+  <div class="dir-drawer-head"><span class="ttl">目录树 · Directory</span><button class="dir-close" id="dirClose" aria-label="关闭">✕</button></div>
+  <div class="dir-tree">
+    <ul>
+      <li class="open"><div class="folder open"><span class="tri">▶</span>工具系列</div>
+        <ul><li><a class="leaf" href="post.html">当一支笔被使用三年</a></li><li><div class="leaf">六年的剪刀</div></li></ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>写作随笔</div>
+        <ul><li><a class="leaf" href="post.html">夜里改掉的一个词</a></li></ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>城市</div>
+        <ul><li><div class="leaf">广州的雨有它自己的语法</div></li></ul>
+      </li>
+    </ul>
+  </div>
+  <div class="dir-drawer-foot">查看完整目录 ↗</div>
+</aside>
+
+<header class="page-head">
+  <span class="glow glow-a"></span><span class="glow glow-b"></span>
+  <div class="ph-inner">
+    <div class="crumbs"><a href="index.html">首页</a><span>/</span><span>相册</span></div>
+    <h1 class="ph-title">相册</h1>
+    <div class="ph-en">/ Albums</div>
+    <p class="ph-desc">用镜头记下一些光、一些雨、一些被时间磨旧的角落。</p>
+  </div>
+</header>
+
+<main class="albums">
+  <div class="album-block">
+    <div class="album-h"><span class="at">广州 · 2026 春</span><span class="am">12 张</span></div>
+    <div class="grid">
+      <div class="photo" data-full="https://picsum.photos/seed/gz1/1600/1000" data-cap="广州 · 西关老巷 · 03/12"><img src="https://picsum.photos/seed/gz1/600/800" loading="lazy" alt=""><div class="cap">西关老巷 · 03/12</div></div>
+      <div class="photo" data-full="https://picsum.photos/seed/gz2/1600/1000" data-cap="广州 · 雨后天台 · 03/15"><img src="https://picsum.photos/seed/gz2/600/500" loading="lazy" alt=""><div class="cap">雨后天台 · 03/15</div></div>
+      <div class="photo" data-full="https://picsum.photos/seed/gz3/1600/1000" data-cap="广州 · 珠江夜 · 04/02"><img src="https://picsum.photos/seed/gz3/600/700" loading="lazy" alt=""><div class="cap">珠江夜 · 04/02</div></div>
+      <div class="photo" data-full="https://picsum.photos/seed/gz4/1600/1000" data-cap="广州 · 榕树根 · 04/18"><img src="https://picsum.photos/seed/gz4/600/600" loading="lazy" alt=""><div class="cap">榕树根 · 04/18</div></div>
+      <div class="photo" data-full="https://picsum.photos/seed/gz5/1600/1000" data-cap="广州 · 早点铺 · 05/01"><img src="https://picsum.photos/seed/gz5/600/800" loading="lazy" alt=""><div class="cap">早点铺 · 05/01</div></div>
+      <div class="photo" data-full="https://picsum.photos/seed/gz6/1600/1000" data-cap="广州 · 旧书店 · 05/19"><img src="https://picsum.photos/seed/gz6/600/500" loading="lazy" alt=""><div class="cap">旧书店 · 05/19</div></div>
+    </div>
+  </div>
+  <div class="album-block">
+    <div class="album-h"><span class="at">北方 · 2025 秋</span><span class="am">9 张</span></div>
+    <div class="grid">
+      <div class="photo" data-full="https://picsum.photos/seed/north1/1600/1000" data-cap="北方 · 落叶 · 10/08"><img src="https://picsum.photos/seed/north1/600/700" loading="lazy" alt=""><div class="cap">落叶 · 10/08</div></div>
+      <div class="photo" data-full="https://picsum.photos/seed/north2/1600/1000" data-cap="北方 · 胡同 · 10/20"><img src="https://picsum.photos/seed/north2/600/500" loading="lazy" alt=""><div class="cap">胡同 · 10/20</div></div>
+      <div class="photo" data-full="https://picsum.photos/seed/north3/1600/1000" data-cap="北方 · 初雪 · 11/12"><img src="https://picsum.photos/seed/north3/600/800" loading="lazy" alt=""><div class="cap">初雪 · 11/12</div></div>
+      <div class="photo" data-full="https://picsum.photos/seed/north4/1600/1000" data-cap="北方 · 窗台 · 11/25"><img src="https://picsum.photos/seed/north4/600/600" loading="lazy" alt=""><div class="cap">窗台 · 11/25</div></div>
+    </div>
+  </div>
+  <div class="album-block">
+    <div class="album-h"><span class="at">器物 · 静物</span><span class="am">6 张</span></div>
+    <div class="grid">
+      <div class="photo" data-full="https://picsum.photos/seed/obj1/1600/1000" data-cap="器物 · 旧钢笔"><img src="https://picsum.photos/seed/obj1/600/500" loading="lazy" alt=""><div class="cap">旧钢笔</div></div>
+      <div class="photo" data-full="https://picsum.photos/seed/obj2/1600/1000" data-cap="器物 · 剪刀"><img src="https://picsum.photos/seed/obj2/600/700" loading="lazy" alt=""><div class="cap">剪刀</div></div>
+      <div class="photo" data-full="https://picsum.photos/seed/obj3/1600/1000" data-cap="器物 · 茶杯"><img src="https://picsum.photos/seed/obj3/600/600" loading="lazy" alt=""><div class="cap">茶杯</div></div>
+    </div>
+  </div>
+</main>
+
+<footer class="page-foot"><span>© 2026 小遨</span><span><a href="subscribe.html">RSS</a> · <a href="index.html">回到首页</a></span></footer>
+
+<div class="lightbox" id="lightbox">
+  <span class="lb-glow"></span>
+  <button class="lb-close" id="lbClose" aria-label="关闭">✕</button>
+  <img class="lb-img" id="lbImg" src="" alt="">
+  <div class="lb-bar">
+    <span class="lb-cap" id="lbCap"></span>
+    <div class="lb-ctrl">
+      <button class="lb-btn" id="lbPrev" aria-label="上一张">←</button>
+      <button class="lb-btn" id="lbNext" aria-label="下一张">→</button>
+    </div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+/* 灯箱 */
+(function(){
+  var photos=Array.from(document.querySelectorAll('.photo'));
+  var lb=document.getElementById('lightbox'),img=document.getElementById('lbImg'),cap=document.getElementById('lbCap');
+  var cur=0;
+  function open(i){cur=i;img.src=photos[i].dataset.full;cap.textContent=photos[i].dataset.cap;lb.classList.add('open');document.body.style.overflow='hidden'}
+  function close(){lb.classList.remove('open');document.body.style.overflow=''}
+  function nav(d){cur=(cur+d+photos.length)%photos.length;img.src=photos[cur].dataset.full;cap.textContent=photos[cur].dataset.cap}
+  photos.forEach(function(p,i){p.addEventListener('click',function(){open(i)})});
+  document.getElementById('lbClose').addEventListener('click',close);
+  document.getElementById('lbPrev').addEventListener('click',function(){nav(-1)});
+  document.getElementById('lbNext').addEventListener('click',function(){nav(1)});
+  lb.addEventListener('click',function(e){if(e.target===lb)close()});
+  document.addEventListener('keydown',function(e){if(!lb.classList.contains('open'))return;if(e.key==='Escape')close();if(e.key==='ArrowLeft')nav(-1);if(e.key==='ArrowRight')nav(1)});
+})();
+</script>
+</body>
+</html>

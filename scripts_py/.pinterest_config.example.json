@@ -1,0 +1,8 @@
+{
+  "_README": "复制本文件为 .pinterest_config.json 后填写。.pinterest_config.json 不会被提交到 git。",
+  "app_id": "你的 Pinterest 应用 App ID（Client ID）",
+  "app_secret": "你的 Pinterest 应用 App Secret",
+  "refresh_token": "OAuth refresh token，有效期 1 年",
+  "access_token": "OAuth access token，有效期 30 天；可留空，脚本会用 refresh_token 自动获取",
+  "access_token_expires_at": ""
+}

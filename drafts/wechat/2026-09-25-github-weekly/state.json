@@ -1,0 +1,92 @@
+{
+  "run_id": "2026-09-25-github-weekly",
+  "updated_at": "2026-09-26T16:02:00+0800",
+  "markdown_path": "source/_posts/每周GitHub趋势/2026-09-25-GitHub趋势.md",
+  "markdown_sha256": "8fa7cfcef6ae3e89e145732e0a9a77624c9b7ca6e59ca6352627ce52550f4db6",
+  "wechat_html_path": "drafts/wechat/2026-09-25-github-weekly/wechat.html",
+  "wechat_html_sha256": "b11115657aa16288505fd9f7bf42c8c63a8d44cb9b4fcccd4e2710c60aa28220",
+  "theme": "github-readme",
+  "style_pack": "C (green series override)",
+  "assets": [
+    {
+      "sha256": "caca514c678fe7487fce232d79b22a0c495b5293ca89a950e9778c66f4ed58ac",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-25-cover-1600x900.png"
+    },
+    {
+      "sha256": "9eb247176c675d93dd9c2ee30e57cf95208a74a092b5a09455865c2c55ff80d7",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-25-wechat-cover-1080x460.png"
+    },
+    {
+      "sha256": "77ea4af3e6df13143b1601046ab42c7b920f9e2ad520f99527e389ee7720c2cb",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-25-poster-1080x1350.png"
+    },
+    {
+      "sha256": "57408d0a8f741735dab463aeb9881b40fe57997c2fb98e7de62a6debc56abcdb",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-25-trend-map-1200x675.png"
+    },
+    {
+      "sha256": "498f37dbefae01bd17b7379b3612ddb49c4f8156b34ef9d2541a3129f631952",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-25-review-flow-1200x675.png"
+    },
+    {
+      "sha256": "408b0937b08b512a7599e8ffbff004ab954714950b10624da8a8cb2737603950",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-25-action-matrix-1200x675.png"
+    }
+  ],
+  "stages": {
+    "research": {
+      "ok": true,
+      "source": "https://github.com/trending?since=weekly",
+      "captured_at": "2026-09-25T18:02:00+0800",
+      "scope": "weekly page snapshot, 20 visible projects; stars this week from page, total stars/language checked via repo API"
+    },
+    "visuals": {
+      "ok": true,
+      "visual_plan": "drafts/wechat/2026-09-25-github-weekly/visual-plan.json",
+      "template": "github-weekly-warm-paper-v1-handdrawn",
+      "canvas_count": 6
+    },
+    "oss_upload": {
+      "ok": true,
+      "image_count": 6,
+      "script": "scripts_py/picgo_upload.py"
+    },
+    "inspect": {
+      "ok": true,
+      "draft_target": "blocked",
+      "blockers": [],
+      "reason": "md2wechat inspect is ready locally; live draft blocked by token precheck 40164"
+    },
+    "convert": {
+      "ok": true,
+      "provider": "local style pack C green override",
+      "reason": "md2wechat API preview degraded by invalid API key; final inline HTML rendered via project style pack"
+    },
+    "experience_validation": {
+      "ok": true,
+      "ul_count": 0,
+      "li_count": 0,
+      "image_count": 5
+    },
+    "draft": {
+      "ok": false,
+      "media_id": null,
+      "reason": "40164 invalid ip 175.13.253.205; no upload, no draft/add, no retry"
+    },
+    "collection": {
+      "name": "每周 GitHub",
+      "album_id": "4695616659267780619",
+      "archived": false,
+      "reason": "no draft created; collection remains pending"
+    },
+    "blog": {
+      "built": true,
+      "audit_passed": true,
+      "pushed": true,
+      "commit": "9353253",
+      "live_url": "https://blog.pengfanao.top/2026/09/25/每周GitHub趋势/2026-09-25-GitHub趋势/",
+      "live_verified": true,
+      "http_status": 200
+    }
+  }
+}

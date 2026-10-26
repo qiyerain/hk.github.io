@@ -1,0 +1,187 @@
+{
+  "success": true,
+  "code": "PREVIEW_READY",
+  "message": "Preview ready",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "inspect": {
+      "source_file": "source/_posts/agent/当AI学会排版-3个开源Skill编排微信公众号引擎.md",
+      "source_dir": "source/_posts/agent",
+      "context": {
+        "mode": "api",
+        "theme": "default",
+        "font_size": "medium",
+        "background_type": "none",
+        "upload": false,
+        "draft": false
+      },
+      "metadata": {
+        "title": {
+          "value": "写一次，博客和公众号草稿同时就绪：我的内容工作流",
+          "source": "frontmatter.title",
+          "limit": 32,
+          "length": 24,
+          "valid": true
+        },
+        "author": {
+          "value": "",
+          "source": "fallback.empty",
+          "limit": 16,
+          "length": 0,
+          "valid": true
+        },
+        "digest": {
+          "value": "我把研究、写作、封面、博客构建、公众号排版和草稿上传串成了一条可检查、可中断、可继续的个人内容工作流。",
+          "source": "frontmatter.description",
+          "limit": 128,
+          "length": 51,
+          "valid": true
+        }
+      },
+      "structure": {
+        "body_h1": {
+          "present": true,
+          "text": "写一次，博客和公众号草稿同时就绪：我的内容工作流"
+        },
+        "duplicate_title_risk": true,
+        "headings": [
+          {
+            "level": 1,
+            "text": "写一次，博客和公众号草稿同时就绪：我的内容工作流"
+          },
+          {
+            "level": 2,
+            "text": "它最终交付什么"
+          },
+          {
+            "level": 2,
+            "text": "三个 Skill，各管一段"
+          },
+          {
+            "level": 3,
+            "text": "1. wechat-article-generator：总控"
+          },
+          {
+            "level": 3,
+            "text": "2. md2wechat：把文章排成公众号能用的 HTML"
+          },
+          {
+            "level": 3,
+            "text": "3. baoyu-post-to-wechat：把成品送进草稿箱"
+          },
+          {
+            "level": 2,
+            "text": "一次完整运行，实际做五件事"
+          },
+          {
+            "level": 3,
+            "text": "1. 先把文章写清楚"
+          },
+          {
+            "level": 3,
+            "text": "2. 让图片服务内容"
+          },
+          {
+            "level": 3,
+            "text": "3. 图片全部进入 OSS"
+          },
+          {
+            "level": 3,
+            "text": "4. 分别生成博客与公众号版本"
+          },
+          {
+            "level": 3,
+            "text": "5. 检查通过后再交付"
+          },
+          {
+            "level": 2,
+            "text": "封面和图片是怎么约束的"
+          },
+          {
+            "level": 2,
+            "text": "失败时到底会怎样"
+          },
+          {
+            "level": 2,
+            "text": "一个真实的恢复过程"
+          },
+          {
+            "level": 2,
+            "text": "你可以借鉴哪一部分"
+          },
+          {
+            "level": 2,
+            "text": "工具与链接"
+          }
+        ],
+        "images": {
+          "total": 2,
+          "local": 0,
+          "remote": 2,
+          "ai": 0
+        }
+      },
+      "assets": [
+        {
+          "index": 0,
+          "kind": "online",
+          "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/workflow-dual-output-1200x675.png",
+          "exists": true
+        },
+        {
+          "index": 1,
+          "kind": "online",
+          "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/failure-resume-1200x675.png",
+          "exists": true
+        }
+      ],
+      "readiness": {
+        "convert_ready": true,
+        "upload_ready": true,
+        "draft_ready": false,
+        "preview_fidelity": "degraded",
+        "schema_version": "v1",
+        "targets": {
+          "preview": "ready",
+          "convert": "ready",
+          "upload": "not_requested",
+          "draft": "not_requested"
+        },
+        "blockers": []
+      },
+      "checks": [
+        {
+          "level": "warn",
+          "code": "DUPLICATE_H1",
+          "message": "Body H1 matches the final article title",
+          "field": "title",
+          "suggested_fix": "remove the body H1 or change the final title"
+        },
+        {
+          "level": "info",
+          "code": "DIGEST_METADATA_ONLY",
+          "message": "Digest affects draft metadata, not body HTML rendering",
+          "field": "digest",
+          "suggested_fix": "use body content or theme behavior to control visible article summary inside the HTML"
+        },
+        {
+          "level": "info",
+          "code": "IMAGE_REPLACEMENT_REQUIRES_UPLOAD_OR_DRAFT",
+          "message": "Images are only uploaded and replaced during upload or draft flows",
+          "field": "images",
+          "suggested_fix": "use --upload or --draft when you need local/remote/AI image references rewritten to published URLs"
+        }
+      ]
+    },
+    "output_file": "drafts/wechat/2026-06-22-skill-orchestrator/preview.html",
+    "render": {
+      "error": "API call failed: API_ERROR: API returned error code 401: Invalid API Key format. Supported prefixes: wme_, wme2_, wmt_.",
+      "exact_html": false,
+      "fidelity": "degraded",
+      "mode": "api",
+      "theme": "default"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+extends includes/layout.pug
+
+block content
+  include ./includes/mixins/post-ui.pug
+  if page.type !== 'post-directory'
+    #xa-home
+      include ./includes/xiaoao/home.pug
+  if page.type === 'post-directory'
+    include ./includes/xiaoao/archive.pug

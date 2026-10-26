@@ -1,0 +1,24 @@
+{
+  "kind": "layout=list",
+  "title": "GitHub 热门项目",
+  "headline": "GitHub 热门项目",
+  "deck": "Agent 开始比拼证据、状态、隔离与恢复",
+  "date": "2026-10-23",
+  "date_label": "2026 年第 43 周",
+  "edition": "每周趋势",
+  "captured_at": "2026-10-23T18:17:34+08:00",
+  "channel": "blog-wechat",
+  "aspect": "portrait",
+  "template_id": "data-terminal",
+  "source_label": "GitHub Trending weekly / 2026-10-23 18:17 CST",
+  "source_urls": ["https://github.com/trending?since=weekly"],
+  "source_files": ["source/_posts/每周GitHub趋势/2026-10-23-GitHub趋势.md", "drafts/wechat/2026-10-23-github-weekly/research.json"],
+  "cta": "排名取自 Trending 页面顺序｜周增 Star 仅代表抓取时点",
+  "items": [
+    {"id":"morluto/rea","name":"morluto/rea","rank":1,"description":"可追溯的 Agent 反向工程","category":"证据链","language":"TypeScript","weekly_stars":106341,"icon_key":"reverse-engineering-chip"},
+    {"id":"anthropics/claude-plugins-official","name":"anthropics/claude-plugins-official","rank":2,"description":"官方 Claude Code 插件目录","category":"能力入口","language":"Python","weekly_stars":5649,"icon_key":"plugin-cursor"},
+    {"id":"ruvnet/ruflo","name":"ruvnet/ruflo","rank":3,"description":"编排、记忆与 RAG","category":"系统编排","language":"TypeScript","weekly_stars":3708,"icon_key":"agent-radar"},
+    {"id":"android/skills","name":"android/skills","rank":4,"description":"Trending 描述未提供","category":"Skills","language":"Kotlin","weekly_stars":1384,"icon_key":"engineering-toolbox"},
+    {"id":"K-Dense-AI/scientific-agent-skills","name":"K-Dense-AI/scientific-agent-skills","rank":5,"description":"科研 Skills 与数据库入口","category":"领域知识","language":"Python","weekly_stars":3967,"icon_key":"engineering-toolbox"}
+  ]
+}

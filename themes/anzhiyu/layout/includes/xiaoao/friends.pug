@@ -1,0 +1,50 @@
+- const xaLinkGroups = site.data.link || []
+- const xaEcosystem = xaLinkGroups.length ? xaLinkGroups[0].link_list || [] : []
+- const xaPersonal = xaLinkGroups.length > 1 ? xaLinkGroups[1].link_list || [] : []
+section.xa-friends
+  nav.xa-page-return(aria-label="页面导航")
+    button(type="button" data-xa-back data-fallback="/")
+      i.anzhiyufont.anzhiyu-icon-chevron-left
+      span 返回上一页
+    .xa-page-crumb
+      a(href=url_for('/')) 首页
+      span /
+      b 友链
+  header.xa-page-head
+    span.xa-kicker AI ECOSYSTEM / FRIENDS
+    h1 友链与工具
+    p 一半是我常用和持续关注的 AI 工具，一半留给互相认真写作的人。
+  .xa-friend-filter(role="toolbar" aria-label="资源筛选")
+    button.is-active(type="button" data-link-filter="all" aria-pressed="true") 全部
+    each category in ['平台','编程助手','Agent','开源','DevOps']
+      button(type="button" data-link-filter=category aria-pressed="false")= category
+  .xa-friend-grid
+    each item in xaEcosystem
+      a.xa-friend-card.xa-glass-panel(href=item.link target="_blank" rel="noopener noreferrer" data-link-category=item.category data-reveal data-glass-spotlight)
+        .xa-friend-card__top
+          img(src=url_for(item.avatar) alt=`${item.name} 图标` loading="lazy")
+          span= item.category
+        h2= item.name
+        p= item.descr
+        .xa-friend-card__foot
+          small= item.tag || '官方资源'
+          b ↗
+  section.xa-personal-links.xa-glass-panel(data-reveal data-glass-spotlight)
+    div
+      span.xa-kicker PERSONAL LINKS
+      h2 个人友链
+      p 这里留给持续创作、有明确署名和稳定访问地址的个人站点。
+    if xaPersonal.length
+      .xa-personal-links__list
+        each item in xaPersonal
+          a(href=item.link target="_blank" rel="noopener noreferrer")
+            img(src=url_for(item.avatar) alt=`${item.name} 头像`)
+            span
+              b= item.name
+              small= item.descr
+    else
+      .xa-personal-empty
+        i.anzhiyufont.anzhiyu-icon-link
+        strong 还没有添加个人友链
+        p 交换友链时，请附上站点名称、地址、头像和一句真实介绍。
+        a(href="mailto:17752683350@qq.com?subject=小遨博客友链申请") 发送申请 ↗

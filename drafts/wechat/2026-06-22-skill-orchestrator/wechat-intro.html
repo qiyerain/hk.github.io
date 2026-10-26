@@ -1,0 +1,16 @@
+<section style="font-family:-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;color:#0f172a;font-size:16px;line-height:1.75;background:#ffffff;padding:24px 16px;max-width:680px;margin:0 auto">
+<section style="margin:18px 0"><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/architecture.png" alt="封面" style="width:100%;max-width:100%;height:auto;display:block;border-radius:8px;border:1px solid #1f2937"><p style="text-align:center;color:#64748b;font-size:13px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;margin:6px 0 0">封面｜当 AI 学会排版：我如何用 3 个开源 Skill 编出一个自动化排版引擎</p></section>
+<h1 style="font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:24px;font-weight:700;color:#0f172a;margin:24px 0 16px;line-height:1.5"><span style="color:#22d3ee">$ </span>当 AI 学会排版：我如何用 3 个开源 Skill 编出一个自动化排版引擎</h1>
+<blockquote style="background:#0d1117;color:#e6edf3;border-left:3px solid #22d3ee;padding:14px 18px;margin:18px 0;border-radius:8px;font-size:15px;line-height:1.75"><strong style="color:#7c3aed;font-weight:700">你将学到</strong>：如何将 3 个独立的 AI Skill（md2mp、baoyu-publisher、自研编排器）组合成一个端到端的内容发布引擎——从选题研究到博客+公众平台双端同步，中间还定制了 6 套专属视觉风格。</blockquote>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">每次写完一篇技术文章，我都要重复三个痛苦步骤：调 Markdown 样式让它适配平台、手动上传图片到 OSS、再在后台粘贴排版。一篇文章光「搬砖」就要 40 分钟。</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">更糟的是，市面上的工具要么只管渲染（md2mp），要么只管发布（baoyu-publisher），没有一个能从「选题 → 写稿 → 渲染 → 博客 → 发布」一条龙跑完。</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">于是我决定：<strong style="color:#7c3aed;font-weight:700">不造轮子，而是把轮子编成引擎</strong>。</p>
+<p style="text-align:center;color:#94a3b8;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;letter-spacing:4px;margin:28px 0">— ◆ —</p>
+<h2 style="font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:18px;font-weight:700;color:#0f172a;margin:32px 0 12px;line-height:1.5"><span style="color:#7c3aed">&gt; </span>目录</h2>
+<ul style="margin:14px 0;padding-left:1.4em;color:#0f172a">
+<li style="margin:6px 0;line-height:1.8"><a href="#一三个轮子三种哲学" style="color:inherit;text-decoration:underline">一、三个轮子，三种哲学</a></li>
+<li style="margin:6px 0;line-height:1.8"><a href="#二编排架构不重造只缝合" style="color:inherit;text-decoration:underline">二、编排架构：不重造，只缝合</a></li>
+<li style="margin:6px 0;line-height:1.8"><a href="#三8-步工作流从选题到双端发布" style="color:inherit;text-decoration:underline">三、8 步工作流：从选题到双端发布</a></li>
+<li style="margin:6px 0;line-height:1.8"><a href="#四6-套专属风格系统" style="color:inherit;text-decoration:underline">四、6 套专属风格系统</a></li>
+<li style="margin:6px 0;line-height:1.8"><a href="#五三大设计原则" style="color:inherit;text-decoration:underline">五、三大设计原则</a></li>
+<li style="margin:6px 0;line-height:1.8"><a href="#六踩坑与收获" style="color:inherit;text-deco</section>

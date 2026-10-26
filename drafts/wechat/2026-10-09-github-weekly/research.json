@@ -1,0 +1,20 @@
+{
+  "captured_at": "2026-10-09T19:37:11+08:00",
+  "source": "https://github.com/trending?since=weekly",
+  "scope": "GitHub Trending weekly page, 11 visible repositories",
+  "thesis": "智能体工具正从单点能力转向持久协作生态",
+  "repositories": [
+    {"rank": 1, "repo": "boykopovar/AnyPS5", "url": "https://github.com/boykopovar/AnyPS5", "language": "C++", "total_stars": 18568, "weekly_stars": 10243, "description": "Tool for automatic PS5 executables porting to Linux and Windows"},
+    {"rank": 2, "repo": "mvschwarz/openrig", "url": "https://github.com/mvschwarz/openrig", "language": "TypeScript", "total_stars": 6287, "weekly_stars": 2693, "description": "Build your own network of agents from Claude Code, Codex and Pi: persistent teams with roles, shared context and owned work."},
+    {"rank": 3, "repo": "mattpocock/skills", "url": "https://github.com/mattpocock/skills", "language": "Shell", "total_stars": 281911, "weekly_stars": 7448, "description": "Skills for Real Engineers. Straight from my .agents directory."},
+    {"rank": 4, "repo": "heygen-com/hyperframes", "url": "https://github.com/heygen-com/hyperframes", "language": "TypeScript", "total_stars": 59477, "weekly_stars": 3996, "description": "Write HTML. Render video. Built for agents."},
+    {"rank": 5, "repo": "cursor/plugins", "url": "https://github.com/cursor/plugins", "language": "TypeScript", "total_stars": 10493, "weekly_stars": 1109, "description": "Cursor plugin specification and official plugins"},
+    {"rank": 6, "repo": "EpicGames/raddebugger", "url": "https://github.com/EpicGames/raddebugger", "language": "C", "total_stars": 8216, "weekly_stars": 448, "description": "A native, user-mode, multi-process, graphical debugger."},
+    {"rank": 7, "repo": "thedotmack/claude-mem", "url": "https://github.com/thedotmack/claude-mem", "language": "TypeScript", "total_stars": 98854, "weekly_stars": 3153, "description": "Persistent Context Across Sessions for Every Agent."},
+    {"rank": 8, "repo": "earthtojake/text-to-cad", "url": "https://github.com/earthtojake/text-to-cad", "language": "Python", "total_stars": 18607, "weekly_stars": 1898, "description": "Give your agent CAD superpowers."},
+    {"rank": 9, "repo": "pingdotgg/t3code", "url": "https://github.com/pingdotgg/t3code", "language": "TypeScript", "total_stars": 26491, "weekly_stars": 2317, "description": "No description shown on Trending."},
+    {"rank": 10, "repo": "Panniantong/Agent-Reach", "url": "https://github.com/Panniantong/Agent-Reach", "language": "Python", "total_stars": 94545, "weekly_stars": 6987, "description": "Give your AI agent eyes to see and search major internet platforms from one CLI."},
+    {"rank": 11, "repo": "DuarteSantos8/openGym", "url": "https://github.com/DuarteSantos8/openGym", "language": "JavaScript", "total_stars": 8327, "weekly_stars": 6086, "description": "Self-hosted gym and body-weight tracker."}
+  ],
+  "verification_note": "Names, links, languages, total stars and weekly stars were read from the official weekly page. No daily snapshot was used as weekly history."
+}

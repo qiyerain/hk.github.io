@@ -1,0 +1,50 @@
+public/
+db.json
+.deploy_git/
+node_modules/
+.idea/
+.claude/
+.codex/
+.qoder/
+.superpowers/
+.env.local
+/md2wechat.yaml
+/.baoyu-skills/.env
+
+# Admin app build output
+admin-app/dist/
+
+# 日志文件
+*.log
+npm-debug.log*
+*.pid
+*.tmp
+*.orig
+*.rej
+*.bak
+
+# 临时工作区、Python 与 QA 产物
+.cache/
+__pycache__/
+*.py[cod]
+qa-artifacts/
+
+# 依赖锁文件（可选）
+# package-lock.json
+# yarn.lock
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# Playwright MCP 缓存
+.playwright-mcp/
+
+# Hexo db
+db.json
+
+# Pinterest API 凭据（不提交到仓库）
+scripts_py/.pinterest_config.json
+
+# 相册原图只应通过 PicGo 上传到 OSS，不保留在仓库
+source/img/curated/

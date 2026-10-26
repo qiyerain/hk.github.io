@@ -1,0 +1,36 @@
+- const archivePosts = page.posts.toArray().filter(function (post) { return is_featured_post(post) })
+
+#archive.xa-archive.xa-article-index
+  header.xa-index-heading
+    h1= page.type === 'post-directory' ? (page.title === 'agent' ? 'AI 与 Agent' : page.title) : '文章'
+    span 最新发布 · 时间倒序
+  nav.xa-index-filters(aria-label="文章归档")
+    a(class=(page.type !== 'post-directory' ? 'is-active' : '') href=url_for('/archives/')) 全部文章
+    a(class=(page.type === 'post-directory' && page.title === 'agent' ? 'is-active' : '') href=url_for('/directory/agent/')) AI 与 Agent
+    a(class=(page.type === 'post-directory' && page.title === '后端' ? 'is-active' : '') href=url_for('/directory/后端/')) Java 与后端
+    a(class=(page.type === 'post-directory' && page.title === '面试' ? 'is-active' : '') href=url_for('/directory/面试/')) 面试
+    a(class=(page.type === 'post-directory' && page.title === '成长' ? 'is-active' : '') href=url_for('/directory/成长/')) 成长
+    a(href=url_for('/dirs/')) 目录归档
+    a(href=url_for('/tags/')) 标签归档
+  .xa-article-card-grid
+    each article, index in archivePosts
+      - const fallback = `/img/covers/cover-${(index % 8) + 1}.webp`
+      - const cover = article.cover || fallback
+      - const category = article.source.replace('_posts/', '').split('/')[0]
+      - const summary = strip_html(article.description || article.excerpt || article.content || '').replace(/\s+/g, ' ').slice(0, 100)
+      article.xa-article-card
+        a.xa-article-card__cover(href=url_for(article.path) aria-label=`阅读 ${article.title}`)
+          img(src=url_for(cover) alt=(article.cover_alt || article.title) loading=(index < 3 ? 'eager' : 'lazy') decoding="async" data-xa-fallback=url_for(fallback))
+        .xa-article-card__body
+          .xa-article-card__meta
+            time(datetime=date_xml(article.date))= date(article.date, 'YYYY.MM.DD')
+            a(href=url_for(`/directory/${encodeURIComponent(category)}/`))= category === 'agent' ? 'AI 与 Agent' : category
+          h2
+            a(href=url_for(article.path))= article.title || _p('no_title')
+          if summary
+            p= summary
+          if article.tags && article.tags.data.length
+            .xa-article-card__tags
+              each tag in article.tags.data.slice(0, 3)
+                a(href=url_for(tag.path)) ##{tag.name}
+  include ../pagination.pug

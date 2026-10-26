@@ -1,0 +1,233 @@
+{
+  "success": true,
+  "code": "PROVIDERS_SHOWN",
+  "message": "Providers shown",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "providers": [
+      {
+        "name": "gemini",
+        "aliases": [
+          "google"
+        ],
+        "description": "Google Gemini image generation provider",
+        "required_config": [
+          "IMAGE_API_KEY"
+        ],
+        "optional_config": [
+          "IMAGE_MODEL",
+          "IMAGE_SIZE"
+        ],
+        "default_model": "gemini-3.1-flash-image-preview",
+        "supported_models": [
+          {
+            "name": "gemini-3.1-flash-image-preview",
+            "description": "Gemini 3.1 Flash image preview",
+            "default": true
+          },
+          {
+            "name": "gemini-3-pro-image-preview",
+            "description": "Gemini 3 Pro image preview"
+          },
+          {
+            "name": "gemini-2.5-flash-image",
+            "description": "Gemini 2.5 Flash image model"
+          },
+          {
+            "name": "gemini-2.5-flash-preview-image",
+            "description": "Gemini 2.5 Flash preview compatibility name"
+          },
+          {
+            "name": "gemini-2.0-flash-exp-image-generation",
+            "description": "Gemini 2.0 Flash experimental image generation"
+          }
+        ],
+        "supports_size": true,
+        "current": false,
+        "configured": true
+      },
+      {
+        "name": "modelscope",
+        "aliases": [
+          "ms"
+        ],
+        "description": "ModelScope image generation provider",
+        "required_config": [
+          "IMAGE_API_KEY"
+        ],
+        "optional_config": [
+          "IMAGE_API_BASE",
+          "IMAGE_MODEL",
+          "IMAGE_SIZE"
+        ],
+        "default_base_url": "https://api-inference.modelscope.cn",
+        "default_model": "Tongyi-MAI/Z-Image-Turbo",
+        "supported_models": [
+          {
+            "name": "Tongyi-MAI/Z-Image-Turbo",
+            "description": "Default verified ModelScope image model",
+            "default": true
+          }
+        ],
+        "supports_size": true,
+        "current": false,
+        "configured": true
+      },
+      {
+        "name": "openai",
+        "description": "OpenAI-compatible image generation provider",
+        "required_config": [
+          "IMAGE_API_KEY"
+        ],
+        "optional_config": [
+          "IMAGE_API_BASE",
+          "IMAGE_MODEL",
+          "IMAGE_SIZE"
+        ],
+        "default_base_url": "https://api.openai.com/v1",
+        "default_model": "gpt-image-2",
+        "supported_models": [
+          {
+            "name": "gpt-image-2",
+            "description": "OpenAI current primary image model",
+            "default": true
+          },
+          {
+            "name": "gpt-image-1.5",
+            "description": "Previous state-of-the-art OpenAI image model"
+          },
+          {
+            "name": "gpt-image-1",
+            "description": "Previous generation general image model"
+          },
+          {
+            "name": "gpt-image-1-mini",
+            "description": "Lower-cost OpenAI image model"
+          },
+          {
+            "name": "dall-e-3",
+            "description": "Legacy compatibility model"
+          },
+          {
+            "name": "dall-e-2",
+            "description": "Legacy compatibility model"
+          }
+        ],
+        "supports_size": true,
+        "current": false,
+        "configured": true
+      },
+      {
+        "name": "openrouter",
+        "aliases": [
+          "or"
+        ],
+        "description": "OpenRouter image generation provider",
+        "required_config": [
+          "IMAGE_API_KEY"
+        ],
+        "optional_config": [
+          "IMAGE_API_BASE",
+          "IMAGE_MODEL",
+          "IMAGE_SIZE"
+        ],
+        "default_base_url": "https://openrouter.ai/api/v1",
+        "default_model": "google/gemini-3-pro-image-preview",
+        "supported_models": [
+          {
+            "name": "google/gemini-3-pro-image-preview",
+            "description": "Gemini 3 Pro via OpenRouter",
+            "default": true
+          },
+          {
+            "name": "google/gemini-2.5-flash-image-preview",
+            "description": "Gemini 2.5 Flash via OpenRouter"
+          },
+          {
+            "name": "black-forest-labs/flux.2-pro",
+            "description": "Flux 2 Pro"
+          },
+          {
+            "name": "black-forest-labs/flux.2-flex",
+            "description": "Flux 2 Flex"
+          },
+          {
+            "name": "sourceful/riverflow-v2-standard-preview",
+            "description": "Riverflow v2 standard"
+          },
+          {
+            "name": "sourceful/riverflow-v2-fast",
+            "description": "Riverflow v2 fast"
+          },
+          {
+            "name": "sourceful/riverflow-v2-pro",
+            "description": "Riverflow v2 pro"
+          }
+        ],
+        "supports_size": true,
+        "current": false,
+        "configured": true
+      },
+      {
+        "name": "tuzi",
+        "description": "TuZi image generation provider",
+        "required_config": [
+          "IMAGE_API_KEY",
+          "IMAGE_API_BASE"
+        ],
+        "optional_config": [
+          "IMAGE_MODEL",
+          "IMAGE_SIZE"
+        ],
+        "default_model": "doubao-seedream-4-5-251128",
+        "supported_models": [
+          {
+            "name": "doubao-seedream-4-5-251128",
+            "description": "Doubao Seedream 4.5",
+            "default": true
+          },
+          {
+            "name": "gemini-3-pro-image-preview",
+            "description": "Gemini 3 Pro image preview"
+          }
+        ],
+        "supports_size": true,
+        "current": false,
+        "configured": true
+      },
+      {
+        "name": "volcengine",
+        "aliases": [
+          "volc"
+        ],
+        "description": "Volcengine Ark image generation provider",
+        "required_config": [
+          "IMAGE_API_KEY"
+        ],
+        "optional_config": [
+          "IMAGE_API_BASE",
+          "IMAGE_MODEL",
+          "IMAGE_SIZE"
+        ],
+        "default_base_url": "https://ark.cn-beijing.volces.com/api/v3",
+        "default_model": "doubao-seedream-5-0-260128",
+        "supported_models": [
+          {
+            "name": "doubao-seedream-5-0-260128",
+            "description": "Doubao Seedream 5.0",
+            "default": true
+          },
+          {
+            "name": "doubao-seedream-5-0-lite-260128",
+            "description": "Doubao Seedream 5.0 Lite"
+          }
+        ],
+        "supports_size": true,
+        "current": true,
+        "configured": true
+      }
+    ]
+  }
+}

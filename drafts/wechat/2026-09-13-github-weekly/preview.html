@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub 开源趋势周报 2026-09-13</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f4ef;
+      --panel: #fffdf7;
+      --ink: #1f1f1f;
+      --muted: #5f5a52;
+      --border: #ddd6c7;
+      --warn: #8c5c00;
+      --error: #9b1c1c;
+      --info: #1f5d8a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Georgia, "Noto Serif SC", serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #efede5 0%, #f9f7f1 100%);
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      gap: 24px;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 12px 32px rgba(59, 43, 17, 0.08);
+    }
+    h1, h2, h3 { margin: 0 0 12px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-top: 24px; }
+    .meta-row { margin-bottom: 14px; }
+    .meta-label { font-size: 12px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.08em; }
+    .meta-value { font-size: 16px; margin-top: 4px; word-break: break-word; }
+    .meta-source { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+      background: #fbf8f0;
+    }
+    .check {
+      border-left: 4px solid var(--border);
+      padding: 10px 12px;
+      background: #fcfaf4;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+    .check.warn { border-color: var(--warn); }
+    .check.error { border-color: var(--error); }
+    .check.info { border-color: var(--info); }
+    .check-code { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .article-shell {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 16px 40px rgba(40, 33, 18, 0.10);
+    }
+    .banner {
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 18px;
+      background: #faf6ec;
+      color: var(--muted);
+    }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #f6f3eb;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      overflow: auto;
+    }
+    @media (max-width: 960px) {
+      .shell { grid-template-columns: 1fr; }
+      .article-shell { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="panel">
+      <h1>Publish Preview</h1>
+      <div class="meta-source">drafts/wechat/2026-09-13-github-weekly/article.md</div>
+
+      <h2>Resolved Metadata</h2>
+      <div class="meta-row">
+        <div class="meta-label">Title</div>
+        <div class="meta-value">GitHub 开源趋势周报 2026-09-13</div>
+        <div class="meta-source">frontmatter.title · 24 / 32</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Author</div>
+        <div class="meta-value">—</div>
+        <div class="meta-source">fallback.empty · 0 / 16</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Digest</div>
+        <div class="meta-value">本周开源热度从模型能力转向智能体工作方法，TOP 5 由 i-have-adhd、gods-eye-view、archify、ponytail 与 ECC 领衔。</div>
+        <div class="meta-source">frontmatter.description · 81 / 128</div>
+      </div>
+
+      <h2>Context</h2>
+      <span class="pill">mode: api</span>
+      <span class="pill">theme: github-readme</span>
+      <span class="pill">font: medium</span>
+      <span class="pill">background: none</span>
+      <span class="pill">preview: degraded</span>
+
+      <h2>Structure</h2>
+      <div class="meta-row">
+        <div class="meta-label">Body H1</div>
+        <div class="meta-value">—</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-label">Images</div>
+        <div class="meta-value">4 total · 0 local · 4 remote · 0 ai</div>
+      </div>
+
+      <h2>Checks</h2>
+
+
+          <div class="check info">
+            <div class="check-code">info · DIGEST_METADATA_ONLY</div>
+            <div>Digest affects draft metadata, not body HTML rendering</div>
+            <div class="meta-source">use body content or theme behavior to control visible article summary inside the HTML</div>
+          </div>
+
+          <div class="check info">
+            <div class="check-code">info · IMAGE_REPLACEMENT_REQUIRES_UPLOAD_OR_DRAFT</div>
+            <div>Images are only uploaded and replaced during upload or draft flows</div>
+            <div class="meta-source">use --upload or --draft when you need local/remote/AI image references rewritten to published URLs</div>
+          </div>
+
+
+    </aside>
+
+    <main class="panel">
+      <div class="article-shell">
+
+          <div class="banner">Preview degraded: exact HTML could not be rendered in the current environment.</div>
+
+
+          <div class="banner">Render error: API call failed: API_ERROR: API returned error code 401: Invalid API Key format. Supported prefixes: wme_, wme2_, wmt_.</div>
+
+
+          <h1 style="margin-bottom:12px;">GitHub 开源趋势周报 2026-09-13</h1>
+
+          <p style="color:#666;">本周开源热度从模型能力转向智能体工作方法，TOP 5 由 i-have-adhd、gods-eye-view、archify、ponytail 与 ECC 领衔。</p>
+          <h2 style="margin-top:24px;">Markdown Body</h2>
+          <pre>&gt; **一句话结论：开源热度正从模型能力转向智能体工作方法。**
+
+这一期能帮你快速完成两件事：先看清本周真正增长最快的项目，再从中挑出适合自己工作流的工具。结论先说：榜单的注意力没有集中在更大的模型，而是落在“怎样让智能体少绕路、少写无用代码、产出可核验结果”上。
+
+数据抓取时间为 **2026-09-13 20:43（北京时间）**。本期以 [GitHub Trending weekly](https://github.com/trending?since=weekly) 页面为周榜口径；本周新增 Star 取自该页面，总 Star 与语言由 GitHub 仓库接口在同一时段复核。数字会随时间继续变化，本文保留的是抓取时快照。
+
+![2026 年第 37 周 GitHub TOP 5 榜单摘要](https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-poster-1080x1350.png)
+
+&gt; 图注：按 GitHub Trending weekly 页面显示的“stars this week”降序整理；总 Star 另由 GitHub 仓库接口复核。
+
+## 本周概览
+
+周榜共读取到 23 个项目。最明显的变化，是智能体项目开始从“再造一个框架”转向更细的工作环节：输出怎么排、上下文怎么省、代码怎么收敛、图表怎么验证、经验怎么沉淀。
+
+TOP 5 中有四项直接服务于智能体或开发工作流。唯一的非同类项目 `gods-eye-view`，把航班、船舶、卫星、地震和公共摄像头等公开信号放到一个三维地球上，凭完整的可交互体验冲到新增 Star 第二位。
+
+## TOP 5 快览
+
+本期 TOP 5 按本周新增 Star 排序，不等同于 GitHub 页面默认展示次序：
+
+1. [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)：Python，43,830 Stars，本周 **&#43;15,924**。让编码助手先给答案，再给步骤。
+2. [bilawalsidhu/gods-eye-view](https://github.com/bilawalsidhu/gods-eye-view)：JavaScript，31,012 Stars，本周 **&#43;10,510**。在浏览器中汇聚公开空间信号。
+3. [tt-a1i/archify](https://github.com/tt-a1i/archify)：JavaScript，60,210 Stars，本周 **&#43;10,442**。把结构化描述确定性渲染成可验证架构图。
+4. [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)：JavaScript，136,962 Stars，本周 **&#43;9,272**。用 YAGNI 思路约束编码智能体的过度实现。
+5. [affaan-m/ECC](https://github.com/affaan-m/ECC)：JavaScript，257,424 Stars，本周 **&#43;8,086**。把计划、测试、评审、记忆与安全扫描组织成工程系统。
+
+![本周高热项目集中在工作方法、表达验证和真实世界工具三条线](https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-trend-map-1200x675.png)
+
+&gt; 图注：依据本期周榜前 15 个仓库说明归纳，三类为本文整理口径，并非 GitHub 官方分类。
+
+## AI 项目重点
+
+### 1. [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)
+
+- **语言与热度**：Python；43,830 Stars；本周 &#43;15,924。
+- **解决的问题**：编码助手常把结论埋在解释、铺垫和旁枝里，读者需要滚动很久才知道下一步做什么。
+- **核心亮点**：把“动作先行、步骤编号、限制旁枝、给出下一步”等十条规则封装成可安装技能；项目同时提供多语言说明。
+- **适用人群**：高频使用编码助手、需要快速扫描结果的人，以及希望统一团队智能体输出方式的开发者。
+- **落地场景**：故障处理、代码修改指令、评审结论、需要在手机上快速读取的任务回报。
+
+它解决的是交付顺序，不是事实质量。装上之后，答案可能更短、更容易执行，但模型给出的技术判断仍要通过测试和来源核验。
+
+### 3. [tt-a1i/archify](https://github.com/tt-a1i/archify)
+
+- **语言与热度**：JavaScript；60,210 Stars；本周 &#43;10,442。
+- **解决的问题**：聊天中生成的系统图经常只“看起来合理”，缺少稳定输入、可重复渲染和机器校验。
+- **核心亮点**：以类型化 JSON 作为中间表示，确定性编译为 HTML/SVG；支持架构、流程、时序、数据流与生命周期图，并提供验证收据和多种导出格式。
+- **适用人群**：架构师、技术负责人、需要用 Codex、Claude Code、Cursor 或 OpenCode 交付技术图的团队。
+- **落地场景**：设计评审、合并请求中的架构差异、运行链路讲解、可复现的系统文档。
+
+它的价值不在“画得更炫”，而在输入、输出和检查都有明确边界。仓库也说明：架构差异图不会自行推断运行影响、风险或是否可以合并。
+
+### 4. [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
+
+- **语言与热度**：JavaScript；136,962 Stars；本周 &#43;9,272。
+- **解决的问题**：编码智能体容易安装多余依赖、搭建过度抽象，或把一个小需求扩成一套框架。
+- **核心亮点**：用 YAGNI、标准库优先和已有依赖优先的决策阶梯约束实现范围，同时明确不牺牲验证、错误处理、安全和可访问性。
+- **适用人群**：维护成熟代码库的工程师、技术负责人，以及担心 AI 生成代码带来维护负担的团队。
+- **落地场景**：需求收敛、实现前检查、代码评审、删除不必要改动和控制技术债。
+
+项目给出的基准是特定模型、特定仓库和 12 项任务上的结果，不能直接外推到所有工程。更稳妥的用法，是把它当评审规则，而不是“必然减少某个百分比代码量”的承诺。
+
+### 5. [affaan-m/ECC](https://github.com/affaan-m/ECC)
+
+- **语言与热度**：JavaScript；257,424 Stars；本周 &#43;8,086。
+- **解决的问题**：单靠提示词难以持续组织计划、测试、实现、评审、记忆和安全检查，多轮任务容易丢失约束。
+- **核心亮点**：提供智能体、技能、命令、钩子、记忆与 AgentShield 扫描，并给出 Claude Code、Codex 等平台的安装与支持说明。
+- **适用人群**：已经把编码智能体用于长期项目、需要团队级流程和安全检查的开发者。
+- **落地场景**：测试驱动开发、构建修复、安全审查、多阶段任务编排与经验沉淀。
+
+ECC 的覆盖面也意味着接入成本更高。仓库明确提示不同平台能力并不完全一致，落地前应先看支持矩阵，再决定是否引入整套系统。
+
+## 其他热门项目
+
+### 2. [bilawalsidhu/gods-eye-view](https://github.com/bilawalsidhu/gods-eye-view)
+
+- **语言与热度**：JavaScript；31,012 Stars；本周 &#43;10,510。
+- **解决的问题**：航班、船舶、卫星、地震、道路与公共摄像头等公开信号分散在不同数据源，很难从全球视角连续探索。
+- **核心亮点**：三维地球、实时或定期更新的数据层、对象追踪、驾驶舱视角和语音控制；基础路径可以无密钥启动，部分高阶数据源需单独配置。
+- **适用人群**：地理信息开发者、数据可视化工程师、开源情报研究者和交互媒体创作者。
+- **落地场景**：空间数据演示、公开信号教学、三维地图原型和多数据层联动实验。
+
+项目文档主动标明了边界：道路车辆依据真实道路模拟；摄像头朝向与火箭轨迹包含粗略估计。它适合探索与展示，不应被当作未经核验即可使用的事实系统。
+
+此外还有几项值得留意：
+
+- [heygen-com/hyperframes](https://github.com/heygen-com/hyperframes)：TypeScript，49,332 Stars，本周 &#43;5,124；用 HTML 描述并渲染视频，面向智能体生成管线。
+- [microsoft/markitdown](https://github.com/microsoft/markitdown)：Python，183,433 Stars，本周 &#43;4,823；把 Office、PDF 等文件转换为 Markdown。
+- [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design)：HTML，39,037 Stars，本周 &#43;7,409；提供 38 种编辑型图表方案。
+- [THU-MAIC/OpenMAIC](https://github.com/THU-MAIC/OpenMAIC)：TypeScript，36,339 Stars，本周 &#43;4,417；构建多智能体互动课堂。
+- [Tencent/WeKnora](https://github.com/Tencent/WeKnora)：Go，22,775 Stars，本周 &#43;1,168；把文档组织为可查询的 RAG、推理智能体与持续维护的知识库。
+
+## 本周最值得看
+
+第一名 `i-have-adhd` 最值得看，不是因为它技术栈复杂，而是它把一个人人都遇到的问题切得很准：答案有时并不差，只是交付顺序不适合执行。
+
+它与 `ponytail`、`ECC`、`archify` 放在一起看更有意义。前两者约束“说什么、写多少”，ECC 组织完整工程过程，archify 把结构化事实变成可复核的图。四个项目共同把智能体能力从模型参数拉回日常工作。
+
+![i-have-adhd 用四步规则约束答案交付顺序](https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-first-place-1200x675.png)
+
+&gt; 图注：依据 i-have-adhd 项目 README 的规则摘要整理；它约束输出结构，不保证模型技术判断正确。
+
+## 趋势观察
+
+1. **技能仓库正在变成工作方法仓库。** `i-have-adhd`、`ponytail` 和 `ECC` 的增长，说明开发者愿意为可重复使用的行为规则投票。
+2. **确定性输出比一次性演示更受重视。** `archify` 将结构化输入、校验与导出放到同一条链路，降低了“图很好看但无法复现”的风险。
+3. **浏览器仍是复杂工具的最佳展示面之一。** `gods-eye-view` 和 `hyperframes` 分别把空间信号与视频渲染放入 Web 技术栈，缩短了体验和二次开发距离。
+4. **Star 是注意力，不是成熟度。** 热度能告诉我们社区正在看什么，却不能代替许可证、数据口径、安全和生产验证。
+
+![按痛点选择本周 TOP 5 项目的落地矩阵](https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-action-matrix-1200x675.png)
+
+&gt; 图注：落地门槛为本文基于 README 的相对判断；建议从一个具体任务试用，不把 Star 数等同于生产成熟度。
+
+## 本周榜单摘要海报
+
+本期摘要海报已经放在导语后，适合保存后快速回看。三秒版本只有一句：**先关注能改善工作方法的项目，再考虑功能更大的系统。**
+
+## 来源
+
+- [GitHub Trending weekly](https://github.com/trending?since=weekly)，抓取于 2026-09-13 20:43（北京时间）。
+- TOP 5 的总 Star、语言与仓库描述由对应 GitHub 仓库接口在同一时段复核。
+- 项目能力、适用方式与限制来自各项目公开 README；本文的分类、推荐与落地门槛属于编辑整理，不是 GitHub 官方结论。
+- 本期只使用 weekly 页面提供的周新增数据，没有用 daily 快照推算整周历史。</pre>
+
+      </div>
+    </main>
+  </div>
+</body>
+</html>

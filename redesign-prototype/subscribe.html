@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>订阅 · 小遨的个人博客</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="common.css" />
+<style>
+.page-head .glow-a{width:30vw;height:30vw;left:-6vw;top:8vh}
+.page-head .glow-b{width:22vw;height:22vw;right:-4vw;top:0}
+.sub-main{max-width:1200px;margin:0 auto;padding:clamp(40px,6vh,64px) var(--pad-x) 60px}
+.sub-intro{margin-bottom:64px;max-width:60ch;color:var(--fg-soft);font-size:18px;line-height:1.8}
+.sub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:72px}
+@media(max-width:860px){.sub-grid{grid-template-columns:1fr}}
+.sub-card{padding:36px 32px;display:flex;flex-direction:column;position:relative;overflow:hidden;min-height:340px;transition:transform .3s var(--ease-out)}
+.sub-card:hover{transform:translateY(-4px)}
+.sub-card .ic{width:52px;height:52px;border-radius:14px;background:var(--muted);display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:22px;color:var(--fg-soft);margin-bottom:24px}
+.sub-card .st{font-family:var(--serif);font-size:24px;font-weight:600}
+.sub-card .se{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-dim);margin-top:8px}
+.sub-card .sd{color:var(--fg-soft);font-size:14px;line-height:1.7;margin-top:18px;flex:1}
+.sub-card .act{margin-top:24px}
+.sub-btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:12px 20px;border-radius:var(--radius-pill);background:var(--fg);color:var(--bg);border:none;cursor:pointer;transition:transform .3s var(--ease-out);text-decoration:none}
+.sub-btn:hover{transform:translateY(-2px)}
+.sub-btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--glass-border)}
+.sub-btn.ghost:hover{background:var(--muted)}
+.email-form{display:flex;gap:8px;margin-top:24px}
+.email-form input{flex:1;background:var(--muted);border:1px solid var(--border);border-radius:var(--radius-pill);padding:12px 18px;color:var(--fg);font-family:var(--sans);font-size:14px;outline:none;transition:border-color .25s}
+.email-form input:focus{border-color:var(--fg-soft)}
+.email-form input::placeholder{color:var(--fg-dim)}
+.email-note{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--fg-dim);margin-top:10px;line-height:1.5}
+.rss-list{margin-top:24px;display:flex;flex-direction:column;gap:8px}
+.rss-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border:1px solid var(--border);border-radius:12px;background:var(--card);transition:border-color .25s,background .25s;text-decoration:none;color:inherit}
+.rss-item:hover{border-color:var(--glass-border);background:var(--muted)}
+.rss-item .rn{font-size:14px}
+.rss-item .ru{font-family:var(--mono);font-size:11px;color:var(--fg-dim);letter-spacing:.04em}
+.faq{margin-bottom:60px}
+.faq-h{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:28px}
+.faq-item{padding:24px 0;border-top:1px solid var(--border)}
+.faq-item:last-child{border-bottom:1px solid var(--border)}
+.faq-q{font-family:var(--serif);font-size:18px;font-weight:600;display:flex;gap:12px;align-items:baseline;cursor:pointer}
+.faq-q .qm{font-family:var(--mono);font-size:12px;color:var(--fg-dim);flex-shrink:0}
+.faq-a{color:var(--fg-soft);font-size:15px;line-height:1.7;margin-top:14px;padding-left:28px;max-width:64ch;display:none}
+.faq-item.open .faq-a{display:block;animation:fade .4s var(--ease-out)}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<nav class="nav" id="nav">
+  <div class="nav-brand" onclick="location.href='index.html'">小遨的个人博客</div>
+  <ul class="nav-center">
+    <li class="nav-item">
+      <button class="nav-link">文章 <span class="caret">▾</span></button>
+      <ul class="nav-drop">
+        <li><a href="archive.html">全部文章 <span>All</span></a></li>
+        <li><a href="archive.html#month">按月份 <span>By Month</span></a></li>
+        <li><a href="archive.html#tag">按标签 <span>By Tag</span></a></li>
+        <li><a href="archive.html#dir">按目录 <span>By Dir</span></a></li>
+      </ul>
+    </li>
+    <li class="nav-item"><a class="nav-link" href="albums.html">相册</a></li>
+    <li class="nav-item"><a class="nav-link" href="friends.html">友链</a></li>
+    <li class="nav-item"><a class="nav-link" href="wechat.html">公众号</a></li>
+    <li class="nav-item"><a class="nav-link" href="about.html">关于</a></li>
+  </ul>
+  <div class="nav-tools">
+    <button class="icon-btn" aria-label="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+    <button class="icon-btn" id="dirBtn" aria-label="目录树"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/><path d="M3 11h18"/></svg></button>
+    <button class="icon-btn theme-toggle" id="themeToggle" aria-label="切换深浅主题">
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></svg>
+    </button>
+    <button class="icon-btn nav-burger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</nav>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="dir-drawer" id="dirDrawer" aria-hidden="true">
+  <div class="dir-drawer-head"><span class="ttl">目录树 · Directory</span><button class="dir-close" id="dirClose" aria-label="关闭">✕</button></div>
+  <div class="dir-tree">
+    <ul>
+      <li class="open"><div class="folder open"><span class="tri">▶</span>工具系列</div>
+        <ul><li><a class="leaf" href="post.html">当一支笔被使用三年</a></li><li><div class="leaf">六年的剪刀</div></li></ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>写作随笔</div>
+        <ul><li><a class="leaf" href="post.html">夜里改掉的一个词</a></li></ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>城市</div>
+        <ul><li><div class="leaf">广州的雨有它自己的语法</div></li></ul>
+      </li>
+    </ul>
+  </div>
+  <div class="dir-drawer-foot">查看完整目录 ↗</div>
+</aside>
+
+<header class="page-head">
+  <span class="glow glow-a"></span><span class="glow glow-b"></span>
+  <div class="ph-inner">
+    <div class="crumbs"><a href="index.html">首页</a><span>/</span><span>订阅</span></div>
+    <h1 class="ph-title">订阅</h1>
+    <div class="ph-en">/ Subscribe</div>
+    <p class="ph-desc">三种方式，让文章自己来找你。</p>
+  </div>
+</header>
+
+<main class="sub-main">
+  <p class="sub-intro reveal">我不发广告，也不群发推广。每周最多一封，关于工具、写作和被时间磨旧的生活。选一种你顺手的方式就好，没有哪种比哪种更"正确"。</p>
+
+  <div class="sub-grid reveal">
+    <div class="glass sub-card">
+      <div class="ic">@</div>
+      <div class="st">邮箱订阅</div>
+      <div class="se">Email · 每周三晚</div>
+      <p class="sd">文章发布后，直接寄到你的邮箱。像一封信，不像一份推送。可随时退订，链接在每封邮件底部。</p>
+      <form class="email-form" onsubmit="event.preventDefault();this.querySelector('button').textContent='已订阅 ✓'">
+        <input type="email" placeholder="your@email.com" required>
+        <button class="sub-btn" type="submit">订阅</button>
+      </form>
+      <div class="email-note">订阅即同意接收每周邮件。邮箱仅用于发送文章，不会转交第三方。</div>
+    </div>
+
+    <div class="glass sub-card">
+      <div class="ic">RSS</div>
+      <div class="st">RSS 订阅</div>
+      <div class="se">Feed Reader · 实时</div>
+      <p class="sd">把博客当成一个源，丢进你习惯的阅读器。不打扰、不推送，只有你主动打开时才会看到。</p>
+      <div class="rss-list">
+        <a class="rss-item" href="#"><span class="rn">全站文章</span><span class="ru">/feed.xml</span></a>
+        <a class="rss-item" href="#"><span class="rn">仅随笔</span><span class="ru">/feed.xml?cat=essay</span></a>
+        <a class="rss-item" href="#"><span class="rn">仅工具</span><span class="ru">/feed.xml?cat=tool</span></a>
+      </div>
+    </div>
+
+    <div class="glass sub-card">
+      <div class="ic">微</div>
+      <div class="st">微信公众号</div>
+      <div class="se">WeChat · 每周三晚</div>
+      <p class="sd">公众号是博客的延伸。同样的内容，换一种呼吸方式重讲一遍。在微信里阅读更顺手的人，选这个。</p>
+      <div class="act"><a class="sub-btn ghost" href="wechat.html">前往公众号页 ↗</a></div>
+      <p class="sd" style="margin-top:20px;font-size:13px;color:var(--fg-dim)">或直接搜索公众号：<b style="color:var(--fg-soft)">小遨的写字台</b></p>
+    </div>
+  </div>
+
+  <section class="faq reveal">
+    <div class="faq-h">常见问题 · <span style="color:var(--fg-soft)">FAQ</span></div>
+    <div class="faq-item">
+      <div class="faq-q"><span class="qm">Q</span><span>邮箱订阅和公众号内容一样吗？</span></div>
+      <div class="faq-a">不完全一样。公众号版本会针对移动端阅读做一些删改和排版调整，邮箱版更接近博客原文。核心内容是一致的。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span class="qm">Q</span><span>多久更新一次？</span></div>
+      <div class="faq-a">每周三晚更新一次。偶尔会有额外的一篇，但绝不会变成日更。慢一点，是这个博客的一部分。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span class="qm">Q</span><span>可以退订吗？</span></div>
+      <div class="faq-a">可以。每封邮件底部都有退订链接，一键即可。RSS 则更简单——从阅读器里删掉源就行，不需要通知我。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span class="qm">Q</span><span>会卖我的邮箱吗？</span></div>
+      <div class="faq-a">不会。邮箱只用于发送文章，不转交、不出售、不做任何分析。这是我做这个博客的底线。</div>
+    </div>
+  </section>
+</main>
+
+<footer class="page-foot"><span>© 2026 小遨</span><span><a href="index.html">回到首页</a></span></footer>
+
+<script src="common.js"></script>
+<script>
+/* FAQ 折叠 */
+(function(){
+  document.querySelectorAll('.faq-q').forEach(function(q){
+    q.addEventListener('click',function(){q.closest('.faq-item').classList.toggle('open')});
+  });
+})();
+</script>
+</body>
+</html>

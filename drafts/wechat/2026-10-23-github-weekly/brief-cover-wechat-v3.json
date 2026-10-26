@@ -1,0 +1,48 @@
+{
+  "kind": "diagram",
+  "title": "GitHub 周报：Agent 开始比拼证据链、隔离与恢复",
+  "headline": "GitHub 热门项目",
+  "deck": "本周判断：Agent 工程化进入深水区",
+  "date": "2026-10-23",
+  "date_label": "2026 年第 43 周",
+  "edition": "每周趋势",
+  "captured_at": "2026-10-23T18:17:34+08:00",
+  "channel": "wechat",
+  "aspect": "cover",
+  "template_id": "data-terminal",
+  "source_label": "GitHub Trending / PFA 周报",
+  "source_urls": [
+    "https://github.com/trending?since=weekly",
+    "https://github.com/morluto/rea",
+    "https://github.com/stablyai/orca",
+    "https://github.com/ruvnet/ruflo"
+  ],
+  "source_files": [
+    "source/_posts/每周GitHub趋势/2026-10-23-GitHub趋势.md"
+  ],
+  "cta": "本周主线｜证据可复核 · 执行可隔离 · 状态可恢复",
+  "items": [
+    {
+      "id": "evidence",
+      "name": "证据可复核",
+      "description": "rea",
+      "category": "rea / 分析证据链",
+      "icon_key": "reverse-engineering-chip"
+    },
+    {
+      "id": "isolation",
+      "name": "执行可隔离",
+      "description": "orca",
+      "category": "orca / worktree 隔离",
+      "icon_key": "ui-window"
+    },
+    {
+      "id": "recovery",
+      "name": "状态可恢复",
+      "description": "ruflo",
+      "category": "ruflo / 编排与状态",
+      "icon_key": "agent-radar"
+    }
+  ],
+  "edges": []
+}

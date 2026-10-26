@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://blog.pengfanao.top/sitemap.xml
+
+# 禁止访问管理后台
+Disallow: /admin/

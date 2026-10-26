@@ -1,0 +1,137 @@
+{
+  "skill": "pfa-content-generate-image",
+  "skill_version": 1,
+  "brand_mark": "pfa",
+  "renderer": "html-svg",
+  "template_id": "data-terminal",
+  "template_name": "数据终端",
+  "route_score": 100,
+  "route_reasons": [
+    "explicit template override"
+  ],
+  "generated_at": "2026-10-23T17:10:41+08:00",
+  "status": "ok",
+  "aspect": "inline",
+  "canvas": "1080x720",
+  "brief_facts": {
+    "title": "Java 缓存怎么选：从为什么缓存到 Caffeine、Redis 与一致性",
+    "category": "后端",
+    "intent": "tech_deep_dive",
+    "channel": "blog",
+    "aspect": "inline"
+  },
+  "captured_at": null,
+  "ranking_rule": null,
+  "input_file": {
+    "path": "docs/design/cache-design-cover/brief.json",
+    "sha256": "b842773b35bfe4cf4e46444c7b770d907d4eb35a0fe79c58e705793b9758bf6a"
+  },
+  "source_inputs": [
+    {
+      "path": "source/_posts/后端/缓存设计实战.md",
+      "captured_at": "2026-10-23T17:10:41+08:00",
+      "exists": true,
+      "sha256": "dfc8112ff31431c81dcfac025817e9cf1c12c4a080377c3f547edfb1afc9252e"
+    }
+  ],
+  "source_urls": [],
+  "icon_map": [
+    {
+      "name": "Caffeine 本地缓存",
+      "icon_key": "context-compress",
+      "icon_fallback": false,
+      "rendered": true
+    },
+    {
+      "name": "Spring Cache",
+      "icon_key": "engineering-toolbox",
+      "icon_fallback": false,
+      "rendered": true
+    },
+    {
+      "name": "Redis 共享缓存",
+      "icon_key": "diagram-nodes",
+      "icon_fallback": false,
+      "rendered": true
+    }
+  ],
+  "artifacts": {
+    "svg": {
+      "path": "docs/design/cache-design-cover/source.svg",
+      "sha256": "dea4176dbba0a8f2517a3db6909af2562dc8452eef1187e949886add24dcf9db"
+    },
+    "png": {
+      "ok": true,
+      "path": "docs/design/cache-design-cover/image.png",
+      "oss_url": null,
+      "skipped": false,
+      "dimensions": [
+        1080,
+        720
+      ],
+      "sha256": "4fb5342dfd401d709375855f19dabb398ef5534bc2dce2c8a27caa65fba81ed0"
+    }
+  },
+  "render": {
+    "renderer": "html-svg",
+    "width": 1080,
+    "height": 720,
+    "text_box_count": 13,
+    "rendered_names": [
+      "Caffeine 本地缓存",
+      "Spring Cache",
+      "Redis 共享缓存"
+    ]
+  },
+  "validation": {
+    "svg_text_present": true,
+    "svg_text_nodes": [
+      "pfa / CONTENTS",
+      "2026-10-19",
+      "Java 缓存怎么选",
+      "从本地缓存到 Redis，再到失效与一致性",
+      "01",
+      "Caffeine 本地缓存",
+      "02",
+      "Spring Cache",
+      "03",
+      "Redis 共享缓存",
+      "先理解需求，再选择缓存层",
+      "来源 / Java 缓存体系 / 实战指南",
+      "pfa"
+    ],
+    "svg_parse_error": null,
+    "png_dimensions": [
+      1080,
+      720
+    ],
+    "text_boxes": {
+      "safe_margin_percent": 7,
+      "text_box_count": 13,
+      "bounds_ok": true,
+      "pair_intersections": [],
+      "overlap_ok": true,
+      "ok": true
+    },
+    "upload": {
+      "attempted": true,
+      "oss_url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/java-cache-guide-20261023.png"
+    },
+    "visual_review": "passed: 1280x720 delivery image retains the full title and labels at homepage card ratio"
+  },
+  "delivery": {
+    "path": "docs/design/cache-design-cover/java-cache-guide-20261023.png",
+    "dimensions": [1280, 720],
+    "sha256": "ae146f6233a22c4bce02e32e9c6f0ee77f7792dd0b53adf0d1f79be47ec91c04",
+    "oss_url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/java-cache-guide-20261023.png",
+    "oss_http_status": 200,
+    "note": "Extended the generated 1080x720 artwork with matching side margins to fit the homepage 16:9 cover slot."
+  },
+  "retry_steps": [],
+  "icon_distinctness": {
+    "unique_count": 3,
+    "total_count": 3,
+    "duplicate_keys": [],
+    "fallback_count": 0
+  }
+}

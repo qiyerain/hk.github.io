@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <filter id="sketch" x="-2%" y="-2%" width="104%" height="104%">
+      <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="4" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2"/>
+    </filter>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#555" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <rect width="800" height="560" fill="#faf9f6" rx="8"/>
+
+  <!-- Title -->
+  <text x="400" y="32" text-anchor="middle" font-size="17" font-weight="700" fill="#333">8 步编排工作流</text>
+
+  <!-- Step boxes - vertical flow -->
+  <!-- Step 1 -->
+  <rect x="50" y="50" width="160" height="40" rx="8" fill="#e3f2fd" stroke="#42a5f5" stroke-width="1.5" filter="url(#sketch)"/>
+  <text x="130" y="75" text-anchor="middle" font-size="12" font-weight="600" fill="#1565c0">1. Intake 接单</text>
+
+  <path d="M130,90 L130,105" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- Step 2 -->
+  <rect x="50" y="110" width="160" height="40" rx="8" fill="#e3f2fd" stroke="#42a5f5" stroke-width="1.5" filter="url(#sketch)"/>
+  <text x="130" y="135" text-anchor="middle" font-size="12" font-weight="600" fill="#1565c0">2. Research 研究</text>
+
+  <path d="M130,150 L130,165" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- Step 3 -->
+  <rect x="50" y="170" width="160" height="40" rx="8" fill="#e8f5e9" stroke="#66bb6a" stroke-width="1.5" filter="url(#sketch)"/>
+  <text x="130" y="195" text-anchor="middle" font-size="12" font-weight="600" fill="#2e7d32">3. Write 写稿</text>
+
+  <path d="M130,210 L130,225" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- Step 4 -->
+  <rect x="50" y="230" width="160" height="40" rx="8" fill="#fff3e0" stroke="#ffa726" stroke-width="1.5" filter="url(#sketch)"/>
+  <text x="130" y="255" text-anchor="middle" font-size="12" font-weight="600" fill="#e65100">4. PicGo 图片上传</text>
+
+  <path d="M130,270 L130,285" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- Step 5 -->
+  <rect x="50" y="290" width="160" height="40" rx="8" fill="#fff3e0" stroke="#ffa726" stroke-width="1.5" filter="url(#sketch)"/>
+  <text x="130" y="315" text-anchor="middle" font-size="12" font-weight="600" fill="#e65100">5. Render 渲染</text>
+
+  <path d="M130,330 L130,345" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- Step 6 -->
+  <rect x="50" y="350" width="160" height="40" rx="8" fill="#fce4ec" stroke="#e57373" stroke-width="2" filter="url(#sketch)"/>
+  <text x="130" y="375" text-anchor="middle" font-size="12" font-weight="700" fill="#c62828">6. Gate 质量门</text>
+
+  <path d="M130,390 L130,405" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- Step 7 -->
+  <rect x="50" y="410" width="160" height="40" rx="8" fill="#f3e5f5" stroke="#ba68c8" stroke-width="1.5" filter="url(#sketch)"/>
+  <text x="130" y="435" text-anchor="middle" font-size="12" font-weight="600" fill="#6a1b9a">7. Blog 博客发布</text>
+
+  <path d="M130,450 L130,465" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- Step 8 -->
+  <rect x="50" y="470" width="160" height="40" rx="8" fill="#fce4ec" stroke="#e57373" stroke-width="1.5" filter="url(#sketch)"/>
+  <text x="130" y="495" text-anchor="middle" font-size="12" font-weight="600" fill="#c62828">8. WeChat 公众号</text>
+
+  <!-- Right side: delegation labels -->
+  <rect x="280" y="170" width="150" height="36" rx="6" fill="#e8f5e9" stroke="#81c784" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="355" y="193" text-anchor="middle" font-size="10" fill="#2e7d32">← 自研：写作+研究</text>
+
+  <rect x="280" y="290" width="170" height="36" rx="6" fill="#fff3e0" stroke="#ffb74d" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="365" y="313" text-anchor="middle" font-size="10" fill="#e65100">→ md2wechat 渲染引擎</text>
+
+  <rect x="280" y="350" width="170" height="36" rx="6" fill="#fce4ec" stroke="#ef9a9a" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="365" y="373" text-anchor="middle" font-size="10" fill="#c62828">6项硬阻断 · 不过即停</text>
+
+  <rect x="280" y="470" width="170" height="36" rx="6" fill="#fce4ec" stroke="#ef9a9a" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="365" y="493" text-anchor="middle" font-size="10" fill="#c62828">→ baoyu 发布引擎</text>
+
+  <!-- Connecting lines from steps to labels -->
+  <path d="M210,190 L280,190" fill="none" stroke="#81c784" stroke-width="1" stroke-dasharray="3,2"/>
+  <path d="M210,310 L280,310" fill="none" stroke="#ffb74d" stroke-width="1" stroke-dasharray="3,2"/>
+  <path d="M210,370 L280,370" fill="none" stroke="#ef9a9a" stroke-width="1" stroke-dasharray="3,2"/>
+  <path d="M210,490 L280,490" fill="none" stroke="#ef9a9a" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- Right panel: 3 design principles -->
+  <rect x="500" y="55" width="270" height="470" rx="10" fill="#fff" stroke="#ccc" stroke-width="1.2" filter="url(#sketch)"/>
+  <text x="635" y="82" text-anchor="middle" font-size="14" font-weight="700" fill="#333">三大设计原则</text>
+
+  <!-- Principle 1 -->
+  <rect x="520" y="100" width="230" height="120" rx="8" fill="#e3f2fd" stroke="#64b5f6" stroke-width="1.2"/>
+  <text x="635" y="122" text-anchor="middle" font-size="12" font-weight="700" fill="#1565c0">Discovery-First 发现优先</text>
+  <text x="535" y="145" font-size="10" fill="#555">不靠记忆猜测能力</text>
+  <text x="535" y="162" font-size="10" fill="#555">先跑 themes list --json</text>
+  <text x="535" y="179" font-size="10" fill="#555">再选主题/版式/模块</text>
+  <text x="535" y="196" font-size="10" fill="#555">避免硬编码过期</text>
+
+  <!-- Principle 2 -->
+  <rect x="520" y="235" width="230" height="120" rx="8" fill="#fce4ec" stroke="#ef9a9a" stroke-width="1.2"/>
+  <text x="635" y="257" text-anchor="middle" font-size="12" font-weight="700" fill="#c62828">Inspect-Gate 硬阻断</text>
+  <text x="535" y="280" font-size="10" fill="#555">inspect readiness.targets.draft</text>
+  <text x="535" y="297" font-size="10" fill="#555">draft=false → 列出 blockers</text>
+  <text x="535" y="314" font-size="10" fill="#555">绝不静默降级</text>
+  <text x="535" y="331" font-size="10" fill="#555">防止"看起来OK但不能发"</text>
+
+  <!-- Principle 3 -->
+  <rect x="520" y="370" width="230" height="120" rx="8" fill="#fff3e0" stroke="#ffb74d" stroke-width="1.2"/>
+  <text x="635" y="392" text-anchor="middle" font-size="12" font-weight="700" fill="#e65100">Idempotent 幂等重跑</text>
+  <text x="535" y="415" font-size="10" fill="#555">state.json 记录 SHA256</text>
+  <text x="535" y="432" font-size="10" fill="#555">已上传图片不重复传</text>
+  <text x="535" y="449" font-size="10" fill="#555">media_id 复用</text>
+  <text x="535" y="466" font-size="10" fill="#555">中断重跑零浪费</text>
+
+  <!-- Footer -->
+  <text x="400" y="545" text-anchor="middle" font-size="10" fill="#bbb">每步都有明确的所有者 · 不重复实现 · 优雅降级</text>
+</svg>

@@ -1,0 +1,62 @@
+#album_detail.album-detail-studio
+  each i in site.data.album
+    - const path_name = is_current(i.path_name)
+    - const albumList = i.album_list || []
+    if path_name
+      - const heroStyle = i.top_background ? `--album-hero-image: url(${url_for(i.top_background)});` : ''
+      header.album-detail-hero(class=albumList.length ? '' : 'is-empty' style=heroStyle)
+        .album-detail-hero-shade
+        .album-detail-hero-content
+          a.album-back-link(href=url_for('/album/') data-pjax-state)
+            i.anzhiyufont.anzhiyu-icon-arrow-left
+            span 返回视觉档案
+          span.album-detail-eyebrow=i.class_name
+          h1=i.name
+          p=i.description
+          .album-detail-count
+            strong=albumList.length
+            span=albumList.length ? '张已收录影像' : '等待第一张真实照片'
+      nav.album-category-switcher(aria-label='切换相册分类')
+        each category in site.data.album
+          - const categoryCount = (category.album_list && category.album_list.length) || 0
+          a(href=url_for(category.path_name) class=is_current(category.path_name) ? 'is-active' : '' data-pjax-state)
+            span=category.name
+            em=categoryCount
+      if albumList.length
+        .album-gallery-intro
+          .album-gallery-heading
+            span CURATED SET · #{String(albumList.length).padStart(2, '0')}
+            h2 影像索引
+          p 不裁成统一尺寸，让每张图片保留自己的节奏。悬浮查看来源，点击进入沉浸式浏览。
+        .xa-masonry(data-masonry data-album-gallery data-page-size=(i.limit || 12))
+          each item, itemIndex in albumList
+            each image, imageIndex in item.image
+              - const masonryIndex = itemIndex + imageIndex
+              article.xa-masonry-item(data-reveal data-album-item style=`--masonry-index:${masonryIndex}`)
+                a.xa-masonry-item__media(href=url_for(image) data-fancybox=`album-${i.class_name}` data-caption=`${item.content} · ${item.license || ''}`)
+                  img.nolazyload(src=url_for(image) alt=item.content loading="lazy")
+                  .xa-masonry-item__shade
+                .xa-masonry-item__meta
+                  span=String(masonryIndex + 1).padStart(2, '0')
+                  div
+                    strong=item.content
+                    small=item.license || '查看来源'
+                  a(href=item.source_page target="_blank" rel="noopener noreferrer" aria-label=`查看${item.content}的图片来源`)
+                    i.anzhiyufont.anzhiyu-icon-arrow-up-right-from-square
+        nav.album-pagination(aria-label=`${i.name}相册分页` data-album-pagination hidden)
+          button(type="button" data-album-prev aria-label="上一页")
+            i.anzhiyufont.anzhiyu-icon-arrow-left(aria-hidden="true")
+            span 上一页
+          span(data-album-page-status aria-live="polite")
+          button(type="button" data-album-next aria-label="下一页")
+            span 下一页
+            i.anzhiyufont.anzhiyu-icon-arrow-right(aria-hidden="true")
+      else
+        section.album-empty-state
+          i.album-empty-icon.anzhiyufont.anzhiyu-icon-images(aria-hidden='true')
+          span.album-empty-kicker PERSONAL · UNPUBLISHED
+          h2 这里暂时保持空白
+          p 个人生活只接受本人拍摄或明确上传的照片。等第一段真实记忆到来时，它会从这里开始。
+          a(href=url_for('/album/') data-pjax-state)
+            span 先看看其他相册
+            i.anzhiyufont.anzhiyu-icon-arrow-right

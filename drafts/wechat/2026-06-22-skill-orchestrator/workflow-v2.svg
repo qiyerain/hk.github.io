@@ -1,0 +1,217 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640">
+  <defs>
+    <filter id="paper" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise" result="gray"/>
+      <feBlend in="SourceGraphic" in2="gray" mode="multiply" result="blend"/>
+      <feComponentTransfer in="blend"><feFuncA type="linear" slope="0.08"/></feComponentTransfer>
+      <feBlend in="SourceGraphic" mode="normal"/>
+    </filter>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-color="#c4a97d" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Cream paper -->
+  <rect width="960" height="640" fill="#faf5ed"/>
+  <rect width="960" height="640" fill="#f5ede0" opacity="0.3" filter="url(#paper)"/>
+  <pattern id="dots2" width="24" height="24" patternUnits="userSpaceOnUse">
+    <circle cx="12" cy="12" r="0.5" fill="#d4c9b8"/>
+  </pattern>
+  <rect width="960" height="640" fill="url(#dots2)" opacity="0.4"/>
+
+  <!-- === TITLE === -->
+  <rect x="40" y="22" width="400" height="38" rx="8" fill="#fff" stroke="#c9b896" stroke-width="1.2" stroke-dasharray="4,3" filter="url(#shadow)"/>
+  <path d="M56,41 C80,37 110,43 140,39 C170,35 200,42 230,38" fill="none" stroke="#8b7355" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M245,41 C260,38 280,43 300,39" fill="none" stroke="#8b7355" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- === 8-STEP VERTICAL CARD FLOW (left side) === -->
+
+  <!-- Step 1 -->
+  <rect x="40" y="80" width="140" height="52" rx="10" fill="#fff" stroke="#7ba8c9" stroke-width="1.5" filter="url(#shadow)"/>
+  <circle cx="68" cy="100" r="12" fill="#e3f0f7" stroke="#7ba8c9" stroke-width="1"/>
+  <text x="68" y="104" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#5a8faf">1</text>
+  <path d="M90,96 C110,93 130,98 160,94" fill="none" stroke="#7ba8c9" stroke-width="1.3" stroke-linecap="round"/>
+  <path d="M90,108 C105,106 120,110 145,107" fill="none" stroke="#c9dde8" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- Arrow 1→2 -->
+  <line x1="110" y1="132" x2="110" y2="148" stroke="#9ab8cc" stroke-width="1.2" stroke-dasharray="3,2"/>
+
+  <!-- Step 2 -->
+  <rect x="40" y="150" width="140" height="52" rx="10" fill="#fff" stroke="#7ba8c9" stroke-width="1.5" filter="url(#shadow)"/>
+  <circle cx="68" cy="170" r="12" fill="#e3f0f7" stroke="#7ba8c9" stroke-width="1"/>
+  <text x="68" y="174" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#5a8faf">2</text>
+  <path d="M90,166 C110,163 130,168 160,164" fill="none" stroke="#7ba8c9" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- Magnifying glass icon -->
+  <circle cx="158" cy="178" r="6" fill="none" stroke="#7ba8c9" stroke-width="0.8"/>
+  <line x1="162" y1="182" x2="166" y2="186" stroke="#7ba8c9" stroke-width="0.8" stroke-linecap="round"/>
+
+  <line x1="110" y1="202" x2="110" y2="218" stroke="#9ab8cc" stroke-width="1.2" stroke-dasharray="3,2"/>
+
+  <!-- Step 3 -->
+  <rect x="40" y="220" width="140" height="52" rx="10" fill="#fff" stroke="#a8c97b" stroke-width="1.5" filter="url(#shadow)"/>
+  <circle cx="68" cy="240" r="12" fill="#eef6e4" stroke="#a8c97b" stroke-width="1"/>
+  <text x="68" y="244" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#6a9a3f">3</text>
+  <path d="M90,236 C110,233 130,238 160,234" fill="none" stroke="#a8c97b" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- Pencil icon -->
+  <line x1="155" y1="248" x2="165" y2="242" stroke="#6a9a3f" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M165,242 L168,239 L166,237 L163,240Z" fill="#6a9a3f"/>
+
+  <line x1="110" y1="272" x2="110" y2="288" stroke="#9ab8cc" stroke-width="1.2" stroke-dasharray="3,2"/>
+
+  <!-- Step 4 -->
+  <rect x="40" y="290" width="140" height="52" rx="10" fill="#fff" stroke="#e8a54c" stroke-width="1.5" filter="url(#shadow)"/>
+  <circle cx="68" cy="310" r="12" fill="#fef3e2" stroke="#e8a54c" stroke-width="1"/>
+  <text x="68" y="314" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#c4893a">4</text>
+  <path d="M90,306 C110,303 130,308 160,304" fill="none" stroke="#e8a54c" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- Upload arrow -->
+  <line x1="158" y1="320" x2="158" y2="312" stroke="#c4893a" stroke-width="1" stroke-linecap="round"/>
+  <path d="M154,315 158,310 162,315" fill="none" stroke="#c4893a" stroke-width="1" stroke-linecap="round"/>
+
+  <line x1="110" y1="342" x2="110" y2="358" stroke="#9ab8cc" stroke-width="1.2" stroke-dasharray="3,2"/>
+
+  <!-- Step 5 -->
+  <rect x="40" y="360" width="140" height="52" rx="10" fill="#fff" stroke="#e8a54c" stroke-width="1.5" filter="url(#shadow)"/>
+  <circle cx="68" cy="380" r="12" fill="#fef3e2" stroke="#e8a54c" stroke-width="1"/>
+  <text x="68" y="384" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#c4893a">5</text>
+  <path d="M90,376 C110,373 130,378 160,374" fill="none" stroke="#e8a54c" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- Palette icon -->
+  <ellipse cx="158" cy="390" rx="7" ry="5" fill="#fef3e2" stroke="#e8a54c" stroke-width="0.8"/>
+  <circle cx="156" cy="389" r="1.5" fill="#7ba8c9"/>
+  <circle cx="160" cy="388" r="1.2" fill="#e8c36a"/>
+
+  <line x1="110" y1="412" x2="110" y2="428" stroke="#9ab8cc" stroke-width="1.2" stroke-dasharray="3,2"/>
+
+  <!-- Step 6 GATE -->
+  <rect x="40" y="430" width="140" height="60" rx="12" fill="#fef2f2" stroke="#e07070" stroke-width="2.5" filter="url(#shadow)"/>
+  <circle cx="68" cy="455" r="12" fill="#fef2f2" stroke="#e07070" stroke-width="1.2"/>
+  <!-- Shield -->
+  <path d="M68,447 C66,444 70,442 68,442 C66,442 70,444 68,447" fill="none" stroke="#e07070" stroke-width="1.2"/>
+  <path d="M64,449 C63,445 68,443 68,443 C68,443 73,445 72,449 C72,453 68,458 68,458 C68,458 64,453 64,449Z" fill="none" stroke="#d05050" stroke-width="1.2"/>
+  <path d="M90,450 C110,447 130,452 160,448" fill="none" stroke="#e07070" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- 6 indicator -->
+  <path d="M90,466 C105,464 120,468 140,465" fill="none" stroke="#f0b0b0" stroke-width="0.8" stroke-linecap="round"/>
+
+  <line x1="110" y1="490" x2="110" y2="508" stroke="#9ab8cc" stroke-width="1.2" stroke-dasharray="3,2"/>
+
+  <!-- Step 7 -->
+  <rect x="40" y="510" width="140" height="52" rx="10" fill="#fff" stroke="#a88cc9" stroke-width="1.5" filter="url(#shadow)"/>
+  <circle cx="68" cy="530" r="12" fill="#f3e8ff" stroke="#a88cc9" stroke-width="1"/>
+  <text x="68" y="534" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#8a6ab5">7</text>
+  <path d="M90,526 C110,523 130,528 160,524" fill="none" stroke="#a88cc9" stroke-width="1.3" stroke-linecap="round"/>
+
+  <!-- Step 8 (right of step 7) -->
+  <rect x="220" y="510" width="140" height="52" rx="10" fill="#fff" stroke="#e07070" stroke-width="1.5" filter="url(#shadow)"/>
+  <circle cx="248" cy="530" r="12" fill="#fef2f2" stroke="#e07070" stroke-width="1"/>
+  <text x="248" y="534" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#c05050">8</text>
+  <path d="M270,526 C290,523 310,528 340,524" fill="none" stroke="#e07070" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- Arrow 7→8 -->
+  <line x1="180" y1="536" x2="220" y2="536" stroke="#9ab8cc" stroke-width="1.2" stroke-dasharray="3,2"/>
+
+  <!-- === RIGHT SIDE: 3 PRINCIPLE CARDS === -->
+
+  <!-- Card 1: Discovery-First -->
+  <rect x="240" y="80" width="280" height="140" rx="14" fill="#fff" stroke="#7ba8c9" stroke-width="1.8" filter="url(#shadow)"/>
+  <!-- Magnifying glass icon -->
+  <circle cx="280" cy="120" r="18" fill="#e3f0f7" stroke="#7ba8c9" stroke-width="1.5"/>
+  <circle cx="280" cy="120" r="10" fill="none" stroke="#5a8faf" stroke-width="1.5"/>
+  <line x1="287" y1="127" x2="295" y2="135" stroke="#5a8faf" stroke-width="2" stroke-linecap="round"/>
+  <!-- List dots inside magnifier -->
+  <circle cx="277" cy="117" r="1.5" fill="#5a8faf"/>
+  <circle cx="277" cy="122" r="1.5" fill="#5a8faf"/>
+  <circle cx="283" cy="119" r="1.5" fill="#5a8faf"/>
+
+  <path d="M310,108 C360,104 420,112 490,107" fill="none" stroke="#5a8faf" stroke-width="2" stroke-linecap="round"/>
+  <path d="M310,128 C345,125 390,130 440,126" fill="none" stroke="#9ab8cc" stroke-width="1" stroke-linecap="round"/>
+  <path d="M310,144 C340,141 380,146 430,142" fill="none" stroke="#c9dde8" stroke-width="0.8" stroke-linecap="round"/>
+  <path d="M310,158 C335,155 370,160 420,156" fill="none" stroke="#c9dde8" stroke-width="0.8" stroke-linecap="round"/>
+  <!-- Small warning icon -->
+  <path d="M470,150 L474,140 L478,150Z" fill="none" stroke="#e8a54c" stroke-width="1" stroke-linejoin="round"/>
+  <line x1="474" y1="145" x2="474" y2="147" stroke="#e8a54c" stroke-width="1"/>
+
+  <!-- Card 2: Inspect-Gate -->
+  <rect x="240" y="240" width="280" height="140" rx="14" fill="#fff" stroke="#e07070" stroke-width="1.8" filter="url(#shadow)"/>
+  <!-- Shield icon -->
+  <circle cx="280" cy="280" r="18" fill="#fef2f2" stroke="#e07070" stroke-width="1.5"/>
+  <path d="M280,270 C276,266 284,263 280,263 C276,263 284,266 280,270Z" fill="none" stroke="#e07070" stroke-width="1.2"/>
+  <path d="M274,274 C273,268 280,264 280,264 C280,264 287,268 286,274 C286,282 280,290 280,290 C280,290 274,282 274,274Z" fill="none" stroke="#d05050" stroke-width="1.5"/>
+  <!-- Checkmark inside -->
+  <path d="M276,278 L279,282 L286,272" fill="none" stroke="#a8c97b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M310,268 C360,264 420,272 490,267" fill="none" stroke="#d05050" stroke-width="2" stroke-linecap="round"/>
+  <path d="M310,288 C345,285 390,290 440,286" fill="none" stroke="#e8b0b0" stroke-width="1" stroke-linecap="round"/>
+  <path d="M310,304 C340,301 380,306 430,302" fill="none" stroke="#f0d0d0" stroke-width="0.8" stroke-linecap="round"/>
+  <path d="M310,318 C335,315 370,320 420,316" fill="none" stroke="#f0d0d0" stroke-width="0.8" stroke-linecap="round"/>
+  <!-- Stop sign -->
+  <circle cx="470" cy="312" r="8" fill="#fef2f2" stroke="#e07070" stroke-width="1.2"/>
+  <rect x="465" y="309" width="10" height="6" rx="1" fill="none" stroke="#e07070" stroke-width="0.8"/>
+
+  <!-- Card 3: Idempotent -->
+  <rect x="240" y="400" width="280" height="140" rx="14" fill="#fff" stroke="#e8a54c" stroke-width="1.8" filter="url(#shadow)"/>
+  <!-- Circular arrows icon -->
+  <circle cx="280" cy="440" r="18" fill="#fef3e2" stroke="#e8a54c" stroke-width="1.5"/>
+  <path d="M280,428 A12,12 0 1,1 268,440" fill="none" stroke="#c4893a" stroke-width="1.8" stroke-linecap="round"/>
+  <polygon points="268,436 264,442 272,441" fill="#c4893a"/>
+  <path d="M280,452 A12,12 0 1,1 292,440" fill="none" stroke="#c4893a" stroke-width="1.8" stroke-linecap="round"/>
+  <polygon points="292,444 296,438 288,439" fill="#c4893a"/>
+
+  <path d="M310,428 C360,424 420,432 490,427" fill="none" stroke="#c4893a" stroke-width="2" stroke-linecap="round"/>
+  <path d="M310,448 C345,445 390,450 440,446" fill="none" stroke="#e8c9a0" stroke-width="1" stroke-linecap="round"/>
+  <path d="M310,464 C340,461 380,466 430,462" fill="none" stroke="#f0dcc0" stroke-width="0.8" stroke-linecap="round"/>
+  <path d="M310,478 C335,475 370,480 420,476" fill="none" stroke="#f0dcc0" stroke-width="0.8" stroke-linecap="round"/>
+  <!-- File icon -->
+  <rect x="466" y="466" width="14" height="18" rx="2" fill="none" stroke="#c4893a" stroke-width="0.8"/>
+  <line x1="469" y1="472" x2="477" y2="472" stroke="#c4893a" stroke-width="0.6"/>
+  <line x1="469" y1="476" x2="474" y2="476" stroke="#c4893a" stroke-width="0.6"/>
+
+  <!-- === RIGHT PANEL: Knowledge Graph / Magnifying Glass === -->
+  <!-- Large magnifying glass -->
+  <circle cx="720" cy="200" r="100" fill="none" stroke="#c9b896" stroke-width="2.5" opacity="0.4"/>
+  <line x1="790" y1="270" x2="850" y2="330" stroke="#c9b896" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+  <!-- Knowledge network inside -->
+  <circle cx="700" cy="170" r="5" fill="#e3f0f7" stroke="#7ba8c9" stroke-width="1" opacity="0.7"/>
+  <circle cx="740" cy="160" r="4" fill="#fef3e2" stroke="#e8a54c" stroke-width="1" opacity="0.7"/>
+  <circle cx="720" cy="200" r="6" fill="#fff" stroke="#5a8faf" stroke-width="1.2" opacity="0.7"/>
+  <circle cx="690" cy="220" r="4" fill="#f3e8ff" stroke="#a88cc9" stroke-width="1" opacity="0.7"/>
+  <circle cx="750" cy="210" r="3.5" fill="#eef6e4" stroke="#a8c97b" stroke-width="1" opacity="0.7"/>
+  <circle cx="710" cy="240" r="3" fill="#fef2f2" stroke="#e07070" stroke-width="1" opacity="0.7"/>
+  <circle cx="740" cy="190" r="3" fill="#fef3e2" stroke="#e8a54c" stroke-width="0.8" opacity="0.6"/>
+  <line x1="704" y1="174" x2="716" y2="195" stroke="#9ab8cc" stroke-width="0.8" opacity="0.5"/>
+  <line x1="738" y1="164" x2="726" y2="195" stroke="#9ab8cc" stroke-width="0.8" opacity="0.5"/>
+  <line x1="720" y1="206" x2="694" y2="217" stroke="#9ab8cc" stroke-width="0.8" opacity="0.5"/>
+  <line x1="720" y1="206" x2="747" y2="207" stroke="#9ab8cc" stroke-width="0.8" opacity="0.5"/>
+  <line x1="694" y1="223" x2="713" y2="237" stroke="#9ab8cc" stroke-width="0.8" opacity="0.5"/>
+  <line x1="747" y1="213" x2="740" y2="188" stroke="#9ab8cc" stroke-width="0.6" opacity="0.4"/>
+
+  <!-- === CONNECTING LINES: steps → cards === -->
+  <path d="M180,106 C200,104 220,102 240,104" fill="none" stroke="#9ab8cc" stroke-width="0.8" stroke-dasharray="3,2" opacity="0.6"/>
+  <path d="M180,256 C200,258 220,270 240,272" fill="none" stroke="#9ab8cc" stroke-width="0.8" stroke-dasharray="3,2" opacity="0.6"/>
+  <path d="M180,456 C200,454 220,440 240,436" fill="none" stroke="#9ab8cc" stroke-width="0.8" stroke-dasharray="3,2" opacity="0.6"/>
+
+  <!-- === DECORATIONS === -->
+  <g fill="#e8c36a" opacity="0.45">
+    <path d="M560,65 l2,-6 2,6 -6,-2 6,0 -6,2z"/>
+    <circle cx="920" cy="100" r="3"/>
+    <path d="M600,580 l2,-5 2,5 -5,-2 5,0 -5,2z"/>
+    <circle cx="50" cy="590" r="2.5"/>
+  </g>
+  <g fill="#7ba8c9" opacity="0.25">
+    <circle cx="900" cy="450" r="2"/>
+    <path d="M580,400 l1.5,-4 1.5,4 -4,-1.5 4,0 -4,1.5z"/>
+  </g>
+  <g fill="#a8c97b" opacity="0.35">
+    <path d="M870,530 l2,-5 2,5 -5,-2 5,0 -5,2z"/>
+    <circle cx="550" cy="580" r="2"/>
+  </g>
+
+  <!-- Gears decoration -->
+  <circle cx="560" cy="560" r="10" fill="none" stroke="#c9b896" stroke-width="0.8" opacity="0.35"/>
+  <circle cx="560" cy="560" r="5" fill="none" stroke="#c9b896" stroke-width="0.6" opacity="0.35"/>
+  <circle cx="580" cy="570" r="7" fill="none" stroke="#c9b896" stroke-width="0.6" opacity="0.3"/>
+  <circle cx="580" cy="570" r="3.5" fill="none" stroke="#c9b896" stroke-width="0.5" opacity="0.3"/>
+
+  <!-- Small book stack (bottom left) -->
+  <rect x="42" y="580" width="30" height="8" rx="2" fill="#e3f0f7" stroke="#7ba8c9" stroke-width="0.8" opacity="0.5"/>
+  <rect x="44" y="572" width="28" height="8" rx="2" fill="#fef3e2" stroke="#e8a54c" stroke-width="0.8" opacity="0.5"/>
+  <rect x="46" y="564" width="26" height="8" rx="2" fill="#eef6e4" stroke="#a8c97b" stroke-width="0.8" opacity="0.5"/>
+</svg>

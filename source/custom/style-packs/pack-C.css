@@ -1,0 +1,60 @@
+/* Style Pack C — 光感卡片 Card Modern
+ * 少数派 × Notion × Stripe 文档。蓝色主色 + 浅灰卡片底 + 数字徽章。
+ */
+
+body[data-style-pack="C"] #article-container h1 {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+body[data-style-pack="C"] #article-container h2 {
+  color: #1f2937;
+  border-left: 4px solid #2563eb;
+  padding-left: 14px;
+  background: transparent;
+  font-weight: 700;
+}
+
+body[data-style-pack="C"] #article-container h3 {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+body[data-style-pack="C"] #article-container strong {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+body[data-style-pack="C"] #article-container blockquote {
+  background: #f5f7fa;
+  border-left: 4px solid #2563eb;
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+body[data-style-pack="C"] #article-container code {
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+}
+
+body[data-style-pack="C"] #article-container pre {
+  background: #f5f7fa;
+  color: #1f2937;
+  border-left: 4px solid #2563eb;
+  border-radius: 10px;
+}
+
+body[data-style-pack="C"] #article-container img {
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+body[data-style-pack="C"] #article-container hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+  margin: 28px 0;
+}

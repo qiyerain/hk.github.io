@@ -1,0 +1,147 @@
+{
+  "success": true,
+  "code": "INSPECT_COMPLETED",
+  "message": "Inspect completed",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "source_file": "drafts/wechat/2026-10-24-archify-dsh/source.md",
+    "source_dir": "drafts/wechat/2026-10-24-archify-dsh",
+    "context": {
+      "mode": "ai",
+      "theme": "autumn-warm",
+      "font_size": "medium",
+      "background_type": "none",
+      "upload": false,
+      "draft": true
+    },
+    "metadata": {
+      "title": {
+        "value": "用 Archify 把项目画成能交付的图",
+        "source": "frontmatter.title",
+        "limit": 32,
+        "length": 20,
+        "valid": true
+      },
+      "author": {
+        "value": "",
+        "source": "fallback.empty",
+        "limit": 16,
+        "length": 0,
+        "valid": true
+      },
+      "digest": {
+        "value": "Archify 把图当成有源文件和验收标准的交付物：十种原生图、类型化 JSON 源文件、交付前四道检查。这篇讲清它是什么、怎么装怎么用，以及一次真实产出。",
+        "source": "frontmatter.description",
+        "limit": 128,
+        "length": 78,
+        "valid": true
+      }
+    },
+    "structure": {
+      "body_h1": {
+        "present": false
+      },
+      "duplicate_title_risk": false,
+      "headings": [
+        {
+          "level": 2,
+          "text": "一、这个项目是什么"
+        },
+        {
+          "level": 2,
+          "text": "二、它和 Mermaid、画图工具的区别"
+        },
+        {
+          "level": 2,
+          "text": "三、安装"
+        },
+        {
+          "level": 2,
+          "text": "四、先选对图类型"
+        },
+        {
+          "level": 2,
+          "text": "五、一条流水线走完交付"
+        },
+        {
+          "level": 2,
+          "text": "六、真实产出：DeepSeek Harness 架构图"
+        },
+        {
+          "level": 2,
+          "text": "七、图上还能做什么"
+        },
+        {
+          "level": 2,
+          "text": "八、我踩的坑"
+        },
+        {
+          "level": 2,
+          "text": "清单"
+        },
+        {
+          "level": 2,
+          "text": "引用"
+        }
+      ],
+      "images": {
+        "total": 3,
+        "local": 0,
+        "remote": 3,
+        "ai": 0
+      }
+    },
+    "assets": [
+      {
+        "index": 0,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/archify-type-router-1200x675.png",
+        "exists": true
+      },
+      {
+        "index": 1,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/archify-pipeline-v2-1200x675.png",
+        "exists": true
+      },
+      {
+        "index": 2,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/archify-dsh-result-1600x922.png",
+        "exists": true
+      }
+    ],
+    "readiness": {
+      "convert_ready": true,
+      "upload_ready": true,
+      "draft_ready": true,
+      "preview_fidelity": "degraded",
+      "schema_version": "v1",
+      "targets": {
+        "preview": "degraded",
+        "convert": "ready",
+        "upload": "ready",
+        "draft": "ready"
+      },
+      "blockers": []
+    },
+    "checks": [
+      {
+        "level": "info",
+        "code": "DIGEST_METADATA_ONLY",
+        "message": "Digest affects draft metadata, not body HTML rendering",
+        "field": "digest",
+        "suggested_fix": "use body content or theme behavior to control visible article summary inside the HTML"
+      },
+      {
+        "level": "info",
+        "code": "AI_MODE_ACTION_REQUIRED",
+        "message": "AI mode produces a prompt/request instead of final HTML until an external model completes the flow",
+        "field": "mode",
+        "suggested_fix": "use --mode api for exact preview or complete the AI prompt externally"
+      }
+    ]
+  }
+}

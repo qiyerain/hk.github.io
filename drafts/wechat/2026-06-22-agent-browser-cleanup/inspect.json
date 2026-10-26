@@ -1,0 +1,206 @@
+{
+  "success": true,
+  "code": "INSPECT_COMPLETED",
+  "message": "Inspect completed",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "source_file": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-22-agent-browser-cleanup/article.md",
+    "source_dir": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-22-agent-browser-cleanup",
+    "context": {
+      "mode": "api",
+      "theme": "github-readme",
+      "font_size": "medium",
+      "background_type": "none",
+      "upload": false,
+      "draft": false
+    },
+    "metadata": {
+      "title": {
+        "value": "Mac 发热？AI 可能忘了关浏览器",
+        "source": "frontmatter.title",
+        "limit": 32,
+        "length": 18,
+        "valid": true
+      },
+      "author": {
+        "value": "",
+        "source": "fallback.empty",
+        "limit": 16,
+        "length": 0,
+        "valid": true
+      },
+      "digest": {
+        "value": "Claude Code、Codex 调用 agent-browser 后留下后台 daemon 和 Chrome 进程？本文讲清根因、排查命令、安全清理方式与长期预防配置。",
+        "source": "frontmatter.description",
+        "limit": 128,
+        "length": 86,
+        "valid": true
+      }
+    },
+    "structure": {
+      "body_h1": {
+        "present": false
+      },
+      "duplicate_title_risk": false,
+      "headings": [
+        {
+          "level": 2,
+          "text": "30 秒结论"
+        },
+        {
+          "level": 2,
+          "text": "目录"
+        },
+        {
+          "level": 2,
+          "text": "一、现象：AI 停了，浏览器却没停"
+        },
+        {
+          "level": 2,
+          "text": "二、根因：常驻 daemon 遇上并发 session"
+        },
+        {
+          "level": 3,
+          "text": "CDP 是不是罪魁祸首？"
+        },
+        {
+          "level": 2,
+          "text": "三、先确认，不要上来就 kill"
+        },
+        {
+          "level": 3,
+          "text": "1. 查看 agent-browser 自己记录的活动 session"
+        },
+        {
+          "level": 3,
+          "text": "2. 查看 daemon 和自动化 Chrome"
+        },
+        {
+          "level": 3,
+          "text": "3. 按 CPU、内存和运行时间查看完整进程树"
+        },
+        {
+          "level": 2,
+          "text": "四、三层清理：官方关闭、温和终止、强制清理"
+        },
+        {
+          "level": 3,
+          "text": "第一层：让 agent-browser 自己收尾"
+        },
+        {
+          "level": 3,
+          "text": "第二层：发送 TERM，让进程有机会优雅退出"
+        },
+        {
+          "level": 3,
+          "text": "第三层：只对仍残留的目标使用 KILL"
+        },
+        {
+          "level": 3,
+          "text": "仓库里放一个可重复使用的脚本"
+        },
+        {
+          "level": 2,
+          "text": "五、怎样保证不误伤普通 Chrome"
+        },
+        {
+          "level": 2,
+          "text": "六、从源头预防：让生命周期闭环"
+        },
+        {
+          "level": 3,
+          "text": "1. 设置 daemon 空闲自动退出"
+        },
+        {
+          "level": 3,
+          "text": "2. 不要为每一步创建新 session"
+        },
+        {
+          "level": 3,
+          "text": "3. 在 shell 脚本里用 trap 兜底"
+        },
+        {
+          "level": 3,
+          "text": "4. 给 Claude Code / Codex 的浏览器 skill 加退出规则"
+        },
+        {
+          "level": 3,
+          "text": "5. 定期做轻量检查"
+        },
+        {
+          "level": 2,
+          "text": "七、可直接收藏的排查清单"
+        },
+        {
+          "level": 2,
+          "text": "最后"
+        },
+        {
+          "level": 2,
+          "text": "参考资料"
+        }
+      ],
+      "images": {
+        "total": 3,
+        "local": 3,
+        "remote": 0,
+        "ai": 0
+      }
+    },
+    "assets": [
+      {
+        "index": 0,
+        "kind": "local",
+        "source": "imgs/02-framework-process-tree.png",
+        "resolved_source": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-22-agent-browser-cleanup/imgs/02-framework-process-tree.png",
+        "exists": true
+      },
+      {
+        "index": 1,
+        "kind": "local",
+        "source": "imgs/03-flowchart-cleanup.png",
+        "resolved_source": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-22-agent-browser-cleanup/imgs/03-flowchart-cleanup.png",
+        "exists": true
+      },
+      {
+        "index": 2,
+        "kind": "local",
+        "source": "imgs/04-comparison-prevention.png",
+        "resolved_source": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-22-agent-browser-cleanup/imgs/04-comparison-prevention.png",
+        "exists": true
+      }
+    ],
+    "readiness": {
+      "convert_ready": true,
+      "upload_ready": true,
+      "draft_ready": false,
+      "preview_fidelity": "exact",
+      "schema_version": "v1",
+      "targets": {
+        "preview": "ready",
+        "convert": "ready",
+        "upload": "not_requested",
+        "draft": "not_requested"
+      },
+      "blockers": []
+    },
+    "checks": [
+      {
+        "level": "info",
+        "code": "DIGEST_METADATA_ONLY",
+        "message": "Digest affects draft metadata, not body HTML rendering",
+        "field": "digest",
+        "suggested_fix": "use body content or theme behavior to control visible article summary inside the HTML"
+      },
+      {
+        "level": "info",
+        "code": "IMAGE_REPLACEMENT_REQUIRES_UPLOAD_OR_DRAFT",
+        "message": "Images are only uploaded and replaced during upload or draft flows",
+        "field": "images",
+        "suggested_fix": "use --upload or --draft when you need local/remote/AI image references rewritten to published URLs"
+      }
+    ]
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "success": true,
+  "code": "INSPECT_COMPLETED",
+  "message": "Inspect completed",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "source_file": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-18-wechat-skill-workflow-validation/content.md",
+    "source_dir": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-18-wechat-skill-workflow-validation",
+    "context": {
+      "mode": "ai",
+      "theme": "autumn-warm",
+      "font_size": "medium",
+      "background_type": "none",
+      "upload": false,
+      "draft": false
+    },
+    "metadata": {
+      "title": {
+        "value": "这个微信文章工作流，到底解决了什么问题？",
+        "source": "cli.title",
+        "limit": 32,
+        "length": 20,
+        "valid": true
+      },
+      "author": {
+        "value": "",
+        "source": "fallback.empty",
+        "limit": 16,
+        "length": 0,
+        "valid": true
+      },
+      "digest": {
+        "value": "",
+        "source": "fallback.empty",
+        "limit": 128,
+        "length": 0,
+        "valid": true
+      }
+    },
+    "structure": {
+      "body_h1": {
+        "present": true,
+        "text": "这个微信文章工作流，到底解决了什么问题？"
+      },
+      "duplicate_title_risk": true,
+      "headings": [
+        {
+          "level": 1,
+          "text": "这个微信文章工作流，到底解决了什么问题？"
+        },
+        {
+          "level": 2,
+          "text": "背景：以前的问题不是不会写，而是链路断了"
+        },
+        {
+          "level": 2,
+          "text": "核心流程：先把内容变成资产，再考虑发布"
+        },
+        {
+          "level": 3,
+          "text": "1. 调研"
+        },
+        {
+          "level": 3,
+          "text": "2. 理解"
+        },
+        {
+          "level": 3,
+          "text": "3. 写作"
+        },
+        {
+          "level": 3,
+          "text": "4. 图文排版"
+        },
+        {
+          "level": 3,
+          "text": "5. 阅读体验验证"
+        },
+        {
+          "level": 3,
+          "text": "6. 发布"
+        },
+        {
+          "level": 2,
+          "text": "原理：三层分工，而不是一个脚本包打天下"
+        },
+        {
+          "level": 2,
+          "text": "它解决了什么问题？"
+        },
+        {
+          "level": 3,
+          "text": "解决 1：内容好但读不下去"
+        },
+        {
+          "level": 3,
+          "text": "解决 2：博客和公众号两套内容割裂"
+        },
+        {
+          "level": 3,
+          "text": "解决 3：草稿发布太容易误操作"
+        },
+        {
+          "level": 3,
+          "text": "解决 4：排版靠感觉，不可验证"
+        },
+        {
+          "level": 2,
+          "text": "最终能做到什么效果？"
+        },
+        {
+          "level": 2,
+          "text": "这次验证的结论"
+        }
+      ],
+      "images": {
+        "total": 2,
+        "local": 2,
+        "remote": 0,
+        "ai": 0
+      }
+    },
+    "assets": [
+      {
+        "index": 0,
+        "kind": "local",
+        "source": "assets-png/flow.png",
+        "resolved_source": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-18-wechat-skill-workflow-validation/assets-png/flow.png",
+        "exists": true
+      },
+      {
+        "index": 1,
+        "kind": "local",
+        "source": "assets-png/layers.png",
+        "resolved_source": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-18-wechat-skill-workflow-validation/assets-png/layers.png",
+        "exists": true
+      }
+    ],
+    "readiness": {
+      "convert_ready": true,
+      "upload_ready": true,
+      "draft_ready": false,
+      "preview_fidelity": "degraded",
+      "schema_version": "v1",
+      "targets": {
+        "preview": "degraded",
+        "convert": "ready",
+        "upload": "not_requested",
+        "draft": "not_requested"
+      },
+      "blockers": []
+    },
+    "checks": [
+      {
+        "level": "warn",
+        "code": "DUPLICATE_H1",
+        "message": "Body H1 matches the final article title",
+        "field": "title",
+        "suggested_fix": "remove the body H1 or change the final title"
+      },
+      {
+        "level": "info",
+        "code": "IMAGE_REPLACEMENT_REQUIRES_UPLOAD_OR_DRAFT",
+        "message": "Images are only uploaded and replaced during upload or draft flows",
+        "field": "images",
+        "suggested_fix": "use --upload or --draft when you need local/remote/AI image references rewritten to published URLs"
+      },
+      {
+        "level": "info",
+        "code": "AI_MODE_ACTION_REQUIRED",
+        "message": "AI mode produces a prompt/request instead of final HTML until an external model completes the flow",
+        "field": "mode",
+        "suggested_fix": "use --mode api for exact preview or complete the AI prompt externally"
+      }
+    ]
+  }
+}

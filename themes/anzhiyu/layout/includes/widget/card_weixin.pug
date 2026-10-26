@@ -1,0 +1,10 @@
+- let faceImg = theme.aside.card_weixin.face
+- let backFaceImg = theme.aside.card_weixin.backFace
+if theme.aside.card_weixin.enable
+  .card-widget.anzhiyu-right-widget#card-wechat
+    #flip-wrapper
+      #flip-content
+        .face(style=`background: url(${faceImg}) center center / 100% no-repeat`)
+          .flip-text 悬停查看公众号二维码
+        .back.face(style=`background: url(${backFaceImg}) center center / contain no-repeat`)
+          .flip-text-back 扫码关注公众号

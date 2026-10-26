@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4f0e7"/><stop offset="1" stop-color="#dff5e9"/>
+    </linearGradient>
+    <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="2" fill="#11382d" fill-opacity=".12"/></pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg2)"/>
+  <rect width="1600" height="900" fill="url(#dots)"/>
+  <rect x="70" y="65" width="1460" height="770" rx="34" fill="#fffdf7" stroke="#163e32" stroke-width="4"/>
+  <rect x="70" y="65" width="390" height="770" rx="32" fill="#143b30"/>
+  <text x="125" y="155" fill="#8ff0be" font-family="Arial Unicode MS, sans-serif" font-size="28" letter-spacing="5">DAILY SIGNAL</text>
+  <text x="125" y="290" fill="#fffdf7" font-family="Arial Unicode MS, sans-serif" font-size="92" font-weight="700">每日</text>
+  <text x="125" y="395" fill="#fffdf7" font-family="Arial Unicode MS, sans-serif" font-size="92" font-weight="700">GitHub</text>
+  <text x="125" y="500" fill="#fffdf7" font-family="Arial Unicode MS, sans-serif" font-size="92" font-weight="700">趋势</text>
+  <text x="125" y="690" fill="#8ff0be" font-family="Arial Unicode MS, sans-serif" font-size="42">2026 / 06 / 19</text>
+  <text x="125" y="760" fill="#b9d9ca" font-family="Arial Unicode MS, sans-serif" font-size="24">24H OPEN SOURCE RADAR</text>
+  <text x="535" y="170" fill="#143b30" font-family="Arial Unicode MS, sans-serif" font-size="30" letter-spacing="4">TODAY'S PICKS</text>
+  <text x="535" y="285" fill="#102d25" font-family="Arial Unicode MS, sans-serif" font-size="62" font-weight="700">代码记忆成为 Agent 的新底座</text>
+  <line x1="535" y1="330" x2="1450" y2="330" stroke="#143b30" stroke-width="3"/>
+  <g font-family="Arial Unicode MS, sans-serif">
+    <rect x="535" y="390" width="430" height="120" rx="20" fill="#dff5e9"/><text x="570" y="440" fill="#143b30" font-size="25">01 / CODE INTELLIGENCE</text><text x="570" y="482" fill="#102d25" font-size="32" font-weight="700">codebase-memory-mcp</text>
+    <rect x="1000" y="390" width="450" height="120" rx="20" fill="#f2e4b7"/><text x="1035" y="440" fill="#594815" font-size="25">02 / FOUNDATION MODEL</text><text x="1035" y="482" fill="#3d3211" font-size="32" font-weight="700">GLM-5 · TimesFM</text>
+    <rect x="535" y="545" width="430" height="120" rx="20" fill="#dce7fa"/><text x="570" y="595" fill="#18375f" font-size="25">03 / GUI AGENT</text><text x="570" y="637" fill="#102d25" font-size="32" font-weight="700">UI-TARS Desktop</text>
+    <rect x="1000" y="545" width="450" height="120" rx="20" fill="#f5dcd1"/><text x="1035" y="595" fill="#63301e" font-size="25">04 / DEV WORKFLOW</text><text x="1035" y="637" fill="#102d25" font-size="32" font-weight="700">Kilo Code · Skills</text>
+  </g>
+  <text x="535" y="750" fill="#48645b" font-family="Arial Unicode MS, sans-serif" font-size="29">开源热点不只是榜单，更是下一轮工具链的预告片。</text>
+  <path d="M1370 745l48 28-48 28" fill="none" stroke="#143b30" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

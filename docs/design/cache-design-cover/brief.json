@@ -1,0 +1,21 @@
+{
+  "kind": "cover",
+  "title": "Java 缓存怎么选：从为什么缓存到 Caffeine、Redis 与一致性",
+  "headline": "Java 缓存怎么选",
+  "deck": "从本地缓存到 Redis，再到失效与一致性",
+  "date": "2026-10-19",
+  "edition": "后端 / Java",
+  "channel": "blog",
+  "aspect": "inline",
+  "category": "后端",
+  "intent": "tech_deep_dive",
+  "template_id": "data-terminal",
+  "source_label": "Java 缓存体系 / 实战指南",
+  "source_files": ["source/_posts/后端/缓存设计实战.md"],
+  "cta": "先理解需求，再选择缓存层",
+  "items": [
+    {"id": "local", "name": "Caffeine 本地缓存", "category": "JVM 内读取", "icon_key": "context-compress"},
+    {"id": "spring", "name": "Spring Cache", "category": "注解与抽象", "icon_key": "engineering-toolbox"},
+    {"id": "redis", "name": "Redis 共享缓存", "category": "多实例共享", "icon_key": "diagram-nodes"}
+  ]
+}

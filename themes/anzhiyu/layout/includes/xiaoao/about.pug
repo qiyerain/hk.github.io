@@ -1,0 +1,126 @@
+section.xa-about
+  nav.xa-page-return(aria-label="页面导航")
+    button(type="button" data-xa-back data-fallback="/")
+      i.anzhiyufont.anzhiyu-icon-chevron-left
+      span 返回上一页
+    .xa-page-crumb
+      a(href=url_for('/')) 首页
+      span /
+      b 关于
+
+  header.xa-about-hero.xa-glass-panel(data-glass-spotlight data-glass-tilt)
+    .xa-about-hero__copy
+      span.xa-kicker ABOUT / RISK AI ENGINEER
+      h1 叫我小遨就好
+      p 99 年，来自湖南涟源，计算机科班出身。有 5 年 Java 后端研发经验，长期深耕风控技术与分布式系统。现在更关注把大模型、Agent、RAG、MCP 和可靠工程体系结合起来，让复杂业务流程真正自动化、可观测、可演进。
+      .xa-about-hero__actions
+        a(href="#xa-about-work") 项目经历 ↘
+        a(href="#xa-about-stack") 技术栈 ↘
+        a(href="#xa-about-life") 工作之外 ↘
+      .xa-about-metrics
+        div
+          strong 5+
+          span 年 Java 后端研发
+        div
+          strong 0→1
+          span 风控 Agent / 决策平台
+      .xa-about-contact-links
+        a(href="https://github.com/wwrtpfa" target="_blank" rel="noopener noreferrer")
+          span GitHub
+          b @wwrtpfa ↗
+        a(href="mailto:17752683350@qq.com")
+          span Email
+          b 17752683350@qq.com ↗
+    figure.xa-about-portrait.xa-profile-card(data-profile-card)
+      .xa-profile-card__glow
+      .xa-profile-card__shell
+        .xa-profile-card__surface
+          .xa-profile-card__shine
+          .xa-profile-card__glare
+          img.xa-profile-card__photo(src=url_for('/img/about/pengfanao-profile.jpg') alt="彭凡遨的个人照片")
+          .xa-profile-card__title
+            span XIAO AO · 2026
+            strong Risk AI Engineer
+          figcaption.xa-profile-card__info
+            img(src=url_for('/img/about/pengfanao-profile.jpg') alt="")
+            span
+              b @xiaoaocodes
+              small 在线 · 广州
+            a(href="mailto:17752683350@qq.com" aria-label="联系小遨") 联系我
+
+  section.xa-about-section#xa-about-work
+    .xa-about-section__intro(data-reveal)
+      span.xa-kicker WHAT I BUILD
+      h2 把“智能”放进可靠系统里。
+      p 我更关心系统能否稳定运行、被解释、被观测，而不只是模型在演示里看起来聪明。
+    .xa-about-stack
+      article.xa-about-project.xa-glass-panel(data-reveal data-glass-spotlight)
+        span 01 / 近期
+        h3 轻量级 AI Agent 框架
+        p 负责记忆模块和 Skill 模块核心设计与开发，支持多渠道接入、LLM 统一调度、MCP 工具动态集成和三层语义记忆，帮助风控运营 SOP 自动化提效。
+        ul
+          li Memory
+          li Skill
+          li MCP
+      article.xa-about-project.xa-glass-panel(data-reveal data-glass-spotlight)
+        span 02 / 重点
+        h3 业务风险 AI 智能决策引擎
+        p 围绕多 Agent 协作、工具体系和 RAG 召回建设核心模块，支撑风险研判、处罚建议与多渠道触达。
+        ul
+          li Multi-Agent
+          li RAG
+          li Decision
+      article.xa-about-project.xa-glass-panel(data-reveal data-glass-spotlight)
+        span 03 / 核心链路
+        h3 实时风控决策系统
+        p 覆盖事件接入、策略树计算、任务编排、能力插件化调度、降级兜底和幂等一致性保障。
+        ul
+          li Realtime
+          li Workflow
+          li Resilience
+      article.xa-about-project.xa-glass-panel(data-reveal data-glass-spotlight)
+        span 04 / 平台
+        h3 统一接入管理
+        p 建设需求审批、预警规则、应急工具和实时咨询模块，让风险响应链路可追踪、更可控。
+        ul
+          li Platform
+          li Observability
+          li Operations
+
+  section.xa-about-section#xa-about-stack
+    .xa-about-section__intro(data-reveal)
+      span.xa-kicker STACK / TOOLBOX
+      h2 常用技术栈
+    .xa-skill-orbit.xa-glass-panel(data-reveal data-glass-spotlight)
+      each skill in ['Java 8/21','Python 3.11+','SOFABoot','Spring Boot','FastAPI','LLM Agent','RAG','MCP Protocol','PowerMem','MyBatis','Redis / Tair','Lindorm','SOFAMQ','gRPC','Docker / K8s','Playwright']
+        span= skill
+
+  section.xa-about-section#xa-about-life
+    .xa-about-section__intro(data-reveal)
+      span.xa-kicker LIFE / OFFLINE
+      h2 工作之外，给生活留一点真实触感。
+    .xa-life-grid
+      article.xa-glass-panel(data-reveal data-glass-spotlight)
+        span GAME
+        h3 打打王者
+        p 喜欢团队配合、节奏判断和临场博弈。代码之外，也需要一点即时反馈。
+      article.xa-glass-panel(data-reveal data-glass-spotlight)
+        span WATER
+        h3 游泳
+        p 把注意力放回呼吸和动作里，很多复杂问题反而会慢慢变清楚。
+      article.xa-glass-panel(data-reveal data-glass-spotlight)
+        span MOUNTAIN
+        h3 爬山
+        p 喜欢往高处走，慢慢把城市、噪音和琐碎事情放在身后。
+      article.xa-glass-panel(data-reveal data-glass-spotlight)
+        span FINANCE
+        h3 理财
+        p 关注长期主义、风险控制和现金流管理，它和工程一样需要理解边界。
+
+  section.xa-about-principles.xa-glass-panel(data-reveal data-glass-spotlight)
+    span.xa-kicker PRINCIPLES
+    h2 先稳定，再智能。
+    ol
+      li Agent 最终还是工程系统，可观测、可回滚、可降级比炫技重要。
+      li 能用 API 解决的问题，不依赖脆弱 DOM；能沉淀成契约，就别停留在一次性脚本里。
+      li 记忆、检索、压缩和经验复用，决定 Agent 能否从“会回答”走向“能做事”。

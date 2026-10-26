@@ -1,0 +1,6 @@
+- [x] Add the local WeChat draft wrapper with credential mapping and input discovery.
+- [x] Add idempotence and weekly HTML list-tag guards.
+- [x] Persist `media_id` immediately and verify the resulting draft with `draft/get`.
+- [x] Route the article orchestrator to the wrapper.
+- [x] Run syntax, dry-run, publisher tests, and repository audit.
+- [x] Record validation and rollback details in `execution-report.md`.

@@ -1,0 +1,14 @@
+section.xa-directory-index
+  header.xa-index-heading
+    h1 目录归档
+    a(href=url_for('/archives/')) 全部文章
+  .xa-directory-list
+    - const posts = featured_posts(site.posts, { limit: 0 })
+    - const directories = Array.from(new Set(posts.map(function (post) { return post.source.replace('_posts/', '').split('/')[0] })))
+    each directory, index in directories
+      - const count = posts.filter(function (post) { return post.source.indexOf('_posts/' + directory + '/') === 0 }).length
+      a.xa-directory-row(href=url_for(`/directory/${encodeURIComponent(directory)}/`))
+        span= String(index + 1).padStart(2, '0')
+        strong= directory === 'agent' ? 'AI 与 Agent' : directory
+        small #{count} 篇文章
+        i.anzhiyufont.anzhiyu-icon-arrow-right(aria-hidden="true")

@@ -1,0 +1,28 @@
+{
+  "run_id": "2026-09-19-github-weekly",
+  "updated_at": "2026-09-19T19:28:36+0800",
+  "markdown_path": "source/_posts/每周GitHub趋势/2026-09-19-GitHub趋势.md",
+  "markdown_sha256": "3fc44a037cdb04397325c329ddd4b8c6427651491eb41300bd5beb8bb9f4e06d",
+  "wechat_html_path": "drafts/wechat/2026-09-19-github-weekly/wechat.html",
+  "wechat_html_sha256": "0dc3646a8af09202d2f5f2186829e682c019f0cad1488ad1b815445e3d2fc4b2",
+  "theme": "github-readme",
+  "style_pack": "C (green series override)",
+  "assets": [
+    {"sha256": "ab8a69ce70dbffcf2c42cd3aa53734e73f4066f5427ec1f991169614e597af72", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-19-cover-1600x900.png"},
+    {"sha256": "a494ce15d84498b65347fd81df057fd0b7b4af442d1e08382fab292e110754f9", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-19-wechat-cover-1080x460.png"},
+    {"sha256": "a8b50142fa08a80abc4817e61ea5b0adb8771af2b710a00e7be470025acc87ab", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-19-poster-1080x1350.png"},
+    {"sha256": "543b2d41485b1cb462f08ffee5b408182df249e9ad85ec53f99ebe328f2fbe0b", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-19-trend-map-1200x675.png"},
+    {"sha256": "498f37dbefae01bd17b7379b3612ddb49c4f8156b34f25c030ec244fb0eb643a", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-19-review-flow-1200x675.png"},
+    {"sha256": "2dbb95dde5f97e8cfba3030d222032adc32e9d41e5209812bdbdeb2ac011a066", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-19-action-matrix-1200x675.png"}
+  ],
+  "stages": {
+    "research": {"ok": true, "source": "https://github.com/trending?since=weekly", "captured_at": "2026-09-19T15:38:00+0800", "scope": "weekly page snapshot, not a seven-day time series"},
+    "oss_upload": {"ok": true, "image_count": 6},
+    "inspect": {"ok": true, "draft_target": "ready", "blockers": []},
+    "convert": {"ok": false, "provider": "md2wechat-api", "reason": "format_api unavailable in doctor; rendered inline Style Pack C from the same Markdown"},
+    "experience_validation": {"ok": true},
+    "draft": {"ok": true, "media_id": "zdr76s0MQZwqyFoO5jodPGt910c6k1f4KZ2sYdxInPMQu6EAVcuoY6tYEb0k_okh", "thumb_media_id": "zdr76s0MQZwqyFoO5jodPDUTeDKe8E2l68zr2SUr0Yx0gNb0niUkhdKdtBk8cSg7", "created_at": "2026-09-19T17:02:26+0800", "updated_at": "2026-09-19T19:28:36+0800", "method": "api", "verified": true, "verification": {"title": "GitHub 开源趋势周报 2026-09-19", "content_length": 17829, "image_count": 5, "source_url_matches": true, "comments_open": true, "fans_only": false, "ul_count": 0, "li_count": 0, "top5_rank_count": 5, "labeled_sections": ["项目详情", "其他热门项目", "趋势观察", "来源"]}},
+    "collection": {"name": "每周 GitHub", "album_id": "4695616659267780619", "archived": false, "reason": "Draft created; current workflow supports collection assignment only after publication, so backend archival remains pending"},
+    "blog": {"built": true, "audit_passed": true, "pushed": true, "commit": "f4c759b", "live_url": "https://blog.pengfanao.top/2026/09/19/每周GitHub趋势/2026-09-19-GitHub趋势/", "live_verified": true}
+  }
+}

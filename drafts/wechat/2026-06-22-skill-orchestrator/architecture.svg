@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <filter id="sketch" x="-2%" y="-2%" width="104%" height="104%">
+      <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="4" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5"/>
+    </filter>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#555" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="500" fill="#faf9f6" rx="8"/>
+
+  <!-- Title -->
+  <text x="400" y="38" text-anchor="middle" font-size="18" font-weight="700" fill="#333">三层技能编排架构</text>
+
+  <!-- Orchestrator box -->
+  <rect x="200" y="60" width="400" height="80" rx="12" fill="#e8f4f8" stroke="#4a9aba" stroke-width="2" stroke-dasharray="6,3" filter="url(#sketch)"/>
+  <text x="400" y="95" text-anchor="middle" font-size="16" font-weight="700" fill="#2a6f8a">wechat-article-generator</text>
+  <text x="400" y="118" text-anchor="middle" font-size="12" fill="#5a8a9a">编排层 Orchestrator</text>
+
+  <!-- Arrow down-left -->
+  <path d="M310,140 Q280,170 250,195" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#arrowhead)"/>
+  <text x="260" y="175" font-size="10" fill="#777">渲染</text>
+
+  <!-- Arrow down-center -->
+  <path d="M400,140 L400,195" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#arrowhead)"/>
+  <text x="410" y="175" font-size="10" fill="#777">质控</text>
+
+  <!-- Arrow down-right -->
+  <path d="M490,140 Q520,170 550,195" fill="none" stroke="#555" stroke-width="1.8" marker-end="url(#arrowhead)"/>
+  <text x="520" y="175" font-size="10" fill="#777">发布</text>
+
+  <!-- Renderer box -->
+  <rect x="50" y="200" width="220" height="90" rx="10" fill="#fff3e0" stroke="#e6a23c" stroke-width="2" stroke-dasharray="5,3" filter="url(#sketch)"/>
+  <text x="160" y="232" text-anchor="middle" font-size="15" font-weight="700" fill="#b8860b">md2wechat</text>
+  <text x="160" y="255" text-anchor="middle" font-size="11" fill="#c09040">渲染层 Renderer</text>
+  <text x="160" y="275" text-anchor="middle" font-size="10" fill="#999">52主题 · 43版式模块 · inspect+convert</text>
+
+  <!-- Quality Gate box -->
+  <rect x="290" y="200" width="220" height="90" rx="10" fill="#e8f5e9" stroke="#66bb6a" stroke-width="2" stroke-dasharray="5,3" filter="url(#sketch)"/>
+  <text x="400" y="232" text-anchor="middle" font-size="15" font-weight="700" fill="#2e7d32">validate_article_experience</text>
+  <text x="400" y="255" text-anchor="middle" font-size="11" fill="#4caf50">质控层 Quality Gate</text>
+  <text x="400" y="275" text-anchor="middle" font-size="10" fill="#999">6项透明指标 · 硬阻断</text>
+
+  <!-- Publisher box -->
+  <rect x="530" y="200" width="220" height="90" rx="10" fill="#fce4ec" stroke="#e57373" stroke-width="2" stroke-dasharray="5,3" filter="url(#sketch)"/>
+  <text x="640" y="232" text-anchor="middle" font-size="15" font-weight="700" fill="#c62828">baoyu-post-to-wechat</text>
+  <text x="640" y="255" text-anchor="middle" font-size="11" fill="#e57373">发布层 Publisher</text>
+  <text x="640" y="275" text-anchor="middle" font-size="10" fill="#999">API+Browser+Remote · 多账号</text>
+
+  <!-- Down arrows from 3 boxes -->
+  <path d="M160,290 L160,330" fill="none" stroke="#555" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <path d="M400,290 L400,330" fill="none" stroke="#555" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <path d="M640,290 L640,330" fill="none" stroke="#555" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <!-- Output boxes -->
+  <rect x="50" y="335" width="220" height="55" rx="8" fill="#fff8e1" stroke="#ffb74d" stroke-width="1.5" filter="url(#sketch)"/>
+  <text x="160" y="358" text-anchor="middle" font-size="12" font-weight="600" fill="#e65100">WeChat 内联样式 HTML</text>
+  <text x="160" y="378" text-anchor="middle" font-size="10" fill="#999">6套专属 Style Pack A-F</text>
+
+  <rect x="290" y="335" width="220" height="55" rx="8" fill="#e8f5e9" stroke="#81c784" stroke-width="1.5" filter="url(#sketch)"/>
+  <text x="400" y="358" text-anchor="middle" font-size="12" font-weight="600" fill="#1b5e20">6 项质量检查通过/阻断</text>
+  <text x="400" y="378" text-anchor="middle" font-size="10" fill="#999">封面·图片·节奏·兼容·颜色·alt</text>
+
+  <rect x="530" y="335" width="220" height="55" rx="8" fill="#fce4ec" stroke="#ef9a9a" stroke-width="1.5" filter="url(#sketch)"/>
+  <text x="640" y="358" text-anchor="middle" font-size="12" font-weight="600" fill="#b71c1c">公众号草稿 / 发布</text>
+  <text x="640" y="378" text-anchor="middle" font-size="10" fill="#999">API · Browser · SSH隧道</text>
+
+  <!-- Converge arrow -->
+  <path d="M160,390 Q160,420 280,440" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#arrowhead)"/>
+  <path d="M400,390 L400,430" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#arrowhead)"/>
+  <path d="M640,390 Q640,420 520,440" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#arrowhead)"/>
+
+  <!-- Hexo blog box -->
+  <rect x="250" y="435" width="300" height="50" rx="10" fill="#f3e5f5" stroke="#ba68c8" stroke-width="2" filter="url(#sketch)"/>
+  <text x="400" y="458" text-anchor="middle" font-size="13" font-weight="700" fill="#6a1b9a">Hexo 博客 + 公众号双端发布</text>
+  <text x="400" y="476" text-anchor="middle" font-size="10" fill="#999">一键编排，两端同步</text>
+
+  <!-- Hand-drawn decorative elements -->
+  <circle cx="30" cy="490" r="3" fill="#ddd"/>
+  <circle cx="770" cy="490" r="3" fill="#ddd"/>
+  <path d="M20,495 Q400,500 780,495" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+</svg>

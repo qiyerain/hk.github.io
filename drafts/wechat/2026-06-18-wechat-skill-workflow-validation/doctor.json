@@ -1,0 +1,55 @@
+{
+  "success": true,
+  "code": "DOCTOR_COMPLETED",
+  "message": "Doctor report completed",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "overall": "ready",
+    "live": false,
+    "checks": [
+      {
+        "id": "config.load",
+        "status": "pass",
+        "blocking": false,
+        "message": "configuration loaded"
+      },
+      {
+        "id": "config.mode",
+        "status": "pass",
+        "blocking": false,
+        "message": "default convert mode is \"api\""
+      },
+      {
+        "id": "api.config",
+        "status": "pass",
+        "blocking": false,
+        "message": "API conversion credentials are present"
+      },
+      {
+        "id": "theme.catalog",
+        "status": "pass",
+        "blocking": false,
+        "message": "default theme \"default\" is selectable for api mode"
+      },
+      {
+        "id": "layout.catalog",
+        "status": "pass",
+        "blocking": false,
+        "message": "layout catalog loaded with 43 modules"
+      },
+      {
+        "id": "wechat.config",
+        "status": "pass",
+        "blocking": false,
+        "message": "WeChat draft credentials are present"
+      }
+    ],
+    "readiness": {
+      "format_api": true,
+      "advanced_layout": true,
+      "draft": true
+    }
+  }
+}

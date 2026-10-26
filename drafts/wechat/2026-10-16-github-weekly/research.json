@@ -1,0 +1,108 @@
+{
+  "captured_at": "2026-10-16T18:06:36+08:00",
+  "source": "https://github.com/trending?since=weekly",
+  "scope": "GitHub Trending weekly page, 11 visible repositories",
+  "thesis": "智能体正在从单点能力走向可复用协作基础设施",
+  "repositories": [
+    {
+      "rank": 1,
+      "repo": "morluto/rea",
+      "url": "https://github.com/morluto/rea",
+      "language": "TypeScript",
+      "total_stars": 282440,
+      "weekly_stars": 239477,
+      "description": "Reverse engineer anything with agents, from app behavior down to native binaries."
+    },
+    {
+      "rank": 2,
+      "repo": "boykopovar/AnyPS5",
+      "url": "https://github.com/boykopovar/AnyPS5",
+      "language": "C++",
+      "total_stars": 39274,
+      "weekly_stars": 25174,
+      "description": "Tool for automatic PS5 executables porting to Linux and Windows"
+    },
+    {
+      "rank": 3,
+      "repo": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills",
+      "language": "Shell",
+      "total_stars": 293495,
+      "weekly_stars": 12147,
+      "description": "Skills for Real Engineers. Straight from my .agents directory."
+    },
+    {
+      "rank": 4,
+      "repo": "heygen-com/hyperframes",
+      "url": "https://github.com/heygen-com/hyperframes",
+      "language": "TypeScript",
+      "total_stars": 64954,
+      "weekly_stars": 5318,
+      "description": "Write HTML. Render video. Built for agents."
+    },
+    {
+      "rank": 5,
+      "repo": "cathrynlavery/diagram-design",
+      "url": "https://github.com/cathrynlavery/diagram-design",
+      "language": "HTML",
+      "total_stars": 56186,
+      "weekly_stars": 10237,
+      "description": "Editorial diagram design for Claude Code, Codex, GitHub Copilot, Cursor, Factory Droid, and Pi."
+    },
+    {
+      "rank": 6,
+      "repo": "NationalSecurityAgency/ghidra",
+      "url": "https://github.com/NationalSecurityAgency/ghidra",
+      "language": "Java",
+      "total_stars": 89261,
+      "weekly_stars": 6614,
+      "description": "Ghidra is a software reverse engineering (SRE) framework"
+    },
+    {
+      "rank": 7,
+      "repo": "ranxianglei/billion-context",
+      "url": "https://github.com/ranxianglei/billion-context",
+      "language": "TypeScript",
+      "total_stars": 1463,
+      "weekly_stars": 659,
+      "description": "A context-compression plugin for small context windows."
+    },
+    {
+      "rank": 8,
+      "repo": "earthtojake/text-to-cad",
+      "url": "https://github.com/earthtojake/text-to-cad",
+      "language": "Python",
+      "total_stars": 20852,
+      "weekly_stars": 2244,
+      "description": "Give your agent CAD superpowers."
+    },
+    {
+      "rank": 9,
+      "repo": "twostraws/SwiftUI-Agent-Skill",
+      "url": "https://github.com/twostraws/SwiftUI-Agent-Skill",
+      "language": "未提供",
+      "total_stars": 6150,
+      "weekly_stars": 900,
+      "description": "SwiftUI agent skill for Claude Code, Codex, and other AI tools."
+    },
+    {
+      "rank": 10,
+      "repo": "DuarteSantos8/openGym",
+      "url": "https://github.com/DuarteSantos8/openGym",
+      "language": "JavaScript",
+      "total_stars": 12670,
+      "weekly_stars": 4471,
+      "description": "Self-hosted gym and body-weight tracker."
+    },
+    {
+      "rank": 11,
+      "repo": "cursor/plugins",
+      "url": "https://github.com/cursor/plugins",
+      "language": "TypeScript",
+      "total_stars": 11770,
+      "weekly_stars": 1214,
+      "description": "Cursor plugin specification and official plugins"
+    }
+  ],
+  "verification_note": "项目名、链接、语言与本周新增 Star 来自官方 weekly 页面；总 Star 与简介由 2026-10-16 GitHub REST API 复核。"
+}

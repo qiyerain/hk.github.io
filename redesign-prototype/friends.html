@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>友链 · 小遨的个人博客</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="common.css" />
+<style>
+.page-head .glow-a{width:28vw;height:28vw;left:-6vw;top:8vh}
+.page-head .glow-b{width:22vw;height:22vw;right:-4vw;top:0}
+.friends-main{max-width:1200px;margin:0 auto;padding:clamp(40px,6vh,64px) var(--pad-x) 60px}
+.apply{margin-bottom:56px}
+.apply-card{padding:32px 36px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.apply-card .t{font-family:var(--serif);font-size:22px;font-weight:600}
+.apply-card .d{font-family:var(--mono);font-size:12px;color:var(--fg-dim);margin-top:8px;letter-spacing:.04em;max-width:48ch}
+.apply-btn{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius-pill);background:var(--fg);color:var(--bg);border:none;cursor:pointer;transition:transform .3s var(--ease-out)}
+.apply-btn:hover{transform:translateY(-2px)}
+.fh{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:24px}
+.fh span{color:var(--fg-soft)}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:860px){.fgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.fgrid{grid-template-columns:1fr}}
+.fcard{padding:26px;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--card);transition:transform .3s var(--ease-out),border-color .3s,background .3s;cursor:pointer;position:relative;overflow:hidden;display:block;color:inherit}
+.fcard:hover{transform:translateY(-3px);border-color:var(--glass-border);background:var(--muted)}
+.fcard .top{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.fcard .avatar{width:48px;height:48px;border-radius:50%;background:var(--muted);overflow:hidden;flex-shrink:0;border:1px solid var(--border)}
+.fcard .avatar img{width:100%;height:100%;object-fit:cover}
+.fcard .fn{font-size:17px;font-weight:600}
+.fcard .fu{font-family:var(--mono);font-size:11px;color:var(--fg-dim);margin-top:2px;letter-spacing:.04em}
+.fcard .fd{font-size:14px;color:var(--fg-soft);line-height:1.5}
+.fcard .fdesc{font-size:12px;color:var(--fg-dim);margin-top:12px;line-height:1.6;max-height:0;overflow:hidden;transition:max-height .4s var(--ease-out),margin .4s}
+.fcard:hover .fdesc{max-height:80px}
+</style>
+</head>
+<body>
+<nav class="nav" id="nav">
+  <div class="nav-brand" onclick="location.href='index.html'">小遨的个人博客</div>
+  <ul class="nav-center">
+    <li class="nav-item">
+      <button class="nav-link">文章 <span class="caret">▾</span></button>
+      <ul class="nav-drop">
+        <li><a href="archive.html">全部文章 <span>All</span></a></li>
+        <li><a href="archive.html#month">按月份 <span>By Month</span></a></li>
+        <li><a href="archive.html#tag">按标签 <span>By Tag</span></a></li>
+        <li><a href="archive.html#dir">按目录 <span>By Dir</span></a></li>
+      </ul>
+    </li>
+    <li class="nav-item"><a class="nav-link" href="albums.html">相册</a></li>
+    <li class="nav-item"><a class="nav-link active" href="friends.html">友链</a></li>
+    <li class="nav-item"><a class="nav-link" href="wechat.html">公众号</a></li>
+    <li class="nav-item"><a class="nav-link" href="about.html">关于</a></li>
+  </ul>
+  <div class="nav-tools">
+    <button class="icon-btn" aria-label="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+    <button class="icon-btn" id="dirBtn" aria-label="目录树"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/><path d="M3 11h18"/></svg></button>
+    <button class="icon-btn theme-toggle" id="themeToggle" aria-label="切换深浅主题">
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></svg>
+    </button>
+    <button class="icon-btn nav-burger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</nav>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="dir-drawer" id="dirDrawer" aria-hidden="true">
+  <div class="dir-drawer-head"><span class="ttl">目录树 · Directory</span><button class="dir-close" id="dirClose" aria-label="关闭">✕</button></div>
+  <div class="dir-tree">
+    <ul>
+      <li class="open"><div class="folder open"><span class="tri">▶</span>工具系列</div>
+        <ul><li><a class="leaf" href="post.html">当一支笔被使用三年</a></li><li><div class="leaf">六年的剪刀</div></li></ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>写作随笔</div>
+        <ul><li><a class="leaf" href="post.html">夜里改掉的一个词</a></li></ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>城市</div>
+        <ul><li><div class="leaf">广州的雨有它自己的语法</div></li></ul>
+      </li>
+    </ul>
+  </div>
+  <div class="dir-drawer-foot">查看完整目录 ↗</div>
+</aside>
+
+<header class="page-head">
+  <span class="glow glow-a"></span><span class="glow glow-b"></span>
+  <div class="ph-inner">
+    <div class="crumbs"><a href="index.html">首页</a><span>/</span><span>友链</span></div>
+    <h1 class="ph-title">友链</h1>
+    <div class="ph-en">/ Friends</div>
+    <p class="ph-desc">一些我常去的角落，和写它们的人。</p>
+  </div>
+</header>
+
+<main class="friends-main">
+  <div class="apply">
+    <div class="glass apply-card">
+      <div>
+        <div class="t">想交换友链？</div>
+        <div class="d">写一封信告诉我你的站点名、地址与一句标语，我会在一周内回信。</div>
+      </div>
+      <a class="apply-btn" href="mailto:xiaoao@example.com">申请友链 ↗</a>
+    </div>
+  </div>
+  <div class="fh">友邻 · <span>12 位</span></div>
+  <div class="fgrid">
+    <a class="fcard" href="#">
+      <div class="top"><div class="avatar"><img src="https://picsum.photos/seed/f1/96/96" alt=""></div><div><div class="fn">友邻甲</div><div class="fu">neighbor.com</div></div></div>
+      <div class="fd">写代码与做饭，两件事都是关于火候的。</div>
+      <div class="fdesc">前端工程师，业余做饭。他的站点里有关于 TypeScript、铸铁锅和慢炖的所有细节。</div>
+    </a>
+    <a class="fcard" href="#">
+      <div class="top"><div class="avatar"><img src="https://picsum.photos/seed/f2/96/96" alt=""></div><div><div class="fn">慢半拍</div><div class="fu">slowhalf.net</div></div></div>
+      <div class="fd">关于慢的实践，以及对效率的反省。</div>
+      <div class="fdesc">记录她从一线城市搬到小城后的生活节奏调整，文字极克制。</div>
+    </a>
+    <a class="fcard" href="#">
+      <div class="top"><div class="avatar"><img src="https://picsum.photos/seed/f3/96/96" alt=""></div><div><div class="fn">北窗</div><div class="fu">northwin.photo</div></div></div>
+      <div class="fd">摄影与文字，都从一扇向北的窗开始。</div>
+      <div class="fdesc">摄影师，专注北方城市的冬天。胶片质感，文字很少但很准。</div>
+    </a>
+    <a class="fcard" href="#">
+      <div class="top"><div class="avatar"><img src="https://picsum.photos/seed/f4/96/96" alt=""></div><div><div class="fn">字与灰</div><div class="fu">typeash.com</div></div></div>
+      <div class="fd">排版实验笔记，字距与灰度的反复。</div>
+      <div class="fdesc">字体设计师，站点本身就是一件作品。可变字体的活体实验场。</div>
+    </a>
+    <a class="fcard" href="#">
+      <div class="top"><div class="avatar"><img src="https://picsum.photos/seed/f5/96/96" alt=""></div><div><div class="fn">旧物志</div><div class="fu">oldthings.log</div></div></div>
+      <div class="fd">收集被遗忘的器物与它们的故事。</div>
+      <div class="fdesc">每件旧物配一段考据，读起来像微型博物馆。</div>
+    </a>
+    <a class="fcard" href="#">
+      <div class="top"><div class="avatar"><img src="https://picsum.photos/seed/f6/96/96" alt=""></div><div><div class="fn">夜读者</div><div class="fu">nightreader.cn</div></div></div>
+      <div class="fd">深夜读书记录，只写不好读的书。</div>
+      <div class="fdesc">文学评论，偏好冷门。更新很慢，但每篇都值得存。</div>
+    </a>
+  </div>
+</main>
+
+<footer class="page-foot"><span>© 2026 小遨</span><span><a href="subscribe.html">RSS</a> · <a href="index.html">回到首页</a></span></footer>
+
+<script src="common.js"></script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+<section style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;color:#1a1a1a;font-size:16px;line-height:1.9;background:#fbf6ec;padding:28px 18px;max-width:680px;margin:0 auto">
+<h1 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:30px;font-weight:800;color:#1a1a1a;line-height:1.3;margin:28px 0 16px">Mac 发热？AI 可能忘了关浏览器</h1>
+<section style="margin:20px 0 6px"><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/01-infographic-ai-browser-heat.png" alt="封面" style="width:100%;max-width:100%;height:auto;display:block;border:0"><p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:13px;color:#5a5550;font-style:italic;text-align:center;margin:0 0 22px">封面｜Mac 发热？AI 可能忘了关浏览器</p></section>
+<blockquote style="border-top:2px solid #1a1a1a;border-bottom:1px solid #1a1a1a;padding:18px 0;margin:24px 0;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;text-align:center;font-style:italic;color:#1a1a1a;line-height:1.7">Claude Code、Codex 明明已经停下来了，Mac 风扇却还在转，内存也迟迟不降。问题可能不在当前会话，而在一批没有正常收尾的 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">agent-browser</code> daemon 与自动化 Chrome。</blockquote>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">这次我在本机清理了 <strong style="color:#8c1f1f;font-weight:700;border-bottom:1px solid #8c1f1f">8 组遗留的 agent-browser / Chrome 后台实例及其子进程</strong>。普通 Chrome 标签页没有动，机器热量很快就降了下来。</p>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">这不是一个玄学问题，也不能简单归咎于“Chrome 太吃内存”。真正要理解的是：AI 编程工具、浏览器自动化工具、CDP、daemon 和 session 之间，到底是谁启动了谁，又该由谁负责关掉。</p>
+<p style="color:#8c1f1f;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-weight:700;letter-spacing:4px;margin:36px 0 4px;font-size:13px">章 节</p>
+<h2 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.4">30 秒结论</h2>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">先给赶时间的人答案：</p>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif">
+<li style="margin:6px 0;line-height:1.85"><code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">agent-browser</code> 采用 <strong style="color:#8c1f1f;font-weight:700;border-bottom:1px solid #8c1f1f">CLI + 后台 daemon + Chrome</strong> 的架构，daemon 会故意跨命令常驻，以便下一条指令不用重新启动浏览器。</li>
+<li style="margin:6px 0;line-height:1.85">每个独立 session 都可能拥有自己的浏览器实例。Claude Code、Codex 并发执行多个 agent 或工具任务时，session 数量很容易叠加。</li>
+<li style="margin:6px 0;line-height:1.85">如果任务异常中断、会话被强制停止，或者调用方忘了执行 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">agent-browser close</code>，后台进程就可能继续存在。</li>
+<li style="margin:6px 0;line-height:1.85">CDP 只是控制通道，不是泄漏的根因。根因是 <strong style="color:#8c1f1f;font-weight:700;border-bottom:1px solid #8c1f1f">浏览器生命周期没有闭环</strong>。</li>
+<li style="margin:6px 0;line-height:1.85">最优先执行官方收尾命令：<code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">agent-browser close --all</code>。只有正常关闭失败，才按特征匹配并发送 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">TERM</code>，最后才考虑 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">KILL</code>。</li>
+<li style="margin:6px 0;line-height:1.85">长期方案是设置空闲超时、复用 session，并要求每个自动化任务在 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">finally</code> 或 shell <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">trap</code> 中关闭自己的 session。</li>
+</ul>
+<p style="color:#8c1f1f;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-weight:700;letter-spacing:4px;margin:36px 0 4px;font-size:13px">章 节</p>
+<h2 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.4">目录</h2>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif">
+<li style="margin:6px 0;line-height:1.85">一、现象：AI 停了，浏览器却没停</li>
+<li style="margin:6px 0;line-height:1.85">二、根因：常驻 daemon 遇上并发 session</li>
+<li style="margin:6px 0;line-height:1.85">三、先确认，不要上来就 kill</li>
+<li style="margin:6px 0;line-height:1.85">四、三层清理：官方关闭、温和终止、强制清理</li>
+<li style="margin:6px 0;line-height:1.85">五、怎样保证不误伤普通 Chrome</li>
+<li style="margin:6px 0;line-height:1.85">六、从源头预防：让生命周期闭环</li>
+<li style="margin:6px 0;line-height:1.85">七、可直接收藏的排查清单</li>
+</ul>
+<p style="color:#8c1f1f;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-weight:700;letter-spacing:4px;margin:36px 0 4px;font-size:13px">章 节</p>
+<h2 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.4">一、现象：AI 停了，浏览器却没停</h2>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">典型场景是这样的：</p>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif">
+<li style="margin:6px 0;line-height:1.85">你让 Claude Code 或 Codex 通过 skill、MCP、shell 工具打开网页；</li>
+<li style="margin:6px 0;line-height:1.85">自动化任务创建了多个命名 session，甚至并行跑了多个子 agent；</li>
+<li style="margin:6px 0;line-height:1.85">任务完成或会话终止后，终端已经安静；</li>
+<li style="margin:6px 0;line-height:1.85">但“活动监视器”里仍有多组 Chrome、Chrome Helper、GPU、Renderer 或 agent-browser 进程；</li>
+<li style="margin:6px 0;line-height:1.85">合上几次窗口也没用，Mac 继续发热，内存和 CPU 占用居高不下。</li>
+</ul>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">最迷惑的一点是：这些进程通常没有可见窗口。你看到的普通 Chrome 标签页可能只有几个，但后台自动化 Chrome 使用的是独立临时用户目录，它们和日常浏览器不是同一组实例。</p>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">因此，“我已经关掉 Chrome 窗口了”并不能证明自动化浏览器已经退出。</p>
+<p style="color:#8c1f1f;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-weight:700;letter-spacing:4px;margin:36px 0 4px;font-size:13px">章 节</p>
+<h2 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.4">二、根因：常驻 daemon 遇上并发 session</h2>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">以本机安装的 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">agent-browser 0.27.0</code> 为例，官方说明明确写了两件事：</p>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif">
+<li style="margin:6px 0;line-height:1.85">它采用 client-daemon 架构，Rust CLI 负责接收命令，Rust daemon 通过 CDP 控制 Chrome；</li>
+<li style="margin:6px 0;line-height:1.85">daemon 会在第一次命令时自动启动，并在后续命令之间保持运行，以换取更快的响应。</li>
+</ul>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">与此同时，官方 session 文档也说明：每个 session 都有独立的浏览器实例、Cookie、存储、历史记录和认证状态。</p>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">这两点放到多 agent 场景里，就形成了下面的链路：</p>
+<section style="margin:20px 0 6px"><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/02-framework-process-tree.png" alt="Claude Code、Codex 到后台 Chrome 的进程与会话链路" style="width:100%;max-width:100%;height:auto;display:block;border:0"><p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:13px;color:#5a5550;font-style:italic;text-align:center;margin:0 0 22px">Claude Code、Codex 到后台 Chrome 的进程与会话链路</p></section>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>Claude Code / Codex
+        │
+
+        ├─ Agent A → session A → daemon A → Chrome A → Renderer / GPU / Network
+
+        ├─ Agent B → session B → daemon B → Chrome B → Renderer / GPU / Network
+
+        └─ Agent C → session C → daemon C → Chrome C → Renderer / GPU / Network</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">单看一组并不可怕。真正吃资源的是“多组浏览器进程树一起常驻”。一个 Chrome 主进程还会派生渲染、GPU、网络等子进程，所以 8 个遗留实例在活动监视器里看起来可能远不止 8 行。</p>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">CDP 是不是罪魁祸首？</h3>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">不是。</p>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">CDP（Chrome DevTools Protocol）只是自动化工具与 Chrome 之间的控制协议。它负责导航、点击、读取 DOM、截图等操作，但不会替调用方决定“任务什么时候算结束”。</p>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">真正缺失的是这条生命周期：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>创建 session → 使用浏览器 → 任务成功或失败 → 关闭 session → 回收 daemon 和 Chrome</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">如果最后两步没有执行，前面的资源就可能继续留在后台。</p>
+<blockquote style="border-top:2px solid #1a1a1a;border-bottom:1px solid #1a1a1a;padding:18px 0;margin:24px 0;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;text-align:center;font-style:italic;color:#1a1a1a;line-height:1.7"><strong style="color:#8c1f1f;font-weight:700;border-bottom:1px solid #8c1f1f">关键判断：</strong> 不是 AI “还在思考”，而是 AI 启动的外部进程已经脱离了当前对话的可见范围。</blockquote>
+<p style="color:#8c1f1f;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-weight:700;letter-spacing:4px;margin:36px 0 4px;font-size:13px">章 节</p>
+<h2 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.4">三、先确认，不要上来就 kill</h2>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">清理前先分清三件事：有多少活动 session、有哪些 agent-browser daemon、哪些 Chrome 使用了 agent-browser 的临时用户目录。</p>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">1. 查看 agent-browser 自己记录的活动 session</h3>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>agent-browser session list</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">如果版本支持 JSON：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>agent-browser session list --json</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">这一步最可信，因为它从工具自己的会话视角回答“现在认为谁还活着”。</p>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">2. 查看 daemon 和自动化 Chrome</h3>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">macOS 上可以使用：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>pgrep -fl &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;
+
+pgrep -fl &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">第二条命令的关键不是进程名“Google Chrome”，而是启动参数中的：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>--user-data-dir=.../agent-browser-chrome-...</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">它说明这个 Chrome 使用的是 agent-browser 创建的隔离用户目录，而不是你日常使用的默认 Chrome Profile。</p>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">3. 按 CPU、内存和运行时间查看完整进程树</h3>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>ps -axo pid,ppid,%cpu,%mem,rss,etime,command \
+  | grep -E &#x27;[a]gent-browser-darwin|[a]gent-browser-chrome-&#x27;</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">字段含义：</p>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif">
+<li style="margin:6px 0;line-height:1.85"><code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">PID</code>：当前进程编号，后续终止时使用。</li>
+<li style="margin:6px 0;line-height:1.85"><code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">PPID</code>：父进程编号，用来判断 daemon 与 Chrome 的父子关系。</li>
+<li style="margin:6px 0;line-height:1.85"><code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">%CPU</code>：CPU 占用，观察它是否持续让机器发热。</li>
+<li style="margin:6px 0;line-height:1.85"><code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">%MEM</code> / <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">RSS</code>：内存占用，确认多个实例是否不断叠加。</li>
+<li style="margin:6px 0;line-height:1.85"><code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">ETIME</code>：已运行时间，判断它是否早已超过当前 AI 任务时长。</li>
+<li style="margin:6px 0;line-height:1.85"><code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">COMMAND</code>：完整启动命令，确认是否带有 agent-browser 特征参数。</li>
+</ul>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">不要只看 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">~/.agent-browser</code> 下有没有 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">.pid</code>、<code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">.sock</code> 文件。它们可能只是过期的 sidecar 文件，并不等于进程仍然存活。进程是否活着，最终以 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">session list</code>、<code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">ps</code> 和 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">pgrep</code> 为准。</p>
+<p style="color:#8c1f1f;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-weight:700;letter-spacing:4px;margin:36px 0 4px;font-size:13px">章 节</p>
+<h2 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.4">四、三层清理：官方关闭、温和终止、强制清理</h2>
+<section style="margin:20px 0 6px"><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/03-flowchart-cleanup.png" alt="从官方关闭到强制清理的安全操作流程" style="width:100%;max-width:100%;height:auto;display:block;border:0"><p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:13px;color:#5a5550;font-style:italic;text-align:center;margin:0 0 22px">从官方关闭到强制清理的安全操作流程</p></section>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">第一层：让 agent-browser 自己收尾</h3>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">优先执行：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>agent-browser close --all</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">然后清理过期的 pid、socket、version 等 sidecar 文件：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>agent-browser doctor --offline --quick</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">当前版本的 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">doctor</code> 会自动清理陈旧的 daemon sidecar 文件；<code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">--fix</code> 还可能执行重装 Chrome、清理旧状态等破坏性修复，因此日常排查先不要加 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">--fix</code>。</p>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">再次验证：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>agent-browser session list
+
+pgrep -fl &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;
+
+pgrep -fl &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">如果没有输出，说明已经清干净。</p>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">第二层：发送 TERM，让进程有机会优雅退出</h3>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">只有官方关闭失败时再执行：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>pgrep -f &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27; \
+  | xargs -n 1 kill -TERM 2&gt;/dev/null || true
+
+pgrep -f &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27; \
+  | xargs -n 1 kill -TERM 2&gt;/dev/null || true</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0"><code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">TERM</code> 会给进程处理退出、关闭文件和回收子进程的机会。执行后等 3 秒，再跑一次检查命令。</p>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">第三层：只对仍残留的目标使用 KILL</h3>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>pgrep -f &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27; \
+  | xargs -n 1 kill -KILL 2&gt;/dev/null || true
+
+pgrep -f &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27; \
+  | xargs -n 1 kill -KILL 2&gt;/dev/null || true</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0"><code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">KILL</code> 不允许进程执行清理逻辑，只适合处理已经卡死、无法响应 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">TERM</code> 的残留。正在进行的自动化、下载、表单填写和未保存状态都会立即丢失。</p>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">仓库里放一个可重复使用的脚本</h3>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">本文配套脚本已放在：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>scripts_py/agent_browser_cleanup.sh</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">使用方式：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>./scripts_py/agent_browser_cleanup.sh status
+./scripts_py/agent_browser_cleanup.sh close
+./scripts_py/agent_browser_cleanup.sh force</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">三条命令依次对应：只查看、官方关闭并清理 sidecar、官方关闭失败后的分级强制清理。</p>
+<p style="color:#8c1f1f;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-weight:700;letter-spacing:4px;margin:36px 0 4px;font-size:13px">章 节</p>
+<h2 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.4">五、怎样保证不误伤普通 Chrome</h2>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">不要使用下面这种“大锤”：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>killall &#x27;Google Chrome&#x27;
+pkill -f &#x27;Google Chrome&#x27;</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">它们会把普通 Chrome 窗口和日常标签页一起关掉。</p>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">本文脚本采用两层限制：</p>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif">
+<li style="margin:6px 0;line-height:1.85">daemon 必须匹配 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">agent-browser-darwin-arm64</code> 或 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">agent-browser-darwin-x64</code> 的安装路径；</li>
+<li style="margin:6px 0;line-height:1.85">Chrome 必须带有 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">--user-data-dir=.../agent-browser-chrome-...</code> 参数。</li>
+</ul>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">也就是说，它针对的是 agent-browser 创建的隔离 Chrome，不是所有名为 Google Chrome 的进程。</p>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">不过还有一个例外需要注意：如果你主动使用 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">--cdp</code> 或 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">--auto-connect</code> 连接了日常 Chrome，那么自动化 session 与普通浏览器之间的边界会变得更近。此时先用 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">session list</code> 和完整命令行确认，不要直接执行强制清理。</p>
+<p style="color:#8c1f1f;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-weight:700;letter-spacing:4px;margin:36px 0 4px;font-size:13px">章 节</p>
+<h2 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.4">六、从源头预防：让生命周期闭环</h2>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">清理脚本只是灭火器。更好的办法是让每个任务都负责关掉自己打开的浏览器。</p>
+<section style="margin:20px 0 6px"><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/04-comparison-prevention.png" alt="临时救火与长期防护的对比清单" style="width:100%;max-width:100%;height:auto;display:block;border:0"><p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:13px;color:#5a5550;font-style:italic;text-align:center;margin:0 0 22px">临时救火与长期防护的对比清单</p></section>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">1. 设置 daemon 空闲自动退出</h3>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">官方提供了 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">AGENT_BROWSER_IDLE_TIMEOUT_MS</code>。例如 10 分钟无命令后自动关闭浏览器并退出 daemon：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>export AGENT_BROWSER_IDLE_TIMEOUT_MS=600000</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">长期使用可以写入 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">~/.zshrc</code>：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>echo &#x27;export AGENT_BROWSER_IDLE_TIMEOUT_MS=600000&#x27; &gt;&gt; ~/.zshrc
+source ~/.zshrc</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">10 分钟只是一个稳妥起点。频繁执行长任务可以设为 30 分钟；偶尔使用、机器资源紧张时可以设为 3 到 5 分钟。</p>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">2. 不要为每一步创建新 session</h3>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">同一个任务尽量复用一个语义明确的 session：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>agent-browser --session blog-research open https://example.com
+agent-browser --session blog-research snapshot -i
+agent-browser --session blog-research close</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">并发任务确实需要隔离时，可以创建多个 session，但每个任务结束后都要单独关闭。</p>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">3. 在 shell 脚本里用 trap 兜底</h3>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>set -euo pipefail
+
+SESSION=&quot;research-$$&quot;
+
+cleanup() {
+  agent-browser --session &quot;$SESSION&quot; close &gt;/dev/null 2&gt;&amp;1 || true
+}
+
+trap cleanup EXIT INT TERM
+
+agent-browser --session &quot;$SESSION&quot; open https://example.com
+agent-browser --session &quot;$SESSION&quot; snapshot -i</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">无论脚本正常结束、报错，还是收到中断信号，<code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">cleanup</code> 都会尝试关闭对应 session。</p>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">4. 给 Claude Code / Codex 的浏览器 skill 加退出规则</h3>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">长期指令里应明确写上：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>浏览器自动化任务结束后，必须关闭本任务创建的 agent-browser session。
+
+成功、失败、取消和超时都要执行清理；不得依赖用户手动回收后台进程。
+
+并发任务必须记录各自的 session 名称，只关闭自己创建的 session。</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">这比“任务结束后记得关浏览器”更有效，因为它定义了成功、失败和取消三条路径。</p>
+<h3 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;font-style:italic;color:#1a1a1a;margin:20px 0 8px">5. 定期做轻量检查</h3>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">如果你经常让多个 agent 并发操作网页，可以在结束工作前运行：</p>
+<pre style="background:#efe6d4;color:#1a1a1a;border-radius:6px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code>agent-browser session list
+./scripts_py/agent_browser_cleanup.sh status</code></pre>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">发现不认识、运行时间异常长的 session，再决定是否关闭。不要把 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">force</code> 放进高频定时任务，因为它可能打断仍在工作的自动化。</p>
+<p style="color:#8c1f1f;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-weight:700;letter-spacing:4px;margin:36px 0 4px;font-size:13px">章 节</p>
+<h2 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.4">七、可直接收藏的排查清单</h2>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">遇到 Mac 突然发热、内存异常时，按这个顺序走：</p>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif">
+<li style="margin:6px 0;line-height:1.85">打开“活动监视器”，确认是否有多组无窗口的 Chrome / agent-browser。</li>
+<li style="margin:6px 0;line-height:1.85">运行 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">agent-browser session list</code>，确认活动 session。</li>
+<li style="margin:6px 0;line-height:1.85">用 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">pgrep -fl</code> 或 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">ps</code> 检查 daemon 与 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">agent-browser-chrome-</code> 用户目录。</li>
+<li style="margin:6px 0;line-height:1.85">先执行 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">agent-browser close --all</code>。</li>
+<li style="margin:6px 0;line-height:1.85">再执行 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">agent-browser doctor --offline --quick</code> 清理陈旧 sidecar。</li>
+<li style="margin:6px 0;line-height:1.85">等待几秒并复查 CPU、内存和进程。</li>
+<li style="margin:6px 0;line-height:1.85">仍有残留时先 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">TERM</code>，最后才 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">KILL</code>。</li>
+<li style="margin:6px 0;line-height:1.85">设置 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">AGENT_BROWSER_IDLE_TIMEOUT_MS</code>。</li>
+<li style="margin:6px 0;line-height:1.85">在每个自动化脚本或 skill 中加入 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">finally</code> / <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">trap</code> 清理。</li>
+<li style="margin:6px 0;line-height:1.85">避免 <code style="background:#efe6d4;color:#5a5550;padding:2px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">killall Google Chrome</code> 这类会误伤普通标签页的命令。</li>
+</ul>
+<p style="color:#8c1f1f;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-weight:700;letter-spacing:4px;margin:36px 0 4px;font-size:13px">章 节</p>
+<h2 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.4">最后</h2>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">浏览器自动化最容易被忽略的，不是“怎么打开网页”，而是“谁负责关闭网页背后的整棵进程树”。</p>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">Claude Code 和 Codex 能把网页操作拆成工具调用，却不会天然替所有第三方工具完成生命周期管理。只要调用链中存在 daemon、session 和独立 Chrome，就应该把清理当成任务的一部分，而不是任务结束后的家务。</p>
+<blockquote style="border-top:2px solid #1a1a1a;border-bottom:1px solid #1a1a1a;padding:18px 0;margin:24px 0;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:18px;text-align:center;font-style:italic;color:#1a1a1a;line-height:1.7"><strong style="color:#8c1f1f;font-weight:700;border-bottom:1px solid #8c1f1f">真正可靠的自动化，不只要能启动，还要能在成功、失败和取消时都干净退出。</strong></blockquote>
+<p style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:16px;line-height:1.9;color:#1a1a1a;margin:14px 0">如果你的 Mac 也曾在 AI 会话结束后莫名发热，先别急着重启。跑一下本文的检查命令，很可能几分钟就能找到那批“已经下班，但进程还没打卡”的浏览器。</p>
+<p style="color:#8c1f1f;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-weight:700;letter-spacing:4px;margin:36px 0 4px;font-size:13px">章 节</p>
+<h2 style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:22px;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.4">参考资料</h2>
+<ul style="margin:14px 0;padding-left:1.4em;color:#1a1a1a;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif">
+<li style="margin:6px 0;line-height:1.85"><a href="https://github.com/vercel-labs/agent-browser" style="color:inherit;text-decoration:underline">agent-browser 官方仓库</a></li>
+<li style="margin:6px 0;line-height:1.85"><a href="https://github.com/vercel-labs/agent-browser/blob/main/README.md" style="color:inherit;text-decoration:underline">agent-browser README：命令、Session 与 Architecture</a></li>
+<li style="margin:6px 0;line-height:1.85"><a href="https://developer.chrome.com/blog/chrome-for-testing/" style="color:inherit;text-decoration:underline">Chrome for Testing 官方介绍</a></li>
+<li style="margin:6px 0;line-height:1.85"><a href="https://developer.chrome.com/docs/devtools/remote-debugging/" style="color:inherit;text-decoration:underline">Chrome DevTools：远程调试</a></li>
+</ul>
+<section style="text-align:center;padding:24px 0;margin:32px 0;border-top:1px solid #d8cdb8;border-bottom:1px solid #d8cdb8"><strong style="font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-style:italic;font-size:17px;color:#1a1a1a;margin:0 0 8px;display:block">若此文对你有所启发——</strong>长按二维码 · 见证下一篇</section>
+<p style="text-align:center;font-family:'Noto Serif SC', 'Songti SC', 'STSong', Georgia, 'Times New Roman', serif;font-size:12px;color:#5a5550;margin:24px 0 8px">主编｜小遨 · 出品｜2026 · 联系｜wwrtpfa</p>
+</section>
+</body>
+</html>

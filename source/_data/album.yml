@@ -1,0 +1,355 @@
+- name: 个人生活
+  class_name: PERSONAL
+  cover: null
+  path_name: /album/life/
+  description: 留给真实生活的空白，等待第一张由我亲自拍下的照片。
+  type: 2
+  top_background: null
+  rowHeight: 260
+  limit: 12
+  lazyload: true
+  btnLazyload: false
+  album_list: []
+- name: 动漫世界
+  class_name: ANIME
+  cover: https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-64.jpg
+  path_name: /album/anime/
+  description: 柔光、想象与角色瞬间，收拢成一组有呼吸感的画面。
+  type: 2
+  top_background: https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-64.jpg
+  rowHeight: 260
+  limit: 12
+  lazyload: true
+  btnLazyload: false
+  album_list:
+    - content: 动漫·0707
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/e8wdxl
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-64.jpg
+      sha256: 8eb6af3598299a2f74aac8afc4b93e91a3ac8b47e07fa2bffedddc2f5736eb7c
+    - content: 动漫·0707
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/og2kq9
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-65.jpg
+      sha256: 2b21b8f3ec0266b73d0b4a4da79d314b89fd3695d200bcdc8f0d6b953889606a
+    - content: 动漫·0707
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/rqp3r7
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-63.jpg
+      sha256: 63b6a95cd26e987c658bc46dd0ffa1d68a8f0e1206635263675afe78054fc9f3
+    - content: 动漫·0707
+      license: Wallhaven · anime
+      source_page: https://wallhaven.cc/w/jevmz5
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-58.jpg
+      sha256: d18216f96df95557e231c40b72ab2794868a5903f5cfeb3f85820d92cf6fc2ca
+    - content: 动漫·0701
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/3qrdr6
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-48.jpg
+      sha256: b03985fa833b78cb13fb75bd7e07466cdd21022ec8788025fc8865018a3508af
+    - content: 动漫·0701
+      license: Wallhaven · anime
+      source_page: https://wallhaven.cc/w/9orlxx
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-49.jpg
+      sha256: 76fb9bc433e242acb6f513ad1ff41c1ed57b4ad0f9a22b576fbb062fae24ba3c
+    - content: 动漫·0701
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/9orv7w
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-50.jpg
+      sha256: e16f4d3c371903062393897398593baa24572b75d29892909a390016b0794533
+    - content: 动漫·0622
+      license: Pinterest
+      source_page: https://www.pinterest.com/
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-15.jpg
+      sha256: be1e2b5d10b7ee4f475b201bfdc179a6c89d157842228145ff3951d4a4772981
+    - content: 林间神社
+      license: Public domain
+      source_page: https://commons.wikimedia.org/wiki/File:Algorithmically-generated_landscape_artwork_of_forest_with_Shinto_shrine.png
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-01.webp
+      sha256: 82f52c1d5774d82e7f732bb3f24be3a54ffea251abd7718a2dce20fd8c8e7692
+    - content: 知识编辑者
+      license: Public domain
+      source_page: https://commons.wikimedia.org/wiki/File:An_anime_girl_editing_Wikipedia.jpg
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-02.webp
+      sha256: 47d0b81c9e1f685e3b3f13de590a8f8e986961fb39be16bfb7d386696a801d50
+    - content: 花与少女
+      license: Public domain
+      source_page: https://commons.wikimedia.org/wiki/File:Anime_Girl_GAN_generated.jpg
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-09.webp
+      sha256: 1314da43e0293ac4eeafb926e828bf01e3530d612854ba7adfd95aec6b534115
+    - content: 橙发肖像
+      license: Public domain
+      source_page: https://commons.wikimedia.org/wiki/File:Orange_short_haired_anime_girl_portrait.jpg
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-04.webp
+      sha256: c8357f223197fb1acf96e8508ec9e167430610ad7751fdec1ba12239179db3f6
+    - content: 黑发肖像
+      license: Public domain
+      source_page: https://commons.wikimedia.org/wiki/File:Black_long_haired_anime_girl_portrait.jpg
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-05.webp
+      sha256: 0e48341a25d9751fce788d11bec05a4448abd323695d2b77ff1d9bb8fc37c583
+    - content: 柔光肖像
+      license: Public domain
+      source_page: https://commons.wikimedia.org/wiki/File:Anime_girl_portrait.jpg
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-06.webp
+      sha256: 2923feae1ca219aff749fde24c25103284c5a95ead081afc11b8ab38240c9143
+    - content: 蓝色自画像
+      license: CC BY 4.0 · VulcanSphere
+      source_page: https://commons.wikimedia.org/wiki/File:VulcanSphere_Anime-style_Self-portrait_(AnimagineXL_4.0).webp
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-07.webp
+      sha256: 34b2c855f526de4f6970fb3672f4b5180caa7f9092723d7b97118664e1ce4541
+    - content: 暮色神社
+      license: Public domain
+      source_page: >-
+        https://commons.wikimedia.org/wiki/File:Algorithmically-generated_landscape_artwork_of_forest_with_Shinto_shrine_using_negative_prompt_for_green_trees.png
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-11.webp
+      sha256: 1aef564c8aa7c0e4315fa429aa69c28247726e27a8df9ce87ca798c2e1aca7b6
+    - content: 机械少女
+      license: Public domain
+      source_page: https://commons.wikimedia.org/wiki/File:Mecha-girl.png
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-03.webp
+      sha256: 53866cc7b9863780d3a24c7b5e1d9d1bc758f36e498cd971318c0b9431a5b09b
+    - content: 纸页与灵感
+      license: Public domain
+      source_page: https://commons.wikimedia.org/wiki/File:AI-generated_Wikipe-tan_writing_on_paper_sheets_2000s_anime_style.jpg
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-08.webp
+      sha256: fbf34747caaf22f2531a47bae0843869469ab3103d2cdd7d9a3a95dc18ef9e31
+    - content: 绘色少女
+      license: Public domain
+      source_page: https://commons.wikimedia.org/wiki/File:Painted_Tsundere.png
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-10.webp
+      sha256: 51df63a6e45c006cdd6a0655d029b5165039a33feeaa8edfe31b77055ac4a311
+- name: 风景远方
+  class_name: LANDSCAPE
+  cover: https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/landscape-42.jpg
+  path_name: /album/landscape/
+  description: 动漫笔触下的山川湖海，想象与远方交织的画面。
+  type: 2
+  top_background: https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/landscape-42.jpg
+  rowHeight: 260
+  limit: 12
+  lazyload: true
+  btnLazyload: false
+  album_list:
+    - content: 风景·0707
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/xedleo
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/landscape-42.jpg
+      sha256: 261304ae08070976cfb629cf19de1a31317e5cccc56b1a4f31c44373b4bd71ef
+    - content: 风景·0707
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/w5mpop
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/landscape-40.jpg
+      sha256: 6c881097fd87af58b513961889e4a40a0f815bc7995665813e737ce994f5f074
+    - content: 风景·0707
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/rqjk91
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/landscape-36.jpg
+      sha256: 4c29a512eed517f4c0012a8d104b35b5e5ddf55190941edea9c04138d8a6d76c
+    - content: 风景·0701
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/w5mgxr
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/landscape-33.jpg
+      sha256: 651b4ee1706fdd6886dedcdbaa7e89340b480f5173a4e60eda9ab513c7b5b840
+    - content: 风景·0701
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/jevgyp
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/landscape-34.jpg
+      sha256: b37f558322e84b6f32966efd944bcc733a3505ef084b29ca2fd3baedc22df6bb
+    - content: 风景·0630
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/qrlqjr
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/landscape-30.jpg
+      sha256: 6eeb635f911ac697bc669b51f2ca7fe5971bf7f9e9305624ff8980351a8127fb
+    - content: 风景·0622
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/xepww3
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/landscape-24.jpg
+      sha256: 7fbe3e7f614709308367aa3e7e9a70978347238da2048fd604efd36fe0775327
+    - content: 风景·0622
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/8grpp1
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/landscape-25.jpg
+      sha256: 5a4fb7d9b419f3f4c612557042f6cd4ea72c519ee92e933faf98aa2c9ec16f48
+    - content: 风景·0622
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/jevokm
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/landscape-26.jpg
+      sha256: 05a1f8483ad964eb7c94dd7ecc0f2ae0bbc99b16df7b308cd096351b893008aa
+- name: 科技切片
+  class_name: TECHNOLOGY
+  cover: https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/technology-62.jpg
+  path_name: /album/technology/
+  description: 赛博朋克与光影电路，用动漫风格重构技术空间。
+  type: 2
+  top_background: https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/technology-62.jpg
+  rowHeight: 260
+  limit: 16
+  lazyload: false
+  btnLazyload: false
+  album_list:
+    - content: 科技·0707
+      license: Wallhaven · anime
+      source_page: https://wallhaven.cc/w/w5mpd6
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/technology-62.jpg
+      sha256: 085591c33c0ab28d4158cb9c81f7e7b7cff8aa1658e144f904e7138972957656
+    - content: 科技·0707
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/k8lxzq
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/technology-63.jpg
+      sha256: b791d3a4e6c24d078e1564aad25c751c3672c0c9385ce39d808292dd1a9ae320
+    - content: 科技·0707
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/vpdp98
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/technology-61.jpg
+      sha256: e9dc51d8628ef3866e985ee82a349b81f42f12c75021d5d7672b72c49f71c310
+    - content: 科技·0707
+      license: Wallhaven · anime
+      source_page: https://wallhaven.cc/w/9orjqw
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/technology-55.jpg
+      sha256: 38e4c123b5fed9f9140c43ca3153d7a63c778ac0c7ea5daaaf8c31774bf94a66
+    - content: 科技·0707
+      license: Wallhaven · anime
+      source_page: https://wallhaven.cc/w/1qr96w
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/technology-56.jpg
+      sha256: 03a37f866c3d02fa286e0312d77a7c712e92a8f560ff97fe3cb6d0047c5ec2bd
+    - content: 科技·0701
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/ly21gl
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/technology-47.jpg
+      sha256: 40db7377655e0bc9032252147e75c38d5660f0e0bca87c0f415d512569a5f6bd
+    - content: 科技·0701
+      license: Wallhaven · anime
+      source_page: https://wallhaven.cc/w/ly21ly
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/technology-48.jpg
+      sha256: 896749a14675de14f7bcb87bfca81c794ecefc0e719899f3b243da6a850d6b2f
+    - content: 科技·0701
+      license: Wallhaven · anime
+      source_page: https://wallhaven.cc/w/og2p6p
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/technology-49.jpg
+      sha256: 81fadd91618b1241347cc1c00e483769c0ec82535e2496e308f582c20069e005
+- name: 城市切片
+  class_name: CITY
+  cover: https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/city-10.jpg
+  path_name: /album/city/
+  description: 天际线、街角与夜灯，把城市的节奏收进一组画面。
+  type: 2
+  top_background: https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/city-10.jpg
+  rowHeight: 260
+  limit: 12
+  lazyload: true
+  btnLazyload: false
+  album_list:
+    - content: 城市·0707
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/zpdppj
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/city-10.jpg
+      sha256: 3b9093f3e99ee5dea5c275c1fb13ddc23614726463e6d492461dd0be1cd1651a
+    - content: 城市·0707
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/lyj29l
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/city-11.jpg
+      sha256: 328ab3652f1b8740c4c7b72b9c055151b6866f8121f4f033fcbb32b43f5224e8
+    - content: 城市·0622
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/k82rrq
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/city-03.jpg
+      sha256: 26a49328efed0823cbb270ff33b5d9a96f967bb64955565d0a60791b650f5eb2
+    - content: 城市·0622
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/d8wv13
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/city-04.jpg
+      sha256: ff33a11c478ee6900017622ed3c1abdf6524e529801488fc23f7614ce59d2451
+    - content: 动漫·0621
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/d8wvxo
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-12.jpg
+      sha256: a1534ce58bb8302d1461ae8f349a1d7b374a40e7f8c6666f1b8b4a1133df1013
+    - content: 动漫·0621
+      license: Wallhaven · general
+      source_page: https://wallhaven.cc/w/8gr6l2
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-14.jpg
+      sha256: b43e408c893e886d34a5585a3914ef6db5c4a470323b899d939d480ace0e9256
+- name: 人文影像
+  class_name: HUMANITY
+  cover: https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/humanity-14.jpg
+  path_name: /album/humanity/
+  description: 节日、面孔与日常，记录人与人之间的温度。
+  type: 2
+  top_background: https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/humanity-14.jpg
+  rowHeight: 260
+  limit: 12
+  lazyload: true
+  btnLazyload: false
+  album_list:
+    - content: 人文·0707
+      license: Wikimedia Commons · CC BY-SA 4.0
+      source_page: https://commons.wikimedia.org/wiki/File:Essence_Festival_of_Culture.jpg
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/humanity-14.jpg
+      sha256: fb1bddcd0463d3175f8c2db7e57318a001fe1bc78da1a4b902092a51d2803f51
+    - content: 人文·0707
+      license: Wikimedia Commons · CC BY-SA 4.0
+      source_page: https://commons.wikimedia.org/wiki/File:Essence_Festival_of_Culture_-_2025_(New_Orleans,_Louisiana.jpg
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/humanity-15.jpg
+      sha256: 16d4b9685ce119e1cf2ecd727f477fac0250442e4e09a15c56d8223d52ecd514
+    - content: 人文·0701
+      license: Wikimedia Commons · CC BY-SA 4.0
+      source_page: https://commons.wikimedia.org/wiki/File:Festival_and_culture_-05.jpg
+      image:
+        - https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/humanity-13.jpg
+      sha256: 714c01211723af1e89864977e6e6c235b997412c3b277729f8547b8c4f9bafe1
+- name: 其他
+  class_name: OTHER
+  cover: null
+  path_name: /album/other/
+  description: 不归属于任何主题的瞬间——灵感、随手、跨界与意外。
+  type: 2
+  top_background: null
+  rowHeight: 260
+  limit: 12
+  lazyload: true
+  btnLazyload: false
+  album_list: []

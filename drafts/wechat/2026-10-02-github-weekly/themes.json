@@ -1,0 +1,831 @@
+{
+  "success": true,
+  "code": "THEMES_SHOWN",
+  "message": "Themes shown",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "themes": [
+      {
+        "name": "autumn-warm",
+        "type": "ai",
+        "description": "【秋日暖光】温暖治愈，橙色调，文艺美学",
+        "version": "4.0",
+        "selectable": true,
+        "metadata_incomplete": true,
+        "style": {}
+      },
+      {
+        "name": "custom",
+        "type": "ai",
+        "description": "自定义主题，使用您自己的提示词",
+        "version": "1.0",
+        "selectable": true,
+        "metadata_incomplete": true,
+        "style": {}
+      },
+      {
+        "name": "ocean-calm",
+        "type": "ai",
+        "description": "【深海静谧】深邃冷静，蓝色调，理性专业",
+        "version": "4.0",
+        "selectable": true,
+        "metadata_incomplete": true,
+        "style": {}
+      },
+      {
+        "name": "spring-fresh",
+        "type": "ai",
+        "description": "【春日清新】清新自然，绿色调，生机盎然",
+        "version": "4.0",
+        "selectable": true,
+        "metadata_incomplete": true,
+        "style": {}
+      },
+      {
+        "name": "api-collection",
+        "type": "api",
+        "description": "md2wechat API 主题集 - 48 个专业主题",
+        "version": "mixed",
+        "selectable": false,
+        "metadata_incomplete": true,
+        "style": {}
+      },
+      {
+        "name": "apple",
+        "type": "api",
+        "description": "Apple 极简风格",
+        "version": "1.0",
+        "api_theme": "apple",
+        "selectable": true,
+        "metadata_incomplete": true,
+        "style": {}
+      },
+      {
+        "name": "bauhaus-primary",
+        "type": "api",
+        "description": "包豪斯三原色风格，红蓝黄碰撞的现代主义先锋",
+        "version": "1.0",
+        "api_theme": "bauhaus-primary",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "featured",
+          "color": "primary",
+          "layout": "三原色几何现代主义",
+          "mood": "先锋实验",
+          "best_for": "发布、策展、强视觉记忆内容",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "bold-blue",
+        "type": "api",
+        "description": "蓝色系，标题满底色圆角投影",
+        "version": "2.0",
+        "api_theme": "bold-blue",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "bold",
+          "color": "blue",
+          "layout": "标题满底色 + 圆角投影",
+          "mood": "视觉冲击",
+          "best_for": "标题党、热点文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "bold-gold",
+        "type": "api",
+        "description": "金色系，标题满底色圆角投影",
+        "version": "2.0",
+        "api_theme": "bold-gold",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "bold",
+          "color": "gold",
+          "layout": "标题满底色 + 圆角投影",
+          "mood": "视觉冲击",
+          "best_for": "标题党、热点文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "bold-gray",
+        "type": "api",
+        "description": "灰色系，标题满底色圆角投影",
+        "version": "2.0",
+        "api_theme": "bold-gray",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "bold",
+          "color": "gray",
+          "layout": "标题满底色 + 圆角投影",
+          "mood": "视觉冲击",
+          "best_for": "标题党、热点文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "bold-green",
+        "type": "api",
+        "description": "绿色系，标题满底色圆角投影",
+        "version": "2.0",
+        "api_theme": "bold-green",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "bold",
+          "color": "green",
+          "layout": "标题满底色 + 圆角投影",
+          "mood": "视觉冲击",
+          "best_for": "标题党、热点文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "bold-navy",
+        "type": "api",
+        "description": "藏青色系，标题满底色圆角投影",
+        "version": "2.0",
+        "api_theme": "bold-navy",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "bold",
+          "color": "navy",
+          "layout": "标题满底色 + 圆角投影",
+          "mood": "视觉冲击",
+          "best_for": "标题党、热点文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "bold-orange",
+        "type": "api",
+        "description": "橙色系，标题满底色圆角投影",
+        "version": "2.0",
+        "api_theme": "bold-orange",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "bold",
+          "color": "orange",
+          "layout": "标题满底色 + 圆角投影",
+          "mood": "视觉冲击",
+          "best_for": "标题党、热点文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "bold-red",
+        "type": "api",
+        "description": "视觉冲击，标题满底色 + 圆角投影",
+        "version": "2.0",
+        "api_theme": "bold-red",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "bold",
+          "color": "red",
+          "layout": "标题满底色 + 圆角投影",
+          "mood": "视觉冲击",
+          "best_for": "标题党、热点文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "bold-sky",
+        "type": "api",
+        "description": "天蓝色系，标题满底色圆角投影",
+        "version": "2.0",
+        "api_theme": "bold-sky",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "bold",
+          "color": "sky",
+          "layout": "标题满底色 + 圆角投影",
+          "mood": "视觉冲击",
+          "best_for": "标题党、热点文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "bytedance",
+        "type": "api",
+        "description": "字节跳动风格",
+        "version": "1.0",
+        "api_theme": "bytedance",
+        "selectable": true,
+        "metadata_incomplete": true,
+        "style": {}
+      },
+      {
+        "name": "chinese",
+        "type": "api",
+        "description": "中国风风格",
+        "version": "1.0",
+        "api_theme": "chinese",
+        "selectable": true,
+        "metadata_incomplete": true,
+        "style": {}
+      },
+      {
+        "name": "coffee-house",
+        "type": "api",
+        "description": "醇厚巧克力棕色调，午后咖啡馆的温暖书卷气",
+        "version": "1.0",
+        "api_theme": "coffee-house",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "featured",
+          "color": "brown",
+          "layout": "咖啡馆书卷感排版",
+          "mood": "温暖人文",
+          "best_for": "访谈、随笔、叙事栏目",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "cyber",
+        "type": "api",
+        "description": "赛博朋克风格",
+        "version": "1.0",
+        "api_theme": "cyber",
+        "selectable": true,
+        "metadata_incomplete": true,
+        "style": {}
+      },
+      {
+        "name": "default",
+        "type": "api",
+        "description": "微信默认风格",
+        "version": "1.0",
+        "api_theme": "default",
+        "selectable": true,
+        "metadata_incomplete": true,
+        "style": {}
+      },
+      {
+        "name": "elegant-blue",
+        "type": "api",
+        "description": "蓝色系，层次丰富，左边框递减",
+        "version": "2.0",
+        "api_theme": "elegant-blue",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "elegant",
+          "color": "blue",
+          "layout": "左边框递减 + 渐变背景",
+          "mood": "层次丰富",
+          "best_for": "深度文章、情感故事",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "elegant-gold",
+        "type": "api",
+        "description": "层次丰富，左边框递减 + 渐变背景",
+        "version": "2.0",
+        "api_theme": "elegant-gold",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "elegant",
+          "color": "gold",
+          "layout": "左边框递减 + 渐变背景",
+          "mood": "层次丰富",
+          "best_for": "深度文章、情感故事",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "elegant-gray",
+        "type": "api",
+        "description": "灰色系，层次丰富，左边框递减",
+        "version": "2.0",
+        "api_theme": "elegant-gray",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "elegant",
+          "color": "gray",
+          "layout": "左边框递减 + 渐变背景",
+          "mood": "层次丰富",
+          "best_for": "深度文章、情感故事",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "elegant-green",
+        "type": "api",
+        "description": "绿色系，层次丰富，左边框递减",
+        "version": "2.0",
+        "api_theme": "elegant-green",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "elegant",
+          "color": "green",
+          "layout": "左边框递减 + 渐变背景",
+          "mood": "层次丰富",
+          "best_for": "深度文章、情感故事",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "elegant-navy",
+        "type": "api",
+        "description": "藏青色系，层次丰富，左边框递减",
+        "version": "2.0",
+        "api_theme": "elegant-navy",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "elegant",
+          "color": "navy",
+          "layout": "左边框递减 + 渐变背景",
+          "mood": "层次丰富",
+          "best_for": "深度文章、情感故事",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "elegant-orange",
+        "type": "api",
+        "description": "橙色系，层次丰富，左边框递减",
+        "version": "2.0",
+        "api_theme": "elegant-orange",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "elegant",
+          "color": "orange",
+          "layout": "左边框递减 + 渐变背景",
+          "mood": "层次丰富",
+          "best_for": "深度文章、情感故事",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "elegant-red",
+        "type": "api",
+        "description": "红色系，层次丰富，左边框递减",
+        "version": "2.0",
+        "api_theme": "elegant-red",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "elegant",
+          "color": "red",
+          "layout": "左边框递减 + 渐变背景",
+          "mood": "层次丰富",
+          "best_for": "深度文章、情感故事",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "elegant-sky",
+        "type": "api",
+        "description": "天蓝色系，层次丰富，左边框递减",
+        "version": "2.0",
+        "api_theme": "elegant-sky",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "elegant",
+          "color": "sky",
+          "layout": "左边框递减 + 渐变背景",
+          "mood": "层次丰富",
+          "best_for": "深度文章、情感故事",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "focus-blue",
+        "type": "api",
+        "description": "蓝色系，居中对称",
+        "version": "2.0",
+        "api_theme": "focus-blue",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "focus",
+          "color": "blue",
+          "layout": "居中对称，标题上下双横线",
+          "mood": "平衡和谐",
+          "best_for": "商务内容、正式文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "focus-gold",
+        "type": "api",
+        "description": "金色系，居中对称",
+        "version": "2.0",
+        "api_theme": "focus-gold",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "focus",
+          "color": "gold",
+          "layout": "居中对称，标题上下双横线",
+          "mood": "平衡和谐",
+          "best_for": "商务内容、正式文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "focus-gray",
+        "type": "api",
+        "description": "灰色系，居中对称",
+        "version": "2.0",
+        "api_theme": "focus-gray",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "focus",
+          "color": "gray",
+          "layout": "居中对称，标题上下双横线",
+          "mood": "平衡和谐",
+          "best_for": "商务内容、正式文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "focus-green",
+        "type": "api",
+        "description": "居中对称，标题上下双横线",
+        "version": "2.0",
+        "api_theme": "focus-green",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "focus",
+          "color": "green",
+          "layout": "居中对称，标题上下双横线",
+          "mood": "平衡和谐",
+          "best_for": "商务内容、正式文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "focus-navy",
+        "type": "api",
+        "description": "藏青色系，居中对称",
+        "version": "2.0",
+        "api_theme": "focus-navy",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "focus",
+          "color": "navy",
+          "layout": "居中对称，标题上下双横线",
+          "mood": "平衡和谐",
+          "best_for": "商务内容、正式文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "focus-orange",
+        "type": "api",
+        "description": "橙色系，居中对称",
+        "version": "2.0",
+        "api_theme": "focus-orange",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "focus",
+          "color": "orange",
+          "layout": "居中对称，标题上下双横线",
+          "mood": "平衡和谐",
+          "best_for": "商务内容、正式文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "focus-red",
+        "type": "api",
+        "description": "红色系，居中对称",
+        "version": "2.0",
+        "api_theme": "focus-red",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "focus",
+          "color": "red",
+          "layout": "居中对称，标题上下双横线",
+          "mood": "平衡和谐",
+          "best_for": "商务内容、正式文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "focus-sky",
+        "type": "api",
+        "description": "天蓝色系，居中对称",
+        "version": "2.0",
+        "api_theme": "focus-sky",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "focus",
+          "color": "sky",
+          "layout": "居中对称，标题上下双横线",
+          "mood": "平衡和谐",
+          "best_for": "商务内容、正式文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "github-readme",
+        "type": "api",
+        "description": "开发者最熟悉的阅读界面，README 即视感",
+        "version": "1.0",
+        "api_theme": "github-readme",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "featured",
+          "color": "blue",
+          "layout": "README 文档式结构",
+          "mood": "技术结构化",
+          "best_for": "开发者说明、教程、产品文档",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "ink-minimal",
+        "type": "api",
+        "description": "纯粹的黑白水墨风，零色彩干扰的极简阅读",
+        "version": "1.0",
+        "api_theme": "ink-minimal",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "featured",
+          "color": "black",
+          "layout": "黑白水墨极简",
+          "mood": "克制鲜明",
+          "best_for": "纯文本表达、重排版、观点文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "lavender-dream",
+        "type": "api",
+        "description": "梦幻紫色调的浪漫氛围，诗意与灵感的温柔表达",
+        "version": "1.0",
+        "api_theme": "lavender-dream",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "featured",
+          "color": "purple",
+          "layout": "柔和紫色调 + 梦幻圆角",
+          "mood": "柔和浪漫",
+          "best_for": "诗意表达、品牌感内容、情绪型文章",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "minimal-blue",
+        "type": "api",
+        "description": "干净克制，纯色文字无装饰",
+        "version": "2.0",
+        "api_theme": "minimal-blue",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "minimal",
+          "color": "blue",
+          "layout": "纯色文字无装饰",
+          "mood": "干净克制",
+          "best_for": "技术文档、简洁风格",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "minimal-gold",
+        "type": "api",
+        "description": "金色系，干净克制",
+        "version": "2.0",
+        "api_theme": "minimal-gold",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "minimal",
+          "color": "gold",
+          "layout": "纯色文字无装饰",
+          "mood": "干净克制",
+          "best_for": "技术文档、简洁风格",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "minimal-gray",
+        "type": "api",
+        "description": "灰色系，干净克制",
+        "version": "2.0",
+        "api_theme": "minimal-gray",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "minimal",
+          "color": "gray",
+          "layout": "纯色文字无装饰",
+          "mood": "干净克制",
+          "best_for": "技术文档、简洁风格",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "minimal-green",
+        "type": "api",
+        "description": "绿色系，干净克制",
+        "version": "2.0",
+        "api_theme": "minimal-green",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "minimal",
+          "color": "green",
+          "layout": "纯色文字无装饰",
+          "mood": "干净克制",
+          "best_for": "技术文档、简洁风格",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "minimal-navy",
+        "type": "api",
+        "description": "藏青色系，干净克制",
+        "version": "2.0",
+        "api_theme": "minimal-navy",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "minimal",
+          "color": "navy",
+          "layout": "纯色文字无装饰",
+          "mood": "干净克制",
+          "best_for": "技术文档、简洁风格",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "minimal-orange",
+        "type": "api",
+        "description": "橙色系，干净克制",
+        "version": "2.0",
+        "api_theme": "minimal-orange",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "minimal",
+          "color": "orange",
+          "layout": "纯色文字无装饰",
+          "mood": "干净克制",
+          "best_for": "技术文档、简洁风格",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "minimal-red",
+        "type": "api",
+        "description": "红色系，干净克制",
+        "version": "2.0",
+        "api_theme": "minimal-red",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "minimal",
+          "color": "red",
+          "layout": "纯色文字无装饰",
+          "mood": "干净克制",
+          "best_for": "技术文档、简洁风格",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "minimal-sky",
+        "type": "api",
+        "description": "天蓝色系，干净克制",
+        "version": "2.0",
+        "api_theme": "minimal-sky",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "minimal",
+          "color": "sky",
+          "layout": "纯色文字无装饰",
+          "mood": "干净克制",
+          "best_for": "技术文档、简洁风格",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "mint-fresh",
+        "type": "api",
+        "description": "清凉薄荷绿底色，适合生活方式与健康类内容",
+        "version": "1.0",
+        "api_theme": "mint-fresh",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "featured",
+          "color": "green",
+          "layout": "薄荷绿底色 + 圆角信息块",
+          "mood": "清新生活方式",
+          "best_for": "生活方式、健康、轻内容表达",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "nyt-classic",
+        "type": "api",
+        "description": "经典米黄色新闻纸，极强的严肃深度报道专业感",
+        "version": "1.0",
+        "api_theme": "nyt-classic",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "featured",
+          "color": "black",
+          "layout": "新闻纸排版 + 严肃分隔线",
+          "mood": "报刊严肃",
+          "best_for": "深度报道、评论、知识型长文",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "sports",
+        "type": "api",
+        "description": "体育风格",
+        "version": "1.0",
+        "api_theme": "sports",
+        "selectable": true,
+        "metadata_incomplete": true,
+        "style": {}
+      },
+      {
+        "name": "sspai-red",
+        "type": "api",
+        "description": "少数派红色风格，利落醒目",
+        "version": "1.0",
+        "api_theme": "sspai-red",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "featured",
+          "color": "red",
+          "layout": "清晰标题 + 红色强调",
+          "mood": "利落醒目",
+          "best_for": "工具评测、效率教程、产品说明",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "sunset-amber",
+        "type": "api",
+        "description": "暖琥珀色调的黄昏意境，散文游记与情感表达",
+        "version": "1.0",
+        "api_theme": "sunset-amber",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "featured",
+          "color": "amber",
+          "layout": "暖琥珀叙事排版",
+          "mood": "温暖叙事",
+          "best_for": "散文、旅行、故事化表达",
+          "api_required": "https://md2wechat.app"
+        }
+      },
+      {
+        "name": "wechat-native",
+        "type": "api",
+        "description": "微信公众号原生，原汁原味的官方绿底纹，满足传统阅读习惯的稳妥之选",
+        "version": "1.0",
+        "api_theme": "wechat-native",
+        "selectable": true,
+        "metadata_incomplete": false,
+        "style": {
+          "series": "featured",
+          "color": "green",
+          "layout": "官方绿底纹",
+          "mood": "原生稳妥",
+          "best_for": "传统阅读习惯、稳妥发布内容",
+          "api_required": "https://md2wechat.app"
+        }
+      }
+    ]
+  }
+}

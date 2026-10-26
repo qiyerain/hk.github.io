@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DreamSkin 动态主题处理流程</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 1080px; height: 720px; margin: 0; overflow: hidden; }
+    body {
+      color: #24333b;
+      font-family: "PingFang SC", "Hiragino Sans GB", sans-serif;
+      background:
+        linear-gradient(rgba(54, 104, 112, .07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(54, 104, 112, .07) 1px, transparent 1px),
+        #f7f2e7;
+      background-size: 28px 28px;
+    }
+    .sheet { position: relative; width: 100%; height: 100%; padding: 58px 64px 44px; }
+    h1 { margin: 0; font-size: 40px; line-height: 1.2; letter-spacing: 0; }
+    .lead { margin: 12px 0 0; color: #607078; font-size: 19px; letter-spacing: 0; }
+    .rule { width: 270px; height: 7px; margin-top: 18px; background: #df6c48; transform: rotate(-1deg); }
+    .flow { display: grid; grid-template-columns: 200px 35px 215px 35px 215px 35px 210px; align-items: center; margin-top: 62px; }
+    .box {
+      position: relative; min-height: 188px; padding: 27px 20px 20px;
+      border: 3px solid #29434a; border-radius: 5px; background: rgba(255,255,255,.6);
+      box-shadow: 7px 7px 0 rgba(41,67,74,.1); transform: rotate(-.5deg);
+    }
+    .box:nth-of-type(2) { transform: rotate(.7deg); }
+    .box strong { display: block; margin-top: 44px; font-size: 24px; letter-spacing: 0; word-break: keep-all; }
+    .box span { display: block; margin-top: 10px; color: #607078; font-size: 17px; line-height: 1.55; letter-spacing: 0; }
+    .badge { position: absolute; top: 18px; left: 20px; color: #df6c48; font: 700 16px/1 ui-monospace, monospace; }
+    .arrow { color: #df6c48; font: 700 42px/1 ui-monospace, monospace; text-align: center; transform: rotate(-2deg); }
+    .limit { border-color: #df6c48; }
+    .limit::after {
+      content: "当前边界"; position: absolute; top: -15px; right: 12px; padding: 5px 10px;
+      color: #fff; background: #df6c48; font-size: 14px; transform: rotate(2deg);
+    }
+    .note {
+      position: absolute; left: 64px; bottom: 48px; width: 620px; padding: 17px 22px;
+      border-left: 7px solid #4a8d91; background: rgba(74,141,145,.1); font-size: 18px; line-height: 1.6;
+    }
+    .future {
+      position: absolute; right: 66px; bottom: 42px; width: 292px; padding: 16px 20px;
+      border: 2px dashed #29434a; border-radius: 50% 44% 48% 46%; text-align: center; transform: rotate(-1deg);
+    }
+    .future b { display: block; color: #df6c48; font-size: 17px; }
+    .future span { display: block; margin-top: 5px; font-size: 16px; line-height: 1.5; }
+    .scribble { position: absolute; right: 212px; bottom: 133px; color: #29434a; font-size: 32px; transform: rotate(21deg); }
+  </style>
+</head>
+<body>
+  <main class="sheet">
+    <h1>一段 MP4，怎样变成 Codex 动态主题？</h1>
+    <p class="lead">DreamSkin 当前的背景通道读取图片文件，因此先把视频变成会动的 WebP。</p>
+    <div class="rule"></div>
+
+    <section class="flow" aria-label="动态主题处理流程">
+      <div class="box">
+        <div class="badge">01 / SOURCE</div>
+        <strong>MP4 原视频</strong>
+        <span>2K / 4K 都可以<br>文件大小不是关键</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="box">
+        <div class="badge">02 / FFMPEG</div>
+        <strong>抽帧与缩放</strong>
+        <span>控制分辨率、帧率<br>画质和时长</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="box limit">
+        <div class="badge">03 / WEBP</div>
+        <strong>动态 WebP</strong>
+        <span>必须小于 10 MiB<br>并确认不止一帧</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="box">
+        <div class="badge">04 / CODEX</div>
+        <strong>DreamSkin 应用</strong>
+        <span>读取背景文件<br>注入到 Codex 界面</span>
+      </div>
+    </section>
+
+    <aside class="note"><b>调参顺序：</b>先降低画质，再降帧率，最后降分辨率。源视频是 40 MB 还是 400 MB，并不能直接决定输出大小。</aside>
+    <div class="scribble">↘</div>
+    <aside class="future"><b>下一步：改引擎</b><span>原生播放 MP4，或放宽 10 MiB 校验</span></aside>
+  </main>
+</body>
+</html>

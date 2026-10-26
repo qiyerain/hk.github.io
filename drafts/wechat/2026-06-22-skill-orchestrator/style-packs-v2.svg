@@ -1,0 +1,275 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640">
+  <defs>
+    <filter id="paper" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise" result="gray"/>
+      <feBlend in="SourceGraphic" in2="gray" mode="multiply" result="blend"/>
+      <feComponentTransfer in="blend"><feFuncA type="linear" slope="0.08"/></feComponentTransfer>
+      <feBlend in="SourceGraphic" mode="normal"/>
+    </filter>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-color="#c4a97d" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Cream paper -->
+  <rect width="960" height="640" fill="#faf5ed"/>
+  <rect width="960" height="640" fill="#f5ede0" opacity="0.3" filter="url(#paper)"/>
+  <pattern id="dots3" width="24" height="24" patternUnits="userSpaceOnUse">
+    <circle cx="12" cy="12" r="0.5" fill="#d4c9b8"/>
+  </pattern>
+  <rect width="960" height="640" fill="url(#dots3)" opacity="0.4"/>
+
+  <!-- === TITLE === -->
+  <rect x="40" y="22" width="360" height="38" rx="8" fill="#fff" stroke="#c9b896" stroke-width="1.2" stroke-dasharray="4,3" filter="url(#shadow)"/>
+  <path d="M56,41 C80,37 110,43 140,39 C170,35 200,42 230,38" fill="none" stroke="#8b7355" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M245,41 C270,37 300,43 340,39" fill="none" stroke="#8b7355" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- === 6 STYLE PACK CARDS in 2×3 grid === -->
+
+  <!-- Pack A: Mono Glass -->
+  <rect x="40" y="80" width="280" height="160" rx="14" fill="#fff" stroke="#8b8b8b" stroke-width="1.8" filter="url(#shadow)"/>
+  <rect x="40" y="80" width="280" height="40" rx="14" fill="#f0f0f0"/>
+  <rect x="40" y="106" width="280" height="14" fill="#f0f0f0"/>
+  <!-- Pack label -->
+  <circle cx="68" cy="100" r="12" fill="#e8e8e8" stroke="#8b8b8b" stroke-width="1"/>
+  <text x="68" y="104" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#555">A</text>
+  <path d="M90,98 C130,94 180,100 240,96" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Glass card preview -->
+  <rect x="56" y="130" width="248" height="56" rx="8" fill="rgba(255,255,255,0.6)" stroke="#ccc" stroke-width="0.8"/>
+  <rect x="64" y="138" width="60" height="4" rx="2" fill="#666"/>
+  <rect x="64" y="148" width="120" height="3" rx="1.5" fill="#bbb"/>
+  <rect x="64" y="156" width="90" height="3" rx="1.5" fill="#ddd"/>
+  <rect x="64" y="164" width="140" height="3" rx="1.5" fill="#ddd"/>
+  <!-- Glass icon -->
+  <rect x="240" y="142" width="36" height="28" rx="4" fill="rgba(255,255,255,0.4)" stroke="#bbb" stroke-width="0.8"/>
+  <rect x="246" y="148" width="10" height="3" rx="1" fill="#999"/>
+  <rect x="246" y="154" width="18" height="2" rx="1" fill="#ccc"/>
+  <!-- Mono tag -->
+  <rect x="60" y="196" width="50" height="16" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="0.6"/>
+  <rect x="118" y="196" width="60" height="16" rx="8" fill="#f0f0f0" stroke="#bbb" stroke-width="0.6"/>
+  <path d="M196,204 C220,200 250,206 280,202" fill="none" stroke="#bbb" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- Pack B: Editorial -->
+  <rect x="340" y="80" width="280" height="160" rx="14" fill="#fff" stroke="#c4956a" stroke-width="1.8" filter="url(#shadow)"/>
+  <rect x="340" y="80" width="280" height="40" rx="14" fill="#fdf6ee"/>
+  <rect x="340" y="106" width="280" height="14" fill="#fdf6ee"/>
+  <circle cx="368" cy="100" r="12" fill="#fef3e2" stroke="#c4956a" stroke-width="1"/>
+  <text x="368" y="104" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#a07030">B</text>
+  <path d="M390,98 C430,94 480,100 540,96" fill="none" stroke="#a07030" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Newspaper layout preview -->
+  <rect x="356" y="130" width="248" height="56" rx="8" fill="#fef9f2" stroke="#d4b896" stroke-width="0.8"/>
+  <rect x="364" y="136" width="80" height="5" rx="2" fill="#8b6914"/>
+  <rect x="364" y="148" width="100" height="3" rx="1.5" fill="#c4a97d"/>
+  <rect x="364" y="156" width="75" height="3" rx="1.5" fill="#d4c0a8"/>
+  <rect x="364" y="164" width="95" height="3" rx="1.5" fill="#d4c0a8"/>
+  <!-- Serif columns -->
+  <rect x="480" y="136" width="50" height="36" rx="2" fill="none" stroke="#d4b896" stroke-width="0.6"/>
+  <line x1="486" y1="142" x2="524" y2="142" stroke="#c4a97d" stroke-width="0.5"/>
+  <line x1="486" y1="148" x2="520" y2="148" stroke="#d4c0a8" stroke-width="0.4"/>
+  <line x1="486" y1="154" x2="522" y2="154" stroke="#d4c0a8" stroke-width="0.4"/>
+  <line x1="486" y1="160" x2="518" y2="160" stroke="#d4c0a8" stroke-width="0.4"/>
+  <!-- Red accent -->
+  <rect x="540" y="140" width="30" height="4" rx="2" fill="#c44444"/>
+  <rect x="540" y="150" width="45" height="3" rx="1.5" fill="#d4c0a8"/>
+  <rect x="360" y="196" width="70" height="16" rx="8" fill="#fef3e2" stroke="#d4b896" stroke-width="0.6"/>
+  <rect x="438" y="196" width="50" height="16" rx="8" fill="#fef3e2" stroke="#d4b896" stroke-width="0.6"/>
+  <path d="M500,204 C520,200 545,206 580,202" fill="none" stroke="#c4a97d" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- Pack C: Card Modern -->
+  <rect x="640" y="80" width="280" height="160" rx="14" fill="#fff" stroke="#7ba8c9" stroke-width="1.8" filter="url(#shadow)"/>
+  <rect x="640" y="80" width="280" height="40" rx="14" fill="#e8f2fb"/>
+  <rect x="640" y="106" width="280" height="14" fill="#e8f2fb"/>
+  <circle cx="668" cy="100" r="12" fill="#e3f0f7" stroke="#7ba8c9" stroke-width="1"/>
+  <text x="668" y="104" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#4a7fa5">C</text>
+  <path d="M690,98 C730,94 780,100 840,96" fill="none" stroke="#4a7fa5" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Card layout preview -->
+  <rect x="656" y="130" width="72" height="56" rx="8" fill="#e3f0f7" stroke="#9ab8cc" stroke-width="0.8"/>
+  <circle cx="680" cy="148" r="8" fill="#fff" stroke="#7ba8c9" stroke-width="0.8"/>
+  <rect x="664" y="162" width="40" height="3" rx="1.5" fill="#9ab8cc"/>
+  <rect x="740" y="130" width="72" height="56" rx="8" fill="#e3f0f7" stroke="#9ab8cc" stroke-width="0.8"/>
+  <circle cx="764" cy="148" r="8" fill="#fff" stroke="#7ba8c9" stroke-width="0.8"/>
+  <rect x="748" y="162" width="40" height="3" rx="1.5" fill="#9ab8cc"/>
+  <rect x="824" y="130" width="72" height="56" rx="8" fill="#e3f0f7" stroke="#9ab8cc" stroke-width="0.8"/>
+  <circle cx="848" cy="148" r="8" fill="#fff" stroke="#7ba8c9" stroke-width="0.8"/>
+  <rect x="832" y="162" width="40" height="3" rx="1.5" fill="#9ab8cc"/>
+  <!-- Number badge -->
+  <circle cx="672" cy="148" r="5" fill="#4a7fa5"/>
+  <circle cx="756" cy="148" r="5" fill="#4a7fa5"/>
+  <circle cx="840" cy="148" r="5" fill="#4a7fa5"/>
+  <rect x="660" y="196" width="55" height="16" rx="8" fill="#e3f0f7" stroke="#9ab8cc" stroke-width="0.6"/>
+  <rect x="723" y="196" width="45" height="16" rx="8" fill="#e3f0f7" stroke="#9ab8cc" stroke-width="0.6"/>
+  <path d="M780,204 C810,200 840,206 880,202" fill="none" stroke="#9ab8cc" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- Pack D: Cyber Local -->
+  <rect x="40" y="260" width="280" height="160" rx="14" fill="#fff" stroke="#a88cc9" stroke-width="1.8" filter="url(#shadow)"/>
+  <rect x="40" y="260" width="280" height="40" rx="14" fill="#1a1a2e"/>
+  <rect x="40" y="286" width="280" height="14" fill="#1a1a2e"/>
+  <circle cx="68" cy="280" r="12" fill="#2a2a4e" stroke="#a88cc9" stroke-width="1"/>
+  <text x="68" y="284" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#c8a8e8">D</text>
+  <path d="M90,278 C130,274 180,280 240,276" fill="none" stroke="#c8a8e8" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Terminal preview -->
+  <rect x="56" y="310" width="248" height="56" rx="8" fill="#0d0d1a" stroke="#4a4a6e" stroke-width="0.8"/>
+  <!-- Terminal header dots -->
+  <circle cx="68" cy="318" r="3" fill="#e07070"/>
+  <circle cx="80" cy="318" r="3" fill="#e8a54c"/>
+  <circle cx="92" cy="318" r="3" fill="#a8c97b"/>
+  <!-- Code lines -->
+  <rect x="64" y="328" width="40" height="3" rx="1.5" fill="#a88cc9"/>
+  <rect x="112" y="328" width="60" height="3" rx="1.5" fill="#6ec6a0"/>
+  <rect x="64" y="336" width="30" height="3" rx="1.5" fill="#7ba8c9"/>
+  <rect x="100" y="336" width="80" height="3" rx="1.5" fill="#4a4a6e"/>
+  <rect x="64" y="344" width="50" height="3" rx="1.5" fill="#e8a54c"/>
+  <rect x="120" y="344" width="40" height="3" rx="1.5" fill="#4a4a6e"/>
+  <!-- Cursor -->
+  <rect x="64" y="352" width="8" height="3" rx="1" fill="#c8a8e8" opacity="0.8"/>
+  <!-- Neon accents -->
+  <rect x="240" y="328" width="2" height="24" rx="1" fill="#a88cc9" opacity="0.4"/>
+  <rect x="60" y="376" width="55" height="16" rx="8" fill="#f3e8ff" stroke="#a88cc9" stroke-width="0.6"/>
+  <rect x="123" y="376" width="70" height="16" rx="8" fill="#f3e8ff" stroke="#a88cc9" stroke-width="0.6"/>
+  <path d="M205,384 C225,380 245,386 280,382" fill="none" stroke="#c8a8e8" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- Pack E: Muted Life -->
+  <rect x="340" y="260" width="280" height="160" rx="14" fill="#fff" stroke="#b5a898" stroke-width="1.8" filter="url(#shadow)"/>
+  <rect x="340" y="260" width="280" height="40" rx="14" fill="#f5f0ea"/>
+  <rect x="340" y="286" width="280" height="14" fill="#f5f0ea"/>
+  <circle cx="368" cy="280" r="12" fill="#eee8e0" stroke="#b5a898" stroke-width="1"/>
+  <text x="368" y="284" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#8a7e70">E</text>
+  <path d="M390,278 C430,274 480,280 540,276" fill="none" stroke="#8a7e70" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Soft diary layout -->
+  <rect x="356" y="310" width="248" height="56" rx="8" fill="#faf7f3" stroke="#d4ccc0" stroke-width="0.8"/>
+  <rect x="364" y="318" width="50" height="4" rx="2" fill="#b5a898"/>
+  <rect x="364" y="328" width="100" height="3" rx="1.5" fill="#d4ccc0"/>
+  <rect x="364" y="336" width="80" height="3" rx="1.5" fill="#e0d8cc"/>
+  <rect x="364" y="344" width="110" height="3" rx="1.5" fill="#e0d8cc"/>
+  <!-- Pastel dots -->
+  <circle cx="510" cy="322" r="4" fill="#d4c4b0" opacity="0.6"/>
+  <circle cx="524" cy="328" r="3" fill="#c4b8a8" opacity="0.5"/>
+  <circle cx="536" cy="320" r="3.5" fill="#d8c8b8" opacity="0.5"/>
+  <!-- Leaf decoration -->
+  <path d="M540,336 C546,330 550,338 546,342 C542,346 538,340 540,336Z" fill="#c4d4b0" opacity="0.7"/>
+  <rect x="360" y="376" width="60" height="16" rx="8" fill="#eee8e0" stroke="#d4ccc0" stroke-width="0.6"/>
+  <rect x="428" y="376" width="45" height="16" rx="8" fill="#eee8e0" stroke="#d4ccc0" stroke-width="0.6"/>
+  <path d="M484,384 C504,380 524,386 560,382" fill="none" stroke="#d4ccc0" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- Pack F: Bold Block -->
+  <rect x="640" y="260" width="280" height="160" rx="14" fill="#fff" stroke="#c04444" stroke-width="1.8" filter="url(#shadow)"/>
+  <rect x="640" y="260" width="280" height="40" rx="14" fill="#8b1a1a"/>
+  <rect x="640" y="286" width="280" height="14" fill="#8b1a1a"/>
+  <circle cx="668" cy="280" r="12" fill="#a02020" stroke="#c04444" stroke-width="1"/>
+  <text x="668" y="284" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#ffd700">F</text>
+  <path d="M690,278 C730,274 780,280 840,276" fill="none" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Bold layout -->
+  <rect x="656" y="310" width="248" height="56" rx="8" fill="#8b1a1a" stroke="#6e1515" stroke-width="0.8"/>
+  <rect x="664" y="318" width="70" height="6" rx="2" fill="#ffd700"/>
+  <rect x="664" y="330" width="100" height="3" rx="1.5" fill="rgba(255,255,255,0.4)"/>
+  <rect x="664" y="338" width="80" height="3" rx="1.5" fill="rgba(255,255,255,0.25)"/>
+  <rect x="664" y="346" width="90" height="3" rx="1.5" fill="rgba(255,255,255,0.25)"/>
+  <!-- Gold star -->
+  <path d="M840,326 l4,-10 4,10 -10,-6 12,0 -10,6z" fill="#ffd700" opacity="0.6"/>
+  <!-- Gold bar -->
+  <rect x="780" y="340" width="60" height="4" rx="2" fill="#ffd700" opacity="0.3"/>
+  <rect x="660" y="376" width="50" height="16" rx="8" fill="#fef2f2" stroke="#e8b0b0" stroke-width="0.6"/>
+  <rect x="718" y="376" width="65" height="16" rx="8" fill="#fef2f2" stroke="#e8b0b0" stroke-width="0.6"/>
+  <path d="M795,384 C815,380 835,386 870,382" fill="none" stroke="#e8b0b0" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- === BOTTOM: Connection flow === -->
+  <!-- Markdown input arrow -->
+  <rect x="40" y="460" width="120" height="44" rx="10" fill="#fff" stroke="#a8c97b" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="52" y="474" width="40" height="4" rx="2" fill="#6a9a3f"/>
+  <rect x="52" y="482" width="55" height="3" rx="1.5" fill="#b5d4a0"/>
+  <!-- Document icon -->
+  <rect x="120" y="472" width="16" height="20" rx="2" fill="none" stroke="#6a9a3f" stroke-width="1"/>
+  <line x1="124" y1="478" x2="132" y2="478" stroke="#6a9a3f" stroke-width="0.6"/>
+  <line x1="124" y1="482" x2="130" y2="482" stroke="#6a9a3f" stroke-width="0.6"/>
+  <line x1="124" y1="486" x2="128" y2="486" stroke="#6a9a3f" stroke-width="0.6"/>
+
+  <!-- Arrow to render -->
+  <line x1="160" y1="482" x2="200" y2="482" stroke="#9ab8cc" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <polygon points="198,478 206,482 198,486" fill="#9ab8cc"/>
+
+  <!-- Render engine box -->
+  <rect x="210" y="460" width="160" height="44" rx="10" fill="#fff" stroke="#e8a54c" stroke-width="1.5" filter="url(#shadow)"/>
+  <!-- Gear icon -->
+  <circle cx="236" cy="482" r="10" fill="#fef3e2" stroke="#e8a54c" stroke-width="1"/>
+  <circle cx="236" cy="482" r="4" fill="none" stroke="#c4893a" stroke-width="0.8"/>
+  <path d="M260,476 C280,472 310,478 340,474" fill="none" stroke="#c4893a" stroke-width="1.3" stroke-linecap="round"/>
+  <path d="M260,486 C280,484 300,488 330,485" fill="none" stroke="#e8c9a0" stroke-width="0.8" stroke-linecap="round"/>
+
+  <!-- Arrow to style packs -->
+  <line x1="370" y1="482" x2="410" y2="482" stroke="#9ab8cc" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <polygon points="408,478 416,482 408,486" fill="#9ab8cc"/>
+
+  <!-- Style Pack selector -->
+  <rect x="420" y="455" width="200" height="54" rx="12" fill="#fff" stroke="#7ba8c9" stroke-width="2" filter="url(#shadow)"/>
+  <!-- 6 mini color swatches -->
+  <rect x="436" y="468" width="14" height="14" rx="4" fill="#8b8b8b"/>
+  <rect x="456" y="468" width="14" height="14" rx="4" fill="#c4956a"/>
+  <rect x="476" y="468" width="14" height="14" rx="4" fill="#7ba8c9"/>
+  <rect x="496" y="468" width="14" height="14" rx="4" fill="#a88cc9"/>
+  <rect x="516" y="468" width="14" height="14" rx="4" fill="#b5a898"/>
+  <rect x="536" y="468" width="14" height="14" rx="4" fill="#c04444"/>
+  <!-- Label -->
+  <path d="M436,494 C470,490 510,496 550,492" fill="none" stroke="#7ba8c9" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M560,494 C575,492 590,496 600,494" fill="none" stroke="#c9dde8" stroke-width="0.8" stroke-linecap="round"/>
+  <!-- Arrow pointer to pack C -->
+  <path d="M483,464 L483,458" fill="none" stroke="#7ba8c9" stroke-width="1.2"/>
+  <polygon points="480,460 483,454 486,460" fill="#7ba8c9"/>
+
+  <!-- Arrow to output -->
+  <line x1="620" y1="482" x2="660" y2="482" stroke="#9ab8cc" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <polygon points="658,478 666,482 658,486" fill="#9ab8cc"/>
+
+  <!-- HTML output -->
+  <rect x="670" y="460" width="120" height="44" rx="10" fill="#fff" stroke="#a88cc9" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="686" y="474" width="40" height="4" rx="2" fill="#8a6ab5"/>
+  <rect x="686" y="482" width="55" height="3" rx="1.5" fill="#c9b0dd"/>
+  <!-- Code brackets -->
+  <path d="M752,470 L748,478 L748,486 L752,492" fill="none" stroke="#8a6ab5" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M766,470 L770,478 L770,486 L766,492" fill="none" stroke="#8a6ab5" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="756" y1="478" x2="762" y2="478" stroke="#c9b0dd" stroke-width="0.8"/>
+
+  <!-- === Bottom info area === -->
+  <!-- Magnifying glass inspecting Pack C -->
+  <circle cx="830" cy="540" r="50" fill="none" stroke="#c9b896" stroke-width="2" opacity="0.45"/>
+  <line x1="866" y1="576" x2="890" y2="600" stroke="#c9b896" stroke-width="2.5" stroke-linecap="round" opacity="0.45"/>
+  <!-- Small card details inside magnifier -->
+  <rect x="810" y="525" width="30" height="20" rx="3" fill="#e3f0f7" stroke="#7ba8c9" stroke-width="0.6" opacity="0.6"/>
+  <rect x="815" y="530" width="15" height="2" rx="1" fill="#7ba8c9" opacity="0.5"/>
+  <rect x="815" y="535" width="20" height="1.5" rx="0.75" fill="#9ab8cc" opacity="0.4"/>
+
+  <!-- Decorative elements -->
+  <g fill="#e8c36a" opacity="0.45">
+    <path d="M920,80 l2,-6 2,6 -6,-2 6,0 -6,2z"/>
+    <circle cx="30" cy="440" r="3"/>
+    <path d="M900,430 l1.5,-5 1.5,5 -5,-1.5 5,0 -5,1.5z"/>
+  </g>
+  <g fill="#7ba8c9" opacity="0.25">
+    <circle cx="920" cy="300" r="2"/>
+    <circle cx="25" cy="200" r="2.5"/>
+  </g>
+  <g fill="#a8c97b" opacity="0.35">
+    <path d="M40,600 l2,-5 2,5 -5,-2 5,0 -5,2z"/>
+    <circle cx="550" cy="620" r="2"/>
+  </g>
+  <g fill="#c04444" opacity="0.2">
+    <path d="M930,540 l1.5,-4 1.5,4 -4,-1.5 4,0 -4,1.5z"/>
+  </g>
+
+  <!-- Book stack (bottom left) -->
+  <rect x="42" y="580" width="30" height="8" rx="2" fill="#e3f0f7" stroke="#7ba8c9" stroke-width="0.8" opacity="0.5"/>
+  <rect x="44" y="572" width="28" height="8" rx="2" fill="#fef3e2" stroke="#e8a54c" stroke-width="0.8" opacity="0.5"/>
+  <rect x="46" y="564" width="26" height="8" rx="2" fill="#f3e8ff" stroke="#a88cc9" stroke-width="0.8" opacity="0.5"/>
+  <rect x="48" y="556" width="24" height="8" rx="2" fill="#fef2f2" stroke="#c04444" stroke-width="0.8" opacity="0.5"/>
+
+  <!-- Small laptop icon -->
+  <rect x="140" y="560" width="30" height="20" rx="3" fill="none" stroke="#c9b896" stroke-width="0.8" opacity="0.4"/>
+  <rect x="136" y="580" width="38" height="3" rx="1.5" fill="#c9b896" opacity="0.3"/>
+  <!-- Screen content -->
+  <line x1="146" y1="566" x2="160" y2="566" stroke="#c9b896" stroke-width="0.5" opacity="0.4"/>
+  <line x1="146" y1="570" x2="164" y2="570" stroke="#c9b896" stroke-width="0.4" opacity="0.3"/>
+  <line x1="146" y1="574" x2="158" y2="574" stroke="#c9b896" stroke-width="0.4" opacity="0.3"/>
+
+  <!-- Footer squiggle -->
+  <path d="M200,610 C300,606 400,614 500,608 C600,602 700,610 800,606" fill="none" stroke="#c9b896" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+</svg>

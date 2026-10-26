@@ -1,0 +1,136 @@
+{
+  "run_id": "2026-10-16-github-weekly",
+  "execution_id": "github-20261016T180636+0800",
+  "updated_at": "2026-10-17T21:16:33+08:00",
+  "markdown_path": "source/_posts/每周GitHub趋势/2026-10-16-GitHub趋势.md",
+  "markdown_sha256": "29331d1f8a410eee0603e531706b9102cfa19973d3c994b37a757dc8fb29de0c",
+  "wechat_html_path": "drafts/wechat/2026-10-16-github-weekly/wechat.html",
+  "wechat_html_sha256": "f5f66ef39ee2cb213dac642480ec5d2a67b6977ba5439e64542ab7fc3051e745",
+  "stages": {
+    "research": {
+      "ok": true,
+      "status": "completed",
+      "source": "https://github.com/trending?since=weekly",
+      "captured_at": "2026-10-16T18:06:36+08:00",
+      "visible_repository_count": 11,
+      "snapshot": "drafts/wechat/2026-10-16-github-weekly/research.json"
+    },
+    "visuals": {
+      "ok": true,
+      "status": "completed",
+      "visual_plan": "drafts/wechat/2026-10-16-github-weekly/visual-plan.json",
+      "template": "github-weekly-warm-paper-v1-handdrawn",
+      "renderer": "html-svg",
+      "canvas_count": 6,
+      "dimension_check": "1600x900, 1080x460, 1080x1350, and three 1200x675 images verified",
+      "visual_review": "year/week/project names/weekly stars checked after correction; no clipping, overlap, or garbled text",
+      "corrected_at": "2026-10-17T08:11:00+08:00"
+    },
+    "oss_upload": {
+      "ok": true,
+      "status": "completed",
+      "script": "scripts_py/picgo_upload.py",
+      "image_count": 6,
+      "completed_at": "2026-10-17T08:11:00+08:00",
+      "note": "Corrected visual set uploaded; article must use only the six final URLs listed in assets"
+    },
+    "blog": {
+      "ok": true,
+      "status": "completed",
+      "built": true,
+      "audit_passed": true,
+      "pushed": true,
+      "commit": "b1a400df24c195ae84d60dc9bbfd99bab8bcaef7",
+      "remote_head_verified": true,
+      "remote_head": "b1a400df24c195ae84d60dc9bbfd99bab8bcaef7",
+      "live_verified": true,
+      "http_status": 200,
+      "verified_at": "2026-10-17T21:16:33+08:00",
+      "live_url": "https://blog.pengfanao.top/2026/10/16/每周GitHub趋势/2026-10-16-GitHub趋势/",
+      "pending_rebuild": false
+    },
+    "wechat_render": {
+      "ok": true,
+      "status": "completed",
+      "theme": "github-readme",
+      "md2wechat_mode": "api",
+      "md2wechat_result": "blocked by invalid API key format",
+      "fallback": "project Style Pack C with green series override",
+      "experience_validation": true,
+      "ul_count": 0,
+      "li_count": 0,
+      "image_count": 4,
+      "anchor_count": 17,
+      "content_safety_hits": [],
+      "experience_validation_note": "单张竖版封面 + 三张不同结论的正文信息图；封面与正文图职责分离。",
+      "single_image_policy": "正文仅一张竖版摘要海报作为封面；项目/趋势说明图按章节保留，不计为封面。"
+    },
+    "draft": {
+      "ok": true,
+      "status": "completed",
+      "operation": "draft/update",
+      "media_id": "zdr76s0MQZwqyFoO5jodPMNhUFRzSKiMoqlOPuvk9iHVQjllvpMAy9trx4kUtniN",
+      "updated_at": "2026-10-17T21:12:43+08:00",
+      "verification": {
+        "title": "GitHub 开源趋势周报 2026-10-16",
+        "digest": "智能体正在从单点能力走向可复用协作基础设施。本期看反向工程、跨平台移植、工程 Skills、视频渲染与图表设计。",
+        "thumb_media_id": "zdr76s0MQZwqyFoO5jodPNOUo8yTJBZ1KzuQ2ZNwebJfV3jMNIs1mCBSlg29UKU3",
+        "content_source_url": "https://blog.pengfanao.top/2026/10/16/每周GitHub趋势/2026-10-16-GitHub趋势/",
+        "img_count": 4,
+        "ul_count": 0,
+        "li_count": 0,
+        "anchor_count": 0,
+        "verified_at": "2026-10-17T21:16:33+08:00"
+      }
+    }
+  },
+  "collection": {
+    "name": "每周 GitHub",
+    "archived": false,
+    "reason": "草稿已创建；当前 state/配置未提供可用 album_id，需后台手动归档"
+  },
+  "wechat_token_precheck": {
+    "ok": true,
+    "checked_at": "2026-10-17T21:00:47+08:00",
+    "errcode": 0,
+    "action": "token precheck succeeded; draft chain permitted"
+  },
+  "md2wechat_readiness": {
+    "overall": "ready",
+    "format_api": false,
+    "advanced_layout": false,
+    "draft": true
+  },
+  "assets": [
+    {
+      "path": ".cache/github-weekly-2026-10-16/visuals/final/github-weekly-2026-10-16-cover-1600x900.png",
+      "sha256": "5c08c988054420cc2fdd21fc7235b04c37d38c774470be93e43030eb96f47515",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-16-cover-1600x900.png"
+    },
+    {
+      "path": ".cache/github-weekly-2026-10-16/visuals/final/github-weekly-2026-10-16-rea-flow-1200x675.png",
+      "sha256": "97feca4c49a3dbf8c9052145952a1ab1b5c798cf17b22b1658d925953109a3a1",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-16-rea-flow-1200x675.png"
+    },
+    {
+      "path": ".cache/github-weekly-2026-10-16/visuals/final/github-weekly-2026-10-16-poster-1080x1350.png",
+      "sha256": "adae61574223150813c5abf5bd4993739641d56c7c0be6dffdf5f322712ab6af",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-16-poster-1080x1350.png"
+    },
+    {
+      "path": ".cache/github-weekly-2026-10-16/visuals/final/github-weekly-2026-10-16-selection-matrix-1200x675.png",
+      "sha256": "eaae75b31c2d3203d2a5e0ad0e0e93dcc7c034f3033359812bcc141b8346a352",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-16-selection-matrix-1200x675.png"
+    },
+    {
+      "path": ".cache/github-weekly-2026-10-16/visuals/final/github-weekly-2026-10-16-trend-map-1200x675.png",
+      "sha256": "24aaac78507d00be392fd621e63997c87c37ca2f6b0fb2e63123e17b20cb6039",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-16-trend-map-1200x675.png"
+    },
+    {
+      "path": ".cache/github-weekly-2026-10-16/visuals/final/github-weekly-2026-10-16-wechat-cover-1080x460.png",
+      "sha256": "77dcff412f42f511a2476d9359bdbd0446e7e2dc31e1d17d4831d844349363b9",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-16-wechat-cover-1080x460.png"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "run_id": "2026-10-24-openrouter-free",
+  "updated_at": "2026-10-24T14:05:16+08:00",
+  "markdown_path": "drafts/wechat/2026-10-24-openrouter-free/source.md",
+  "markdown_sha256": "97f36b53aff89fdfb4d7a3ad08c68388902ab63ca32ea1cb32551979278bb874",
+  "wechat_html_path": "drafts/wechat/2026-10-24-openrouter-free/wechat.html",
+  "wechat_html_sha256": "52698a322be5f91ebee98675ebb81da20d10653a5716dfd3e8adb1c7c0a580d8",
+  "stages": {
+    "blog": {
+      "ok": true,
+      "status": "local_verified",
+      "built": true,
+      "audit_passed": true,
+      "live_url": "https://blog.pengfanao.top/2026/10/24/工具/OpenRouter-免费模型怎么用/"
+    },
+    "wechat_render": {
+      "ok": true,
+      "status": "completed",
+      "style_pack": "C",
+      "theme": "autumn-warm",
+      "md2wechat_mode": "ai",
+      "md2wechat_result": "inspect gate passed; final HTML rendered with project Style Pack",
+      "ul_count": 0,
+      "li_count": 0,
+      "ol_count": 0,
+      "image_count": 3,
+      "anchor_count": 0,
+      "content_safety_hits": [],
+      "note": "platform cover kept out of the article body; images are OSS URLs rewritten to WeChat CDN at draft time"
+    },
+    "md2wechat_readiness": {
+      "overall": "ready",
+      "format_api": false,
+      "advanced_layout": false,
+      "draft": true,
+      "default_mode": "ai"
+    },
+    "draft": {
+      "ok": true,
+      "status": "completed",
+      "operation": "draft/add",
+      "media_id": "zdr76s0MQZwqyFoO5jodPH8SltpswbNDDHGOywqF8oFyeDF2-VwsdxDjYbrTV3YC",
+      "updated_at": "2026-10-24T14:05:15+08:00",
+      "verification": {
+        "title": "OpenRouter 免费模型：18 个能聊，17 个能调工具",
+        "digest": "469 个模型里 20 个零价条目：18 个能聊天，17 个支持工具调用。按任务挑、按客户端接、按证据验收，再说免费换来的四个约束。",
+        "thumb_media_id": "zdr76s0MQZwqyFoO5jodPF_B3ZlTqb4zWCvKnvn4xIaK328MgC2vp4sMPS0zNPUm",
+        "content_source_url": "https://blog.pengfanao.top/2026/10/24/工具/OpenRouter-免费模型怎么用/",
+        "img_count": 3,
+        "ul_count": 0,
+        "li_count": 0,
+        "anchor_count": 0,
+        "verified_at": "2026-10-24T14:05:16+08:00"
+      }
+    }
+  },
+  "wechat_token_precheck": {
+    "ok": true,
+    "checked_at": "2026-10-24T14:04:55+08:00",
+    "expires_in": 7200
+  },
+  "assets": [
+    {
+      "role": "wechat_cover",
+      "path": ".cache/blog-2026-10-24/wechat/openrouter-wechat-cover-1080x460.png",
+      "sha256": "8c435c453edd832927f025a2f63233bfb05ea6cbe2cc3b96036c6909171900d1",
+      "url": ""
+    }
+  ]
+}

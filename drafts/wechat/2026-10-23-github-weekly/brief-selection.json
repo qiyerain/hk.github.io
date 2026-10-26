@@ -1,0 +1,24 @@
+{
+  "kind": "diagram",
+  "title": "项目选择矩阵",
+  "headline": "先看成本与成熟度，再看 Star",
+  "deck": "位置为本文基于安装路径、权限边界、Release 与工作流完整度的相对判断",
+  "date": "2026-10-23",
+  "date_label": "2026 年第 43 周",
+  "captured_at": "2026-10-23T18:17:34+08:00",
+  "channel": "blog-wechat",
+  "aspect": "inline",
+  "template_id": "data-terminal",
+  "source_label": "项目 README / Release / Security 文档",
+  "source_urls": ["https://github.com/morluto/rea", "https://github.com/ruvnet/ruflo", "https://github.com/stablyai/orca", "https://github.com/anomalyco/opencode"],
+  "source_files": ["source/_posts/每周GitHub趋势/2026-10-23-GitHub趋势.md"],
+  "cta": "先用可回滚任务试跑，再扩大权限与并发",
+  "axes": {"x":"接入成本：低 → 高","y":"工程成熟度：低 → 高"},
+  "items": [
+    {"id":"opencode","name":"opencode","description":"单 Agent 编码入口","category":"成本较低 / 成熟度中上","icon_key":"ui-window","x":0.26,"y":0.68},
+    {"id":"orca","name":"orca","description":"worktree 隔离并行","category":"成本中等 / 成熟度中上","icon_key":"ui-window","x":0.52,"y":0.76},
+    {"id":"ruflo","name":"ruflo","description":"编排、记忆、RAG","category":"成本较高 / 成熟度中等","icon_key":"agent-radar","x":0.76,"y":0.57},
+    {"id":"rea","name":"rea","description":"专业工具与证据链","category":"成本高 / 成熟度中上","icon_key":"reverse-engineering-chip","x":0.84,"y":0.72}
+  ],
+  "edges": []
+}

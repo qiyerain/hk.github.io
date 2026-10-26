@@ -1,0 +1,34 @@
+{
+  "success": true,
+  "code": "CONVERT_AI_REQUEST_READY",
+  "message": "Convert AI request prepared",
+  "schema_version": "v1",
+  "status": "action_required",
+  "retryable": false,
+  "data": {
+    "action": "ai_request",
+    "images": [
+      {
+        "Index": 0,
+        "Original": "assets-png/flow.png",
+        "Placeholder": "<!-- IMG:0 -->",
+        "WechatURL": "",
+        "Type": "local",
+        "AIPrompt": ""
+      },
+      {
+        "Index": 1,
+        "Original": "assets-png/layers.png",
+        "Placeholder": "<!-- IMG:1 -->",
+        "WechatURL": "",
+        "Type": "local",
+        "AIPrompt": ""
+      }
+    ],
+    "markdown_file": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-18-wechat-skill-workflow-validation/content.md",
+    "mode": "ai",
+    "prompt": "【终极指令 V4.0】秋日暖光美学兼容性网页设计提示词\n\n指令：\n你是一位世界顶级的网页设计师和提示词工程师，专精于温暖治愈和文艺美学，并对代码在不同平台（特别是微信公众号编辑器）的兼容性有深刻理解。你的任务是根据以下经过多轮优化的风格指南和技术要求，创建一个完整、纯粹使用HTML内联样式的单页式网页模板。\n\n核心主题与愿景 (Core Theme & Vision):\n创造一个沉浸式、充满治愈感、被秋日暖光浸染的文艺世界。最终成品应如同精致的艺术博客或个人作品集，充满了自然感、柔和光效和清晰的视觉层次。它既要传达信息，本身也要成为一件充满美学价值的数字艺术品。\n\n第一部分：【兼容性优先】结构与技术要求 (Structural & Technical Requirements)\n\n【关键】主容器结构 (Main Container):\n- 必须在 <body> 标签之后立即创建一个主 <div> 容器来包裹所有内容\n- 所有全局样式（特别是 background-color, padding, display: flex, letter-spacing 等布局样式）必须应用在这个主 <div> 上，而不是 <body>，以确保在微信等环境中背景和布局不丢失\n- 主容器 padding 精确设置为 40px 10px\n\n【关键】样式实现 (Styling Implementation):\n- 必须使用纯HTML内联样式，禁止使用 <style> 标签或任何外部CSS文件\n- 必须为每一个 <p> 标签明确地添加 color: #4a413d; 样式，以防止被微信编辑器强制重置为黑色\n\n模块化与间距 (Modularity & Spacing):\n- 内容的核心载体是 <section> 模块（卡片）\n- 卡片之间的垂直间距 gap 固定为 40px\n\n第二部分：设计美学与风格指南 (Aesthetics & Style Guide)\n\n色彩方案 (Color Palette):\n- 暖白背景: #faf9f5 (应用于主容器)\n- 主文字体: #4a413d\n- 秋日暖橙 (主强调色): #d97758\n- 橙红高亮 (副强调色): #c06b4d\n- 引用背景: #fef4e7\n\n卡片式布局 (Card Layout):\n- 最大宽度: max-width: 800px\n- 内部边距: padding: 25px\n- 背景: 必须结合使用 background-color: #ffffff; 和 background-image: linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px); background-size: 20px 20px; 来实现带有精致米白方格纹理的背景效果\n- 边框: border: 1px solid rgba(0, 0, 0, 0.05);\n- 暖光阴影: box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 0 15px rgba(217, 119, 88, 0.4);\n- 圆角: border-radius: 18px\n\n第三部分：排版与元素特效 (Typography & Element Effects)\n\n字体 (Font):\n- 字体族: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif\n- 正文字号: font-size: 16px\n- 行高: line-height: 1.75\n- 字间距: letter-spacing: 0.5px (应用于主容器)\n\n一级标题 (<h2>) 特效:\n- 结构: 必须由两个 <span> 构成：一个用于 ▶ 符号，另一个用于标题文本\n- ▶ 符号 <span>: 应用 color: #d97758; 和 text-shadow: 0 0 12px rgba(217, 119, 88, 0.5);\n- 标题文本 <span>: 必须应用纯色 color: #d97758;，禁止使用任何渐变色\n- 下划线: border-bottom: 1px dashed rgba(74, 65, 61, 0.3);\n\n二级标题 (<h3>) 特效:\n- 样式: 必须应用纯色 color: #d97758;，并使用 border-bottom: 2px solid #d97758; 来创建短实线，长度与文字对齐\n- 禁止为文字本身添加 text-shadow\n\n加粗/高亮 (<strong>):\n- 效果: 文字颜色设为 color: #c06b4d;，禁止附带任何 text-shadow 效果\n\n引用 (<blockquote>):\n- 背景: background-color: #fef4e7;\n- 左边框: border-left: 5px solid #d97758;\n- 阴影: box-shadow: inset 0 0 15px rgba(217, 119, 88, 0.1);\n- 禁止为引用内的文字添加 text-shadow\n\n分割线 (<hr>):\n- 样式: border: none; height: 1px; background-color: rgba(74, 65, 61, 0.1);\n\n第四部分：最终交付要求 (Final Delivery Requirements)\n\n输出格式: 提供一个完整的、独立的 HTML 内容\n代码封装: 将完整的HTML代码包裹在Markdown的代码块中\n无外部依赖: 确保代码自包含，字体通过CDN链接，无本地图片\n\n重要补充规则:\n1. 图片使用占位符格式：<!-- IMG:index -->，例如第一张图用 <!-- IMG:0 -->\n2. 只使用安全的 HTML 标签（section, p, span, strong, em, a, h1-h6, ul, ol, li, blockquote, pre, code, table, img, br, hr）\n3. 返回完整的 HTML，不需要其他说明文字\n\n请转换以下 Markdown内容：\n\n\n```\n\n# 这个微信文章工作流，到底解决了什么问题？\n\n> 它不是一个“帮我写篇文章”的模板，而是一条从选题、调研、写作、图文排版、博客沉淀，到公众号草稿的完整生产线。\n\n![核心流程图：从调研到发布的文章生产线](assets-png/flow.png)\n\n## 背景：以前的问题不是不会写，而是链路断了\n\n单独生成一篇文章并不难。\n\n真正麻烦的是，公众号文章不是纯文本。它同时需要事实、结构、封面、配图、排版、移动端阅读体验，还要能留存在博客里，最后再进入公众号草稿箱。\n\n过去这几个步骤容易散掉：\n\n- 调研和写作是一段流程。\n- 博客正文文档是另一段流程。\n- 微信排版又是另一段流程。\n- 封面、正文图、素材上传和草稿发布经常临时处理。\n\n结果就是内容本身可能不错，但读者在手机上看到的是一大坨文字。读不下去，文章就等于没有完成。\n\n## 核心流程：先把内容变成资产，再考虑发布\n\n这个工作流现在的流程被拆成六步。\n\n### 1. 调研\n\n如果主题涉及新闻、产品、工具接口、价格、政策、版本变化，就先联网查资料。\n\n它要求保留来源，不允许凭感觉编事实、编数据、编截图。\n\n### 2. 理解\n\n写之前先判断这篇文章到底要讲什么：\n\n- 核心观点是什么？\n- 读者为什么要看？\n- 哪些信息应该删掉？\n- 哪些地方需要图、截图或流程图？\n- 适合教程、分析、观点、清单，还是案例复盘？\n\n这一步的作用，是避免文章变成资料拼贴。\n\n### 3. 写作\n\n正文输出的是博客友好的文档。\n\n它必须保留标题、分类、标签、封面、来源和正文图片。也就是说，这份正文文档不只是给公众号用，也能沉淀到本地博客里。\n\n### 4. 图文排版\n\n公众号排版优先交给本地排版流程。\n\n它负责预览、转换、主题、微信网页、素材和草稿相关能力。当前工作流则负责决定文章结构、主题方向和是否允许产生远程副作用。\n\n### 5. 阅读体验验证\n\n这是这次升级最关键的地方。\n\n文章必须有封面/海报、正文配图、视觉断点、颜色层次和移动端可读性。否则不能算完成。\n\n### 6. 发布\n\n默认只生成本地草稿和预览。\n\n只有明确要求“上传草稿”，才会创建公众号草稿。只有明确说“确认发布”或“直接发布”，才会进入发布动作。\n\n## 原理：三层分工，而不是一个脚本包打天下\n\n这个工作流的设计不是把所有事情都自己重写一遍，而是做分工。\n\n![能力分层图：内容层、表现层、发布层](assets-png/layers.png)\n\n**第一层：内容层。**\n\n负责调研、理解、续写、结构和事实边界。\n\n**第二层：表现层。**\n\n负责海报、配图、图文节奏、颜色层次和高流量公众号常见的阅读路径。\n\n**第三层：发布层。**\n\n负责本地博客、本地网页、公众号预览、草稿上传和发布确认。\n\n这样做的好处是，每一层都能被验证。\n\n不是“看起来差不多”，而是可以检查：有没有封面、有没有图、有没有网页预览、有没有颜色层次、有没有草稿风险。\n\n## 它解决了什么问题？\n\n### 解决 1：内容好但读不下去\n\n现在文章不允许纯文字到底。\n\n封面负责第一眼，正文图负责解释和停顿，引用和列表负责打断密度，颜色层次负责帮助读者扫描。\n\n### 解决 2：博客和公众号两套内容割裂\n\n正文文档先作为长期资产保存。\n\n公众号网页是它的发布形态之一，而不是唯一产物。这样文章能同时进入博客和公众号。\n\n### 解决 3：草稿发布太容易误操作\n\n上传草稿和直接发布被明确区分。\n\n默认只本地生成，远程动作必须有明确意图。发布更需要明确确认。\n\n### 解决 4：排版靠感觉，不可验证\n\n新增的阅读体验验证脚本会检查：\n\n- 是否有封面/海报\n- 是否有正文图\n- 是否有多级标题\n- 是否有引用或列表\n- 是否存在过长段落\n- 网页预览是否有图片和颜色层次\n\n这让“好不好读”至少有了最低标准。\n\n## 最终能做到什么效果？\n\n最终它可以把一个选题变成一套完整文章资产：\n\n- 正文文档：可沉淀到博客\n- 微信网页：适合公众号预览\n- 本地预览：方便发布前检查\n- 检查报告：记录排版和发布前风险\n- 封面/海报和正文图片\n- 可选本地博客发布\n- 可选公众号草稿\n- 明确确认后的公众号发布\n\n## 这次验证的结论\n\n这个工作流的核心价值不是“自动写文章”。\n\n它真正解决的是：把一篇文章从零散内容，变成可以阅读、可以沉淀、可以预览、可以发布、可以检查的完整内容资产。\n\n如果只追求文字完成，公众号文章很容易停在半成品。\n\n但如果把图文、排版、颜色层次和验证放进流程里，文章才更接近真正能发布的状态。\n\n```",
+    "prompt_file": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-18-wechat-skill-workflow-validation/wechat.prompt.txt",
+    "requested_output_file": "/Users/pengfanao/code/wwrtpfa.github.io/drafts/wechat/2026-06-18-wechat-skill-workflow-validation/wechat.html"
+  }
+}

@@ -1,0 +1,38 @@
+- const albumCollections = site.data.album || []
+- const albumPhotoCount = albumCollections.reduce((total, item) => total + ((item.album_list && item.album_list.length) || 0), 0)
+#album.album-studio
+  header.album-studio-hero
+    .album-studio-copy
+      span.album-studio-eyebrow VISUAL ARCHIVE · 视觉档案
+      h1 把喜欢的世界，慢慢收藏起来。
+      p 动漫的想象、风景的呼吸，以及尚未被填满的个人生活。这里不追求数量，只留下愿意再看一眼的画面。
+    .album-studio-stats(aria-label='相册统计')
+      .album-studio-stat
+        strong=albumCollections.length
+        span 个分类
+      .album-studio-stat
+        strong=albumPhotoCount
+        span 张影像
+  nav.album-collection-grid(aria-label='相册分类')
+    each i, index in albumCollections
+      - const count = (i.album_list && i.album_list.length) || 0
+      a.album-collection-card(href=url_for(i.path_name) class=count ? '' : 'is-empty' data-pjax-state)
+        if i.cover
+          img.album-collection-cover(src=url_for(i.cover) alt=`${i.name}相册封面` loading='lazy')
+        else
+          .album-empty-visual(aria-hidden='true')
+            i.anzhiyufont.anzhiyu-icon-images
+        .album-collection-shade
+        .album-collection-index=String(index + 1).padStart(2, '0')
+        .album-collection-content
+          .album-collection-meta
+            span=i.class_name
+            span=count ? `${count} PHOTOS` : 'WAITING'
+          h2=i.name
+          p=i.description
+          .album-collection-action
+            span=count ? '进入相册' : '查看空白档案'
+            i.anzhiyufont.anzhiyu-icon-arrow-right
+  footer.album-source-note
+    i.anzhiyufont.anzhiyu-icon-circle-info
+    span 公开图片均保留来源与授权记录；个人生活仅收录本人上传内容。

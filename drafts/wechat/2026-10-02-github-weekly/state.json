@@ -1,0 +1,118 @@
+{
+  "run_id": "2026-10-02-github-weekly",
+  "updated_at": "2026-10-02T20:02:00+08:00",
+  "markdown_path": "source/_posts/每周GitHub趋势/2026-10-02-GitHub趋势.md",
+  "markdown_sha256": "cadf20e991adcd45d07db90adca623f6d2573da2a760e522f770a1f5e8753a18",
+  "wechat_html_path": "drafts/wechat/2026-10-02-github-weekly/wechat.html",
+  "wechat_html_sha256": "e536d2f5324e17620b5f0c04c049a0ff207bc8218b3dad0269d2a9f835f6b91d",
+  "theme": "github-readme",
+  "style_pack": "C (green series override)",
+  "assets": [
+    {
+      "path": ".cache/github-weekly-2026-10-02/visuals/final/github-weekly-2026-10-02-action-matrix-1200x675.png",
+      "sha256": "7388d61bb596b43e78b7ba8d666a5882dc471ae59486771500db6e8266e2ea30",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-02-action-matrix-1200x675.png"
+    },
+    {
+      "path": ".cache/github-weekly-2026-10-02/visuals/final/github-weekly-2026-10-02-cover-1600x900.png",
+      "sha256": "e29faef15947a5ddc5035e6bad6093403318e61e9fd36d4c37d9a402a80e51e3",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-02-cover-1600x900.png"
+    },
+    {
+      "path": ".cache/github-weekly-2026-10-02/visuals/final/github-weekly-2026-10-02-poster-1080x1350.png",
+      "sha256": "b5cc09c1f4f133c479c4f13cbc7311ecbd735a3dd76413494dca6ff147e72249",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-02-poster-1080x1350.png"
+    },
+    {
+      "path": ".cache/github-weekly-2026-10-02/visuals/final/github-weekly-2026-10-02-review-flow-1200x675.png",
+      "sha256": "67ec1cd72da92bc57bb0e6da270945785953d74345d7fbe770f98ce23c68348f",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-02-review-flow-1200x675.png"
+    },
+    {
+      "path": ".cache/github-weekly-2026-10-02/visuals/final/github-weekly-2026-10-02-trend-map-1200x675.png",
+      "sha256": "73f0b26329decb1d616ac19b8abf44def869e32baa8a8c6b64c1ec5199fc9e15",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-02-trend-map-1200x675.png"
+    },
+    {
+      "path": ".cache/github-weekly-2026-10-02/visuals/final/github-weekly-2026-10-02-wechat-cover-1080x460.png",
+      "sha256": "d43eab2bb7493fffd10903183a7ec02ddd0f90b856ffea2b72d0d911e7dd4d34",
+      "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-02-wechat-cover-1080x460.png"
+    }
+  ],
+  "stages": {
+    "research": {
+      "ok": true,
+      "source": "https://github.com/trending?since=weekly",
+      "captured_at": "2026-10-02T18:02:00+0800",
+      "scope": "weekly page snapshot, 18 visible projects; stars this week from page, total stars/language checked via repo API"
+    },
+    "visuals": {
+      "ok": true,
+      "visual_plan": "drafts/wechat/2026-10-02-github-weekly/visual-plan.json",
+      "template": "github-weekly-warm-paper-v1-handdrawn",
+      "canvas_count": 6,
+      "revision": "high-contrast tech typography; ranking header; weekly Star legend; left-side node diagram"
+    },
+    "oss_upload": {
+      "ok": true,
+      "image_count": 6,
+      "script": "scripts_py/picgo_upload.py",
+      "revision": "re-uploaded same OSS filenames after visual revision"
+    },
+    "inspect": {
+      "ok": true,
+      "draft_target": "not_requested",
+      "blockers": []
+    },
+    "convert": {
+      "ok": true,
+      "provider": "local style pack C green override",
+      "reason": "md2wechat API preview unavailable due invalid API key; fallback inline HTML normalized for GitHub list contract"
+    },
+    "experience_validation": {
+      "ok": true,
+      "ul_count": 0,
+      "li_count": 0,
+      "image_count": 6
+    },
+    "draft": {
+      "ok": true,
+      "media_id": "zdr76s0MQZwqyFoO5jodPGDDXqWTJyclFvWFtLvuUBtV6j3iNbc5G3gBro42uOsH",
+      "operation": "draft/update",
+      "updated_at": "2026-10-02T20:02:00+08:00",
+      "verification": {
+        "title": "GitHub 开源趋势周报 2026-10-02",
+        "digest": "智能体热榜转向可执行工作流，本期看 Agent 记忆、本地语音与团队运营。",
+        "thumb_media_id": "zdr76s0MQZwqyFoO5jodPDU0TL8vA9XYIIt7ncSOgwdl0047E6T7KCI8XVvElY8y",
+        "content_source_url": "https://blog.pengfanao.top/2026/10/02/每周GitHub趋势/2026-10-02-GitHub趋势/",
+        "img_count": 6,
+        "ul_count": 0,
+        "li_count": 0,
+        "anchor_count": 0,
+        "verified_at": "2026-10-02T20:02:00+08:00",
+        "link_roundtrip": "external anchors sanitized by WeChat draft/update API; local HTML retains clickable hrefs"
+      }
+    },
+    "collection": {
+      "name": "每周 GitHub",
+      "album_id": "4695616659267780619",
+      "archived": false,
+      "reason": "草稿已创建；合集归档仍需后台操作"
+    },
+    "blog": {
+      "built": true,
+      "audit_passed": true,
+      "pushed": true,
+      "commit": "14d5abf",
+      "live_url": "https://blog.pengfanao.top/2026/10/02/每周GitHub趋势/2026-10-02-GitHub趋势/",
+      "live_verified": false,
+      "http_status": 404,
+      "reason": "content and WeChat HTML synchronized; live host still returns 404"
+    }
+  },
+  "wechat_token_precheck": {
+    "ok": true,
+    "checked_at": "2026-10-02T19:10:46.789057+08:00",
+    "egress_ip": "175.13.254.48"
+  }
+}

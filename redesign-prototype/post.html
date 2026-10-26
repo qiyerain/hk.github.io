@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>把工具用旧 · 小遨的个人博客</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="common.css" />
+<style>
+.article-head{padding:calc(64px + clamp(60px,10vh,120px)) var(--pad-x) clamp(40px,6vh,64px);position:relative;overflow:hidden}
+.article-head .glow{z-index:0;opacity:.5}
+.glow-a{width:30vw;height:30vw;left:-6vw;top:10vh}
+.glow-b{width:24vw;height:24vw;right:-4vw;top:0}
+.head-inner{position:relative;z-index:1;max-width:880px;margin:0 auto}
+.crumbs{margin-bottom:28px}
+.art-meta{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--prose-meta);display:flex;gap:18px;flex-wrap:wrap;margin-bottom:22px}
+.art-meta span{display:inline-flex;align-items:center;gap:6px}
+.art-title{font-family:var(--serif);font-weight:700;font-size:clamp(36px,5.5vw,72px);line-height:1.08;letter-spacing:-0.015em}
+.art-excerpt{margin-top:24px;font-size:clamp(16px,1.4vw,20px);color:var(--fg-soft);line-height:1.7;max-width:62ch}
+.article-body-wrap{display:grid;grid-template-columns:minmax(0,var(--prose-width)) 220px;gap:clamp(32px,4vw,64px);justify-content:center;padding:0 var(--pad-x);max-width:100%}
+.article-body{font-family:var(--sans);font-size:18px;line-height:1.85;color:var(--prose-fg);max-width:var(--prose-width)}
+.article-body h2{font-family:var(--serif);font-weight:600;font-size:clamp(26px,3vw,36px);line-height:1.2;margin:64px 0 20px;scroll-margin-top:90px}
+.article-body h3{font-family:var(--serif);font-weight:600;font-size:clamp(20px,2.2vw,26px);margin:44px 0 16px;scroll-margin-top:90px}
+.article-body p{margin:0 0 24px}
+.article-body p:first-of-type::first-letter{font-family:var(--serif);font-size:1.3em;font-weight:600}
+.article-body blockquote{border-left:2px solid var(--accent);padding:4px 0 4px 22px;margin:28px 0;color:var(--fg-soft);font-style:italic}
+.article-body ul,.article-body ol{margin:0 0 24px;padding-left:24px}
+.article-body li{margin:8px 0}
+.article-body code{font-family:var(--mono);font-size:.9em;background:var(--code-bg);padding:2px 7px;border-radius:6px}
+.article-body pre{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;padding:20px 22px;overflow-x:auto;margin:0 0 28px;position:relative}
+.article-body pre code{background:none;padding:0;font-size:14px;line-height:1.6}
+.article-body pre .lang-tag{position:absolute;top:10px;right:14px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-dim)}
+.article-body img{border-radius:12px;border:1px solid var(--img-frame);margin:0 0 28px}
+.article-body a{border-bottom:1px solid var(--line);transition:border-color .2s ease}
+.article-body a:hover{border-color:var(--fg)}
+.toc{position:sticky;top:90px;align-self:start;max-height:calc(100vh - 110px);overflow-y:auto;padding-left:18px;border-left:1px solid var(--dir-line)}
+.toc-h{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:14px}
+.toc ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.toc a{font-size:13px;color:var(--fg-dim);line-height:1.5;display:block;transition:color .2s ease,padding .2s ease;border-bottom:none}
+.toc a:hover{color:var(--fg-soft)}
+.toc a.active{color:var(--fg);font-weight:500;border-left:2px solid var(--accent);margin-left:-8px;padding-left:8px}
+.toc .lv3{padding-left:14px;font-size:12px}
+.article-foot{max-width:var(--prose-width);margin:0 auto;padding:48px var(--pad-x) 0}
+.foot-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px}
+.prev-next{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px}
+.pn-card{padding:24px;border:1px solid var(--border);border-radius:var(--radius-card);transition:background .3s,transform .3s var(--ease-out);cursor:pointer;display:block}
+.pn-card:hover{background:var(--muted);transform:translateY(-2px)}
+.pn-card .dir{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:10px}
+.pn-card.next .dir{text-align:right}
+.pn-card .ttl{font-family:var(--serif);font-size:18px;font-weight:600}
+.pn-card.next .ttl{text-align:right}
+.sub-mini{padding:28px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.sub-mini .t{font-family:var(--serif);font-size:22px;font-weight:600}
+.sub-mini .d{font-family:var(--mono);font-size:12px;color:var(--fg-dim);margin-top:6px;letter-spacing:.06em}
+.sub-btn{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:12px 22px;border-radius:var(--radius-pill);background:var(--fg);color:var(--bg);border:none;cursor:pointer;transition:transform .3s var(--ease-out)}
+.sub-btn:hover{transform:translateY(-2px)}
+.to-top{position:fixed;right:24px;bottom:24px;width:42px;height:42px;border-radius:50%;background:var(--glass-bg-strong);backdrop-filter:blur(20px);border:1px solid var(--glass-border);color:var(--fg);display:grid;place-items:center;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s;z-index:60;font-size:16px}
+.to-top.show{opacity:1;pointer-events:auto}
+@media (max-width:860px){.article-body-wrap{grid-template-columns:1fr;gap:0}.toc{display:none}.prev-next{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="nav" id="nav">
+  <div class="nav-brand" onclick="location.href='index.html'">小遨的个人博客</div>
+  <ul class="nav-center">
+    <li class="nav-item">
+      <button class="nav-link active">文章 <span class="caret">▾</span></button>
+      <ul class="nav-drop">
+        <li><a href="archive.html">全部文章 <span>All</span></a></li>
+        <li><a href="archive.html#month">按月份 <span>By Month</span></a></li>
+        <li><a href="archive.html#tag">按标签 <span>By Tag</span></a></li>
+        <li><a href="archive.html#dir">按目录 <span>By Dir</span></a></li>
+      </ul>
+    </li>
+    <li class="nav-item"><a class="nav-link" href="albums.html">相册</a></li>
+    <li class="nav-item"><a class="nav-link" href="friends.html">友链</a></li>
+    <li class="nav-item"><a class="nav-link" href="wechat.html">公众号</a></li>
+    <li class="nav-item"><a class="nav-link" href="about.html">关于</a></li>
+  </ul>
+  <div class="nav-tools">
+    <button class="icon-btn" aria-label="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+    <button class="icon-btn" id="dirBtn" aria-label="目录树"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/><path d="M3 11h18"/></svg></button>
+    <button class="icon-btn theme-toggle" id="themeToggle" aria-label="切换深浅主题">
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></svg>
+    </button>
+    <button class="icon-btn nav-burger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</nav>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="dir-drawer" id="dirDrawer" aria-hidden="true">
+  <div class="dir-drawer-head"><span class="ttl">目录树 · Directory</span><button class="dir-close" id="dirClose" aria-label="关闭">✕</button></div>
+  <div class="dir-tree">
+    <ul>
+      <li class="open"><div class="folder open"><span class="tri">▶</span>工具系列</div>
+        <ul>
+          <li><div class="folder open"><span class="tri">▶</span>把工具用旧</div>
+            <ul><li><a class="leaf" href="post.html">当一支笔被使用三年</a></li><li><div class="leaf">六年的剪刀</div></li></ul>
+          </li>
+          <li><div class="leaf">工具的弧度</div></li>
+        </ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>写作随笔</div>
+        <ul><li><a class="leaf" href="post.html">夜里改掉的一个词</a></li><li><div class="leaf">承认一句话不需要被连起来</div></li></ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>城市</div>
+        <ul><li><div class="leaf">广州的雨有它自己的语法</div></li><li><div class="leaf">北方的秋天</div></li></ul>
+      </li>
+    </ul>
+  </div>
+  <div class="dir-drawer-foot">查看完整目录 ↗</div>
+</aside>
+
+<header class="article-head">
+  <span class="glow glow-a"></span><span class="glow glow-b"></span>
+  <div class="head-inner">
+    <div class="crumbs"><a href="index.html">首页</a><span>/</span><a href="archive.html#dir">工具系列</a><span>/</span><a href="archive.html#dir">把工具用旧</a></div>
+    <div class="art-meta"><span>2026 / 06 / 12</span><span>·</span><span>阅读 7 分钟</span><span>·</span><span>约 1800 字</span></div>
+    <h1 class="art-title">把工具用旧</h1>
+    <p class="art-excerpt">当一支笔被使用三年，它才开始成为你的笔。工具的价值不在新，而在被磨损出的那道弧。</p>
+  </div>
+</header>
+
+<div class="article-body-wrap">
+  <article class="article-body">
+    <p>我有一支用了三年的钢笔。笔杆上的漆已经磨掉一半，露出黄铜的底色。握笔的地方有一道浅浅的凹痕——那不是摔出来的，是几千次书写后，指腹慢慢压出来的。</p>
+    <h2 id="s1">工具的新，是一种未完成</h2>
+    <p>新工具总是让人兴奋。拆封的那一刻，它属于所有人，又不属于任何人。它还没有被你的手型塑造，没有记住你用力的方向，不知道你习惯从哪个角度切入。它干净、锋利、完美，也因此——空。</p>
+    <p>一支全新的笔写出的字，和一支用了三年的笔写出的字，是不一样的。不是好坏的区别，是"有没有人"的区别。</p>
+    <h2 id="s2">磨损是双向的</h2>
+    <p>我们以为是人在使用工具，但工具也在使用人。它磨你的指节，定你的姿势，教会你它喜欢被怎样对待。三年下来，我和这支笔之间形成了一种默契：我知道它下水快，写撇要慢半拍；它知道我握得紧，所以在关键一笔前会给我一点阻力。</p>
+    <blockquote>工具不是被你拥有的，工具是和你一起长出来的。</blockquote>
+    <h3 id="s2-1">那道弧</h3>
+    <p>笔尖上有一道肉眼几乎看不见的弧。那是我的弧，不是别人的。如果我把它送给别人，对方会需要几个月去适应，或者永远适应不了——因为那道弧是我的手写出来的，换一只手，它就成了错位。</p>
+    <h2 id="s3">把工具用旧，是一种承诺</h2>
+    <p>在这个什么都讲究"换新"的时代，把一件工具用旧，本身就是一种态度。它意味着你愿意为一段关系投入时间，愿意忍受它不那么完美的阶段，愿意相信"熟悉"比"新鲜"更值钱。</p>
+    <p>所以当我看到一个人用着磨得发亮的剪刀、卷了边的笔记本、屏幕有划痕的老相机——我看到的不是节俭，而是忠诚。对工具的忠诚，本质是对自己生活节奏的忠诚。</p>
+    <pre><code><span class="lang-tag">js</span>// 工具与人的关系，大概是这样
+const pen = new Pen();
+for (let day = 0; day &lt; 1095; day++) {
+  pen.write(dailyLife[day]);
+  pen.shape += hand.grip;   // 笔被手塑形
+  hand.adapt(pen.resistance); // 手也被笔塑形
+}
+// 三年后，pen 和 hand 不再可分</code></pre>
+    <h2 id="s4">尾声</h2>
+    <p>我还会继续用这支笔。直到它的漆全部磨光，直到那道弧深到我写不动为止。到那一天，我会找一支新的，然后重新开始——用十年，再把它用旧。</p>
+    <p>那才是它成为"我的笔"的方式。</p>
+  </article>
+  <aside class="toc" id="toc">
+    <div class="toc-h">目录 · TOC</div>
+    <ul>
+      <li><a href="#s1" data-tgt="s1">工具的新，是一种未完成</a></li>
+      <li><a href="#s2" data-tgt="s2">磨损是双向的</a></li>
+      <li><a href="#s2-1" class="lv3" data-tgt="s2-1">那道弧</a></li>
+      <li><a href="#s3" data-tgt="s3">把工具用旧，是一种承诺</a></li>
+      <li><a href="#s4" data-tgt="s4">尾声</a></li>
+    </ul>
+  </aside>
+</div>
+
+<footer class="article-foot">
+  <div class="foot-tags"><a class="tag-pill" href="archive.html#tag">随笔</a><a class="tag-pill" href="archive.html#tag">工具</a><a class="tag-pill" href="archive.html#tag">把工具用旧</a></div>
+  <div class="prev-next">
+    <a class="pn-card prev" href="post.html"><div class="dir">← 上一篇</div><div class="ttl">广州的雨有它自己的语法</div></a>
+    <a class="pn-card next" href="post.html"><div class="dir">下一篇 →</div><div class="ttl">夜里改掉的一个词</div></a>
+  </div>
+  <a class="glass sub-mini" href="subscribe.html" style="display:flex;text-decoration:none;color:inherit">
+    <div><div class="t">每周一封，关于工具与写作</div><div class="d">RSS · 邮箱订阅 · 公众号</div></div>
+    <span class="sub-btn">订阅 ↗</span>
+  </a>
+  <div style="height:80px"></div>
+</footer>
+
+<button class="to-top" id="toTop" aria-label="回到顶部">↑</button>
+
+<script src="common.js"></script>
+<script>
+/* 回顶 */
+(function(){var tt=document.getElementById('toTop');if(tt){window.addEventListener('scroll',function(){tt.classList.toggle('show',scrollY>600)},{passive:true});tt.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})})}})();
+/* TOC 高亮 */
+(function(){
+  var links=document.querySelectorAll('#toc a');var map={};
+  links.forEach(function(l){map[l.dataset.tgt]=l});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(l){l.classList.remove('active')});var m=map[e.target.id];if(m)m.classList.add('active')}})},{rootMargin:'-80px 0px -70% 0px'});
+  document.querySelectorAll('.article-body h2,.article-body h3').forEach(function(h){if(h.id)io.observe(h)});
+})();
+/* TOC 点击平滑滚动 */
+document.querySelectorAll('#toc a').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var t=document.getElementById(a.dataset.tgt);if(t){var y=t.getBoundingClientRect().top+window.scrollY-80;window.scrollTo({top:y,behavior:'smooth'})}})});
+</script>
+</body>
+</html>

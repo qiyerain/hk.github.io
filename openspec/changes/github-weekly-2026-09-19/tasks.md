@@ -1,0 +1,7 @@
+- [x] Capture and verify GitHub Trending weekly and project README evidence.
+- [x] Render and upload six edition-specific images to OSS.
+- [x] Write the Hexo article and inline-style WeChat HTML; validate experience.
+- [x] Build and audit the repository.
+- [x] Record WeChat `40164` IP allowlist blocker; no `draft/add` was attempted.
+- [x] Commit and push only this edition's required artifacts on `master`; verify the live article.
+- [x] Write execution report with exact results and rollback guidance.

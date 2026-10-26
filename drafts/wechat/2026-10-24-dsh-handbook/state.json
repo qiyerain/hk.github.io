@@ -1,0 +1,70 @@
+{
+  "run_id": "2026-10-24-dsh-handbook",
+  "updated_at": "2026-10-24T14:07:10+08:00",
+  "markdown_path": "drafts/wechat/2026-10-24-dsh-handbook/source.md",
+  "markdown_sha256": "dc48f5439e72640317988fe516f4863d28838172c3d3fd71b034f09bbc5f0711",
+  "wechat_html_path": "drafts/wechat/2026-10-24-dsh-handbook/wechat.html",
+  "wechat_html_sha256": "bb72b98438f53ea1d705fe723fa6dbbd069a0503c0a543320fa2eaca27b84048",
+  "stages": {
+    "blog": {
+      "ok": true,
+      "status": "local_verified",
+      "built": true,
+      "audit_passed": true,
+      "live_url": "https://blog.pengfanao.top/2026/10/24/agent/DeepSeek-Harness-学习手册/"
+    },
+    "wechat_render": {
+      "ok": true,
+      "status": "completed",
+      "style_pack": "A",
+      "theme": "autumn-warm",
+      "md2wechat_mode": "ai",
+      "md2wechat_result": "inspect gate passed; final HTML rendered with project Style Pack",
+      "ul_count": 0,
+      "li_count": 0,
+      "ol_count": 0,
+      "image_count": 3,
+      "anchor_count": 0,
+      "content_safety_hits": [],
+      "note": "platform cover kept out of the article body; images are OSS URLs rewritten to WeChat CDN at draft time"
+    },
+    "md2wechat_readiness": {
+      "overall": "ready",
+      "format_api": false,
+      "advanced_layout": false,
+      "draft": true,
+      "default_mode": "ai"
+    },
+    "draft": {
+      "ok": true,
+      "status": "completed",
+      "operation": "draft/add",
+      "media_id": "zdr76s0MQZwqyFoO5jodPDycKM8X4uevs8wYi2qqRDAn709C3mLkd9jf9uMhj3H5",
+      "updated_at": "2026-10-24T14:07:08+08:00",
+      "verification": {
+        "title": "DeepSeek Harness：363 个包里的一条主线",
+        "digest": "363 个包、52 个分组，真正要读的只有一条线：先建心智模型，再顺着一次 turn 读源码，最后用能力接缝判断新行为该放哪。",
+        "thumb_media_id": "zdr76s0MQZwqyFoO5jodPBfLlol-XPCszsS0yeOqp_OzijdcNc6lAOep09RC3nad",
+        "content_source_url": "https://blog.pengfanao.top/2026/10/24/agent/DeepSeek-Harness-学习手册/",
+        "img_count": 3,
+        "ul_count": 0,
+        "li_count": 0,
+        "anchor_count": 0,
+        "verified_at": "2026-10-24T14:07:10+08:00"
+      }
+    }
+  },
+  "wechat_token_precheck": {
+    "ok": true,
+    "checked_at": "2026-10-24T14:06:55+08:00",
+    "expires_in": 7200
+  },
+  "assets": [
+    {
+      "role": "wechat_cover",
+      "path": ".cache/blog-2026-10-24/wechat/handbook-wechat-cover-1080x460.png",
+      "sha256": "b5d7a3d2b1cf78d07ad172dab4b112cd0cee5f4883e4d8da177a86c396eaddde",
+      "url": ""
+    }
+  ]
+}

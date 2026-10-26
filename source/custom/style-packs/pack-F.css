@@ -1,0 +1,79 @@
+/* Style Pack F — 冲击标题 Bold Block
+ * 营销号头部 × 强标题党。墨红主色 + 金色副色。
+ */
+
+body[data-style-pack="F"] #article-container h1 {
+  background: #b91c1c;
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(185, 28, 28, 0.25);
+  font-weight: 900;
+}
+
+body[data-style-pack="F"] #article-container h2 {
+  color: #b91c1c;
+  font-weight: 800;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+body[data-style-pack="F"] #article-container h2::after {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #fbbf24;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+body[data-style-pack="F"] #article-container h3 {
+  color: #b91c1c;
+  font-weight: 700;
+  border-bottom: 2px solid #b91c1c;
+  display: inline-block;
+  padding-bottom: 2px;
+}
+
+body[data-style-pack="F"] #article-container strong {
+  background: linear-gradient(transparent 55%, #fbbf24 55%);
+  color: #1a1a1a;
+  font-weight: 700;
+  padding: 0 2px;
+  border: 0;
+}
+
+body[data-style-pack="F"] #article-container blockquote {
+  background: rgba(185, 28, 28, 0.06);
+  border-right: 4px solid #b91c1c;
+  border-left: 0;
+  padding: 14px 18px;
+  border-radius: 0;
+}
+
+body[data-style-pack="F"] #article-container code {
+  background: #fee2e2;
+  color: #b91c1c;
+  font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+body[data-style-pack="F"] #article-container pre {
+  background: #1a1a1a;
+  color: #fff;
+  border-left: 4px solid #b91c1c;
+  border-radius: 10px;
+}
+
+body[data-style-pack="F"] #article-container img {
+  border-radius: 10px;
+  border: 2px solid #b91c1c;
+}
+
+body[data-style-pack="F"] #article-container hr {
+  border: 0;
+  border-top: 2px solid #b91c1c;
+  margin: 28px 0;
+}

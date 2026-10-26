@@ -1,0 +1,78 @@
+extends includes/layout.pug
+
+block content
+  #post.xa-reading-page
+    meta(name="article-id" content=page.article_id)
+    if top_img === false || page.bilibili_bg
+      include includes/header/post-info.pug
+    if theme.post_head_ai_description
+      include includes/anzhiyu/ai-info.pug
+    - let url = page.copyright_url || page.permalink
+    header.xa-post-lead
+      .xa-post-eyebrow
+        span= date(page.date, 'YYYY / MM / DD')
+        if page.wordcount
+          span= page.wordcount + ' 字'
+        if page.min2read
+          span= page.min2read + ' 分钟阅读'
+      h1#CrawlerTitle(itemprop="name headline")= page.title || _p('no_title')
+      if page.description
+        p.xa-post-summary= page.description
+      else
+        - const xaSummary = strip_html(page.excerpt || page.content || '').replace(/\s+/g, ' ').slice(0, 120)
+        if xaSummary
+          p.xa-post-summary= xaSummary
+    .xa-reading-grid
+      article#article-container.post-content(itemscope itemtype=url_for(url) data-article-id=page.article_id)
+        - let author = page.copyright_author || config.author
+        meta(itemprop="author" content=author)
+        !=page.content
+
+      aside.xa-reading-toc#xa-reading-toc(aria-label="本文目录" aria-hidden="false")
+        .xa-reading-toc__label
+          strong 本文目录
+          b(data-reading-progress) 01
+          button.xa-reading-toc__close(type="button" aria-label="关闭目录" data-toc-close)
+            i.anzhiyufont.anzhiyu-icon-xmark(aria-hidden="true")
+        #xa-reading-toc__list
+          .xa-reading-toc__indicator(aria-hidden="true")
+
+    button.xa-mobile-toc-trigger(type="button" aria-label="打开本文目录" aria-controls="xa-reading-toc" aria-expanded="false" data-toc-trigger)
+      i.anzhiyufont.anzhiyu-icon-list(aria-hidden="true")
+      span(data-mobile-reading-progress) 01 / 01
+    button.xa-toc-backdrop(type="button" aria-label="关闭目录" tabindex="-1" data-toc-backdrop)
+
+    include includes/post/post-copyright.pug
+
+    section.article-analytics(data-article-analytics aria-label="文章统计" hidden)
+      span.article-analytics__title 阅读数据
+      span.article-analytics__item
+        i.anzhiyufont.anzhiyu-icon-eye(aria-hidden="true")
+        span(data-analytics-page-views) 0
+        span 次阅读
+      span.article-analytics__item
+        i.anzhiyufont.anzhiyu-icon-user(aria-hidden="true")
+        span(data-analytics-unique-visitors) 0
+        span 位访客
+      span.article-analytics__item
+        i.anzhiyufont.anzhiyu-icon-check(aria-hidden="true")
+        span(data-analytics-valid-reads) 0
+        span 次有效阅读
+      span.article-analytics__item
+        i.anzhiyufont.anzhiyu-icon-time(aria-hidden="true")
+        span(data-analytics-reading-seconds) 0
+        span 秒阅读时长
+
+    //- ad
+    if theme.ad && theme.ad.post
+      .ads-wrap!=theme.ad.post
+
+    if theme.post_pagination
+      include includes/pagination.pug
+    if theme.related_post && theme.related_post.enable
+      != related_posts(page,site.posts)
+
+    if page.comments !== false && theme.comments && theme.comments.use
+      - var commentsJsLoad = true
+      !=partial('includes/third-party/comments/index', {}, {cache: true})
+      

@@ -1,0 +1,243 @@
+/* ============================================================
+   小遨的个人博客 · 全站共享样式
+   风格：ReactBits 灰阶外壳 + 苹果玻璃 + 光晕
+   各页面 <link rel="stylesheet" href="common.css"> 后，
+   仅补充本页专属样式即可。
+   ============================================================ */
+
+:root{
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-rev: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --pad-x: clamp(24px, 6vw, 96px);
+  --serif: "Noto Serif SC", ui-serif, Georgia, serif;
+  --sans: "Inter", "Noto Sans SC", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --radius-card: 16px;
+  --radius-panel: 28px;
+  --radius-pill: 999px;
+  --prose-width: 68ch;
+}
+
+/* 深色（默认） */
+[data-theme="dark"]{
+  --bg:#0a0a0a; --bg-soft:#111111; --card:#111111; --muted:#1f1f1f;
+  --fg:#ffffff; --fg-soft:#d6d6d6; --fg-dim:#8b8b8b;
+  --border:#1f1f1f; --line:rgba(255,255,255,.10); --accent:#ffffff;
+  --glass-bg:rgba(18,18,18,0.42); --glass-bg-strong:rgba(18,18,18,0.62);
+  --glass-border:rgba(255,255,255,0.12); --glass-hi:rgba(255,255,255,0.14);
+  --glass-shadow:0 12px 48px rgba(0,0,0,0.45);
+  --glow-a:rgba(86,140,245,0.55); --glow-b:rgba(196,132,252,0.40); --glow-c:rgba(251,191,120,0.32);
+  --veil-top:rgba(10,10,10,0.20); --veil-bottom:rgba(10,10,10,0.92);
+  --tag-bg:var(--muted); --tag-fg:var(--fg-soft); --code-bg:var(--bg-soft);
+  --dir-line:var(--border); --img-frame:var(--glass-border);
+  --prose-fg:var(--fg); --prose-meta:var(--fg-dim);
+  --selection-bg:#ffffff; --selection-fg:#0a0a0a;
+}
+
+/* 浅色 */
+[data-theme="light"]{
+  --bg:#ffffff; --bg-soft:#f4f4f4; --card:#ffffff; --muted:#f0f0f0;
+  --fg:#0f0f0f; --fg-soft:#444444; --fg-dim:#8a8a8a;
+  --border:#e8e8e8; --line:rgba(0,0,0,.08); --accent:#0f0f0f;
+  --glass-bg:rgba(255,255,255,0.52); --glass-bg-strong:rgba(255,255,255,0.72);
+  --glass-border:rgba(255,255,255,0.65); --glass-hi:rgba(255,255,255,0.9);
+  --glass-shadow:0 12px 40px rgba(0,0,0,0.10);
+  --glow-a:rgba(120,170,255,0.40); --glow-b:rgba(196,132,252,0.28); --glow-c:rgba(251,191,120,0.30);
+  --veil-top:rgba(255,255,255,0.10); --veil-bottom:rgba(255,255,255,0.86);
+  --tag-bg:var(--muted); --tag-fg:var(--fg-soft); --code-bg:var(--bg-soft);
+  --dir-line:var(--border); --img-frame:var(--glass-border);
+  --prose-fg:var(--fg); --prose-meta:var(--fg-dim);
+  --selection-bg:#0f0f0f; --selection-fg:#ffffff;
+}
+
+*{box-sizing:border-box; margin:0; padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family: var(--sans);
+  background: var(--bg); color: var(--fg);
+  -webkit-font-smoothing: antialiased; line-height: 1.6;
+  overflow-x: hidden;
+  transition: background .5s ease, color .5s ease;
+}
+::selection{background:var(--selection-bg); color:var(--selection-fg)}
+a{color:inherit; text-decoration:none}
+img{display:block; max-width:100%}
+
+/* ---------- 玻璃 ---------- */
+.glass{
+  background: var(--glass-bg);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-hi);
+}
+
+/* ---------- 光晕球 ---------- */
+.glow{position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; mix-blend-mode:screen; opacity:.9}
+[data-theme="light"] .glow{mix-blend-mode:normal; opacity:.55}
+.glow-a{background:var(--glow-a); animation: drift1 18s ease-in-out infinite}
+.glow-b{background:var(--glow-b); animation: drift2 22s ease-in-out infinite}
+.glow-c{background:var(--glow-c); animation: drift3 26s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,-30px)}}
+@keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,40px)}}
+@keyframes drift3{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-40px)}}
+
+/* ---------- 顶栏 ---------- */
+.nav{
+  position: fixed; top:0; left:0; right:0; z-index: 80;
+  height: 64px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap: 24px;
+  padding: 0 var(--pad-x);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
+  transition: height .3s var(--ease-out);
+}
+.nav.shrunk{height:56px}
+.nav-brand{font-family: var(--serif); font-size:16px; font-weight:700; letter-spacing:.02em; white-space:nowrap; cursor:pointer}
+.nav-center{display:flex; align-items:center; gap:30px; list-style:none}
+.nav-item{position:relative}
+.nav-link{
+  font-family: var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+  color: var(--fg-soft); cursor:pointer; padding: 8px 2px;
+  display:inline-flex; align-items:center; gap:5px;
+  transition: color .25s ease; background:none; border:none;
+}
+.nav-link:hover, .nav-item:hover > .nav-link{color:var(--fg)}
+.nav-link::after{content:""; position:absolute; left:0; bottom:0; height:1px; width:0; background:var(--fg); transition:width .28s var(--ease-out)}
+.nav-link:hover::after, .nav-item:hover > .nav-link::after, .nav-link.active::after{width:100%}
+.nav-link.active{color:var(--fg)}
+.nav-link .caret{font-size:9px; opacity:.6}
+
+/* 文章下拉 */
+.nav-drop{
+  position:absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(8px);
+  min-width: 200px; padding: 10px;
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  opacity:0; pointer-events:none;
+  transition: opacity .26s var(--ease-out), transform .26s var(--ease-out);
+  list-style:none;
+}
+.nav-item:hover .nav-drop{opacity:1; pointer-events:auto; transform: translateX(-50%) translateY(0)}
+.nav-drop li a{
+  display:flex; justify-content:space-between; align-items:center; gap:16px;
+  padding: 10px 14px; border-radius: 10px;
+  font-family: var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase;
+  color: var(--fg-soft);
+  transition: background .2s ease, color .2s ease;
+}
+.nav-drop li a:hover{background: var(--muted); color:var(--fg)}
+.nav-drop li a span{font-size:10px; color:var(--fg-dim)}
+
+.nav-tools{display:flex; align-items:center; gap:4px}
+.icon-btn{
+  width:34px; height:34px; border:none; border-radius:10px;
+  background:transparent; color:var(--fg-soft);
+  display:grid; place-items:center; cursor:pointer;
+  transition: background .25s ease, color .25s ease;
+}
+.icon-btn:hover{background:var(--muted); color:var(--fg)}
+.icon-btn svg{width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:1.6}
+.nav-burger{display:none}
+
+/* 主题切换 */
+.theme-toggle{position:relative}
+.theme-toggle svg{position:absolute; transition: opacity .4s ease, transform .5s var(--ease-out)}
+.theme-toggle .icon-moon{opacity:1; transform:rotate(0) scale(1)}
+.theme-toggle .icon-sun{opacity:0; transform:rotate(-30deg) scale(.7)}
+[data-theme="light"] .theme-toggle .icon-moon{opacity:0; transform:rotate(30deg) scale(.7)}
+[data-theme="light"] .theme-toggle .icon-sun{opacity:1; transform:rotate(0) scale(1)}
+
+/* ---------- 目录树抽屉 ---------- */
+.dir-drawer{
+  position: fixed; top:0; right:0; height:100vh; width: min(420px, 88vw);
+  z-index: 90;
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border-left: 1px solid var(--glass-border);
+  box-shadow: -20px 0 60px rgba(0,0,0,.4);
+  transform: translateX(100%);
+  transition: transform .5s var(--ease-out);
+  display:flex; flex-direction:column;
+  padding: 24px;
+}
+.dir-drawer.open{transform: translateX(0)}
+.dir-drawer-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:20px}
+.dir-drawer-head .ttl{font-family:var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--fg-dim)}
+.dir-close{background:none; border:none; color:var(--fg-soft); font-size:22px; cursor:pointer; line-height:1}
+.dir-tree{flex:1; overflow-y:auto; font-family:var(--mono); font-size:13px}
+.dir-tree ul{list-style:none; padding-left:18px; position:relative}
+.dir-tree ul::before{content:""; position:absolute; left:6px; top:0; bottom:8px; width:1px; background:var(--dir-line)}
+.dir-tree li{position:relative; padding:5px 0}
+.dir-tree li::before{content:""; position:absolute; left:-12px; top:14px; width:10px; height:1px; background:var(--dir-line)}
+.dir-tree .folder{cursor:pointer; color:var(--fg-soft); display:flex; align-items:center; gap:8px; user-select:none}
+.dir-tree .folder:hover{color:var(--fg)}
+.dir-tree .folder .tri{font-size:9px; transition: transform .24s var(--ease-out); color:var(--fg-dim)}
+.dir-tree .folder.open .tri{transform: rotate(90deg)}
+.dir-tree .leaf{cursor:pointer; color:var(--fg-soft); padding-left:6px}
+.dir-tree .leaf:hover{color:var(--fg)}
+.dir-tree ul ul{display:none}
+.dir-tree ul li.open > ul{display:block}
+.dir-drawer-foot{margin-top:16px; padding-top:16px; border-top:1px solid var(--line); font-family:var(--mono); font-size:11px; color:var(--fg-dim); letter-spacing:.08em; cursor:pointer}
+.dir-drawer-foot:hover{color:var(--fg)}
+.drawer-backdrop{position:fixed; inset:0; z-index:85; background:rgba(0,0,0,.5); opacity:0; pointer-events:none; transition: opacity .4s ease}
+.drawer-backdrop.open{opacity:1; pointer-events:auto}
+
+/* ---------- 章节通用 ---------- */
+.section{position:relative; z-index:5; background: var(--bg); padding: clamp(90px,14vh,160px) var(--pad-x); border-top:1px solid var(--border)}
+.section:first-of-type{border-top:none}
+.sec-head{display:flex; align-items:baseline; gap:18px; margin-bottom: clamp(40px,6vh,72px); flex-wrap:wrap}
+.sec-num{font-family:var(--mono); font-size:12px; letter-spacing:.2em; color:var(--fg-dim)}
+.sec-title{font-family: var(--serif); font-weight:700; font-size: clamp(28px,4vw,52px); line-height:1.1; letter-spacing:-0.01em}
+.sec-en{font-family:var(--mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg-dim)}
+
+/* ---------- 页头（子页通用） ---------- */
+.page-head{position:relative; padding:calc(64px + clamp(60px,10vh,110px)) var(--pad-x) 0; overflow:hidden}
+.page-head .glow{position:absolute; border-radius:50%; filter:blur(90px); pointer-events:none; mix-blend-mode:screen; opacity:.45; z-index:0}
+[data-theme="light"] .page-head .glow{mix-blend-mode:normal; opacity:.3}
+.ph-inner{position:relative; z-index:1; max-width:1200px; margin:0 auto}
+.crumbs{font-family:var(--mono); font-size:11px; letter-spacing:.1em; color:var(--fg-dim); margin-bottom:24px; display:flex; gap:8px}
+.crumbs a:hover{color:var(--fg)}
+.ph-title{font-family:var(--serif); font-weight:700; font-size:clamp(40px,6vw,84px); line-height:1; letter-spacing:-0.02em}
+.ph-en{font-family:var(--mono); font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--fg-dim); margin-top:14px}
+.ph-desc{margin-top:20px; color:var(--fg-soft); font-size:17px; max-width:54ch}
+
+/* ---------- 标签 ---------- */
+.tag-pill{font-family:var(--mono); font-size:11px; letter-spacing:.06em; padding:4px 10px; border-radius:var(--radius-pill); background:var(--tag-bg); color:var(--tag-fg); transition:background .25s,color .25s}
+.tag-pill:hover{background:var(--fg); color:var(--bg)}
+
+/* ---------- 页脚 ---------- */
+.page-foot{max-width:1200px; margin:0 auto; padding:40px var(--pad-x) 60px; border-top:1px solid var(--border); font-family:var(--mono); font-size:11px; color:var(--fg-dim); letter-spacing:.08em; display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px}
+.page-foot a{color:var(--fg-soft)}.page-foot a:hover{color:var(--fg)}
+
+/* ---------- 滚动揭幕 ---------- */
+.reveal{opacity:0; transform: translateY(24px); transition: opacity .9s var(--ease-out), transform .9s var(--ease-out)}
+.reveal.is-in{opacity:1; transform:none}
+.reveal-stagger > *{opacity:0; transform: translateY(18px); transition: opacity .8s var(--ease-out), transform .8s var(--ease-out)}
+.reveal-stagger.is-in > *{opacity:1; transform:none}
+.reveal-stagger.is-in > *:nth-child(1){transition-delay:.0s}
+.reveal-stagger.is-in > *:nth-child(2){transition-delay:.08s}
+.reveal-stagger.is-in > *:nth-child(3){transition-delay:.16s}
+.reveal-stagger.is-in > *:nth-child(4){transition-delay:.24s}
+.reveal-stagger.is-in > *:nth-child(5){transition-delay:.32s}
+
+/* ---------- 移动端 ---------- */
+@media (max-width: 860px){
+  .nav-center{display:none}
+  .nav-burger{display:grid}
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  *{animation: none !important; transition-duration: .01ms !important}
+  .reveal, .reveal-stagger > *{opacity:1; transform:none}
+}

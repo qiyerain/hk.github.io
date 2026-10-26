@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "run_id": "2026-06-22-skill-orchestrator",
+  "article": {
+    "title": "写一次，博客和公众号草稿同时就绪：我的内容工作流",
+    "source": "article.md",
+    "source_sha256": "c62b9bd6a97eae90a3ffe9471f8b52212192be9f5cedcef8476491608bcc4c63",
+    "html": "wechat.html",
+    "html_sha256": "53f75e9ac9dd89ba587d6386a6c1f33f9f80cd374295a1a54a0e7b137ac94a60"
+  },
+  "wechat": {
+    "status": "draft_uploaded",
+    "method": "api",
+    "draft_media_id": "zdr76s0MQZwqyFoO5jodPL1prRqEltsZWLoaeEBRijVAw_R_BBhrLaF4fIzi61tp",
+    "thumb_media_id": "zdr76s0MQZwqyFoO5jodPP6zV6vktgcB7bZGeqHmEWx7yLn7H6EbiIDQN5ImnYc2",
+    "created_at": "2026-09-15T21:32:51+08:00",
+    "published": false,
+    "mass_sent": false,
+    "preview_sent": false
+  },
+  "assets": {
+    "cover_sha256": "1708d9575f6033a3b1f4f60f2e1dfff601c25fc6e47e3bc8a8342594c4328953",
+    "workflow_sha256": "53dc74a4c33239a4efc59191c125c92508f88fdc73b63946306911e6ad31f8c5",
+    "failure_resume_sha256": "3c0d78af24011fa2529991c1daba0ee3d64326f24f5aa6c6eb04e28f5b170a58"
+  }
+}

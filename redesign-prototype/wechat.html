@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>公众号 · 小遨的个人博客</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="common.css" />
+<style>
+.page-head .glow-a{width:30vw;height:30vw;left:-6vw;top:8vh}
+.page-head .glow-b{width:22vw;height:22vw;right:-4vw;top:0}
+.wc-main{max-width:1200px;margin:0 auto;padding:clamp(40px,6vh,64px) var(--pad-x) 60px}
+.wc-hero{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(28px,4vw,56px);align-items:center;margin-bottom:72px}
+@media(max-width:860px){.wc-hero{grid-template-columns:1fr}}
+.wc-hero .t{font-family:var(--serif);font-size:clamp(28px,3.4vw,44px);font-weight:700;line-height:1.15;letter-spacing:-0.01em}
+.wc-hero .d{margin-top:20px;color:var(--fg-soft);font-size:16px;line-height:1.7;max-width:46ch}
+.wc-hero .stats{display:flex;gap:36px;margin-top:32px;flex-wrap:wrap}
+.wc-hero .stat .n{font-family:var(--serif);font-size:clamp(28px,3vw,40px);font-weight:700;line-height:1}
+.wc-hero .stat .l{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-dim);margin-top:8px}
+.qr-card{padding:32px;display:flex;flex-direction:column;align-items:center;gap:18px}
+.qr-frame{width:200px;height:200px;border-radius:20px;background:var(--muted);border:1px solid var(--border);display:grid;place-items:center;overflow:hidden;position:relative}
+.qr-frame .qr-ph{width:100%;height:100%;background-image:repeating-conic-gradient(var(--fg) 0 25%,var(--bg) 0 50%);background-size:24px 24px;opacity:.92;mask-image:radial-gradient(circle at center,#000 70%,transparent 71%);-webkit-mask-image:radial-gradient(circle at center,#000 70%,transparent 71%)}
+.qr-frame .logo{position:absolute;width:44px;height:44px;border-radius:12px;background:var(--bg);border:2px solid var(--fg);display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:20px;color:var(--fg)}
+.qr-cap{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-dim)}
+.qr-sub{font-size:13px;color:var(--fg-soft);text-align:center;max-width:30ch;line-height:1.6}
+.wc-sec-h{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-dim);margin-bottom:24px;display:flex;justify-content:space-between;align-items:baseline}
+.wc-sec-h span{color:var(--fg-soft)}
+.wc-list{display:flex;flex-direction:column;margin-bottom:72px}
+.wc-row{position:relative;display:grid;grid-template-columns:80px 1fr auto;gap:24px;align-items:center;padding:24px 8px;border-top:1px solid var(--border);cursor:pointer;transition:background .28s,padding-left .28s var(--ease-out);text-decoration:none;color:inherit}
+.wc-row:last-child{border-bottom:1px solid var(--border)}
+.wc-row:hover{background:var(--muted);padding-left:20px}
+.wc-row .date{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--fg-dim);text-align:center}
+.wc-row .date b{display:block;font-size:22px;font-weight:600;color:var(--fg);font-family:var(--serif);margin-bottom:2px}
+.wc-row .info .mt{font-family:var(--serif);font-size:clamp(18px,2vw,24px);font-weight:600;transition:transform .34s var(--ease-out)}
+.wc-row:hover .info .mt{transform:translateX(8px)}
+.wc-row .info .me{font-family:var(--mono);font-size:11px;color:var(--fg-dim);letter-spacing:.06em;margin-top:6px}
+.wc-row .info .ex{color:var(--fg-soft);font-size:14px;margin-top:8px;max-width:60ch;line-height:1.5}
+.wc-row .rarrow{color:var(--fg-dim);transition:transform .3s var(--ease-out),color .25s}
+.wc-row:hover .rarrow{transform:rotate(-45deg);color:var(--fg)}
+@media(max-width:560px){.wc-row{grid-template-columns:1fr;gap:12px}.wc-row .date{text-align:left;display:flex;align-items:baseline;gap:8px}.wc-row .date b{font-size:16px;display:inline}}
+.wc-top{margin-bottom:72px}
+.top-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:860px){.top-grid{grid-template-columns:1fr}}
+.top-card{padding:0;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--card);transition:transform .3s var(--ease-out),border-color .3s;cursor:pointer;display:block;color:inherit}
+.top-card:hover{transform:translateY(-3px);border-color:var(--glass-border)}
+.top-card .cover{aspect-ratio:16/9;background:var(--muted);overflow:hidden;position:relative}
+.top-card .cover img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
+.top-card:hover .cover img{transform:scale(1.05)}
+.top-card .body{padding:22px}
+.top-card .mt{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.3}
+.top-card .me{font-family:var(--mono);font-size:11px;color:var(--fg-dim);letter-spacing:.06em;margin-top:10px}
+</style>
+</head>
+<body>
+<nav class="nav" id="nav">
+  <div class="nav-brand" onclick="location.href='index.html'">小遨的个人博客</div>
+  <ul class="nav-center">
+    <li class="nav-item">
+      <button class="nav-link">文章 <span class="caret">▾</span></button>
+      <ul class="nav-drop">
+        <li><a href="archive.html">全部文章 <span>All</span></a></li>
+        <li><a href="archive.html#month">按月份 <span>By Month</span></a></li>
+        <li><a href="archive.html#tag">按标签 <span>By Tag</span></a></li>
+        <li><a href="archive.html#dir">按目录 <span>By Dir</span></a></li>
+      </ul>
+    </li>
+    <li class="nav-item"><a class="nav-link" href="albums.html">相册</a></li>
+    <li class="nav-item"><a class="nav-link" href="friends.html">友链</a></li>
+    <li class="nav-item"><a class="nav-link active" href="wechat.html">公众号</a></li>
+    <li class="nav-item"><a class="nav-link" href="about.html">关于</a></li>
+  </ul>
+  <div class="nav-tools">
+    <button class="icon-btn" aria-label="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg></button>
+    <button class="icon-btn" id="dirBtn" aria-label="目录树"><svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10H3z"/><path d="M3 11h18"/></svg></button>
+    <button class="icon-btn theme-toggle" id="themeToggle" aria-label="切换深浅主题">
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></svg>
+    </button>
+    <button class="icon-btn nav-burger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</nav>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="dir-drawer" id="dirDrawer" aria-hidden="true">
+  <div class="dir-drawer-head"><span class="ttl">目录树 · Directory</span><button class="dir-close" id="dirClose" aria-label="关闭">✕</button></div>
+  <div class="dir-tree">
+    <ul>
+      <li class="open"><div class="folder open"><span class="tri">▶</span>工具系列</div>
+        <ul><li><a class="leaf" href="post.html">当一支笔被使用三年</a></li><li><div class="leaf">六年的剪刀</div></li></ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>写作随笔</div>
+        <ul><li><a class="leaf" href="post.html">夜里改掉的一个词</a></li></ul>
+      </li>
+      <li><div class="folder"><span class="tri">▶</span>城市</div>
+        <ul><li><div class="leaf">广州的雨有它自己的语法</div></li></ul>
+      </li>
+    </ul>
+  </div>
+  <div class="dir-drawer-foot">查看完整目录 ↗</div>
+</aside>
+
+<header class="page-head">
+  <span class="glow glow-a"></span><span class="glow glow-b"></span>
+  <div class="ph-inner">
+    <div class="crumbs"><a href="index.html">首页</a><span>/</span><span>公众号</span></div>
+    <h1 class="ph-title">公众号</h1>
+    <div class="ph-en">/ WeChat</div>
+    <p class="ph-desc">每周一封，关于工具、写作与被时间磨旧的生活。</p>
+  </div>
+</header>
+
+<main class="wc-main">
+  <section class="wc-hero reveal">
+    <div>
+      <div class="t">在公众号，写一些更慢的东西。</div>
+      <p class="d">公众号是博客的延伸。博客上发布完整的文章与草稿，公众号则放更克制、更面向读者的版本——同样的内容，换一种呼吸方式重讲一遍。每周三晚更新，不打扰，不追热点。</p>
+      <div class="stats">
+        <div class="stat"><div class="n">128</div><div class="l">已发文章</div></div>
+        <div class="stat"><div class="n">2.4k</div><div class="l">订阅读者</div></div>
+        <div class="stat"><div class="n">72h</div><div class="l">平均更新间隔</div></div>
+      </div>
+    </div>
+    <div class="glass qr-card">
+      <div class="qr-frame">
+        <span class="qr-ph"></span>
+        <span class="logo">遨</span>
+      </div>
+      <div class="qr-cap">微信扫码关注</div>
+      <div class="qr-sub">关注后可在微信内第一时间收到每周更新，无需打开网页。</div>
+    </div>
+  </section>
+
+  <section class="wc-top reveal">
+    <div class="wc-sec-h">精选回顾 · <span>Editor's Pick</span></div>
+    <div class="top-grid">
+      <a class="top-card" href="post.html">
+        <div class="cover"><img src="https://picsum.photos/seed/wc1/800/450" alt=""></div>
+        <div class="body"><div class="mt">把工具用旧，是一种承诺</div><div class="me">06/12 · 阅读量 3.2k · 在看 48</div></div>
+      </a>
+      <a class="top-card" href="post.html">
+        <div class="cover"><img src="https://picsum.photos/seed/wc2/800/450" alt=""></div>
+        <div class="body"><div class="mt">广州的雨有它自己的语法</div><div class="me">05/21 · 阅读量 2.8k · 在看 41</div></div>
+      </a>
+      <a class="top-card" href="post.html">
+        <div class="cover"><img src="https://picsum.photos/seed/wc3/800/450" alt=""></div>
+        <div class="body"><div class="mt">夜里改掉的一个词</div><div class="me">06/03 · 阅读量 2.1k · 在看 33</div></div>
+      </a>
+    </div>
+  </section>
+
+  <section class="wc-list reveal">
+    <div class="wc-sec-h">近期更新 · <span>Recent</span></div>
+    <a class="wc-row" href="post.html">
+      <div class="date"><b>12</b>06月</div>
+      <div class="info"><div class="mt">把工具用旧，是一种承诺</div><div class="me">06/12 · 工具 · 随笔</div><div class="ex">当一支笔被使用三年，它才开始成为你的笔。工具的价值不在新，而在被磨损出的那道弧。</div></div>
+      <span class="rarrow">↗</span>
+    </a>
+    <a class="wc-row" href="post.html">
+      <div class="date"><b>03</b>06月</div>
+      <div class="info"><div class="mt">夜里改掉的一个词</div><div class="me">06/03 · 写作 · 日常</div><div class="ex">有些词在白天是对的，到了夜里就不对了。写完一篇东西，我会把它留到第二天早上再审一遍。</div></div>
+      <span class="rarrow">↗</span>
+    </a>
+    <a class="wc-row" href="post.html">
+      <div class="date"><b>21</b>05月</div>
+      <div class="info"><div class="mt">广州的雨有它自己的语法</div><div class="me">05/21 · 城市 · 随笔</div><div class="ex">它先停一句，再补一段。像不肯一口气说完话的人。</div></div>
+      <span class="rarrow">↗</span>
+    </a>
+    <a class="wc-row" href="post.html">
+      <div class="date"><b>10</b>05月</div>
+      <div class="info"><div class="mt">承认一句话不需要被连起来</div><div class="me">05/10 · 写作</div><div class="ex">现代写作有一种连词焦虑。其实，留白才是更诚实的方式。</div></div>
+      <span class="rarrow">↗</span>
+    </a>
+    <a class="wc-row" href="post.html">
+      <div class="date"><b>28</b>12月</div>
+      <div class="info"><div class="mt">年终的一支笔</div><div class="me">2025/12/28 · 工具</div><div class="ex">年末，给笔做一次清洗。像给一年做一次复盘，但不写下来。</div></div>
+      <span class="rarrow">↗</span>
+    </a>
+  </section>
+</main>
+
+<footer class="page-foot"><span>© 2026 小遨</span><span><a href="subscribe.html">RSS</a> · <a href="index.html">回到首页</a></span></footer>
+
+<script src="common.js"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720">
+  <defs>
+    <filter id="paper" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise" result="gray"/>
+      <feBlend in="SourceGraphic" in2="gray" mode="multiply" result="blend"/>
+      <feComponentTransfer in="blend"><feFuncA type="linear" slope="0.08"/></feComponentTransfer>
+    </filter>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-color="#c4a97d" flood-opacity="0.18"/>
+    </filter>
+    <style>
+      .title{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;font-weight:700;}
+      .body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+    </style>
+  </defs>
+
+  <rect width="960" height="720" fill="#faf5ed"/>
+  <rect width="960" height="720" fill="#f5ede0" opacity="0.3" filter="url(#paper)"/>
+  <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+    <circle cx="12" cy="12" r="0.6" fill="#d4c9b8"/>
+  </pattern>
+  <rect width="960" height="720" fill="url(#dots)" opacity="0.5"/>
+
+  <!-- 标题 -->
+  <text x="480" y="44" text-anchor="middle" class="title" font-size="26" fill="#3a3a3a">8 步编排工作流</text>
+  <text x="480" y="68" text-anchor="middle" class="body" font-size="13" fill="#8b7355">从选题到双端发布，每一步都有明确所有者</text>
+
+  <!-- 左侧 8 步流程 -->
+  <!-- Step 1 -->
+  <rect x="40" y="100" width="320" height="62" rx="10" fill="#fff" stroke="#7ba8c9" stroke-width="1.8" filter="url(#shadow)"/>
+  <circle cx="72" cy="131" r="16" fill="#e3f0f7" stroke="#7ba8c9" stroke-width="1.2"/>
+  <text x="72" y="137" text-anchor="middle" class="title" font-size="16" fill="#5a8faf">1</text>
+  <text x="98" y="125" class="title" font-size="15" fill="#3a3a3a">Intake 接单</text>
+  <text x="98" y="145" class="body" font-size="11" fill="#5a8faf">识别意图 · 目标读者 · 输出目标 · 账号选择</text>
+  <text x="98" y="158" class="body" font-size="10" fill="#9ab8cc">所有者：编排器</text>
+
+  <!-- Step 2 -->
+  <rect x="40" y="172" width="320" height="62" rx="10" fill="#fff" stroke="#7ba8c9" stroke-width="1.8" filter="url(#shadow)"/>
+  <circle cx="72" cy="203" r="16" fill="#e3f0f7" stroke="#7ba8c9" stroke-width="1.2"/>
+  <text x="72" y="209" text-anchor="middle" class="title" font-size="16" fill="#5a8faf">2</text>
+  <text x="98" y="197" class="title" font-size="15" fill="#3a3a3a">Research 研究</text>
+  <text x="98" y="217" class="body" font-size="11" fill="#5a8faf">搜索源事实，保留 source URL 到 front matter</text>
+  <text x="98" y="230" class="body" font-size="10" fill="#9ab8cc">所有者：编排器 · 不编造数据</text>
+
+  <!-- Step 3 -->
+  <rect x="40" y="244" width="320" height="62" rx="10" fill="#fff" stroke="#a8c97b" stroke-width="1.8" filter="url(#shadow)"/>
+  <circle cx="72" cy="275" r="16" fill="#eef6e4" stroke="#a8c97b" stroke-width="1.2"/>
+  <text x="72" y="281" text-anchor="middle" class="title" font-size="16" fill="#6a9a3f">3</text>
+  <text x="98" y="269" class="title" font-size="15" fill="#3a3a3a">Write 写稿</text>
+  <text x="98" y="289" class="body" font-size="11" fill="#6a9a3f">短段落 · 清晰层级 · 嵌入图片 · 元数据</text>
+  <text x="98" y="302" class="body" font-size="10" fill="#a8c97b">所有者：编排器自研</text>
+
+  <!-- Step 4 -->
+  <rect x="40" y="316" width="320" height="62" rx="10" fill="#fff" stroke="#e8a54c" stroke-width="1.8" filter="url(#shadow)"/>
+  <circle cx="72" cy="347" r="16" fill="#fef3e2" stroke="#e8a54c" stroke-width="1.2"/>
+  <text x="72" y="353" text-anchor="middle" class="title" font-size="16" fill="#c4893a">4</text>
+  <text x="98" y="341" class="title" font-size="15" fill="#3a3a3a">PicGo 图片上传</text>
+  <text x="98" y="361" class="body" font-size="11" fill="#c4893a">每张图通过 picgo_upload.py 上传 OSS</text>
+  <text x="98" y="374" class="body" font-size="10" fill="#e8c9a0">强制步骤 · 失败则停</text>
+
+  <!-- Step 5 -->
+  <rect x="40" y="388" width="320" height="62" rx="10" fill="#fff" stroke="#e8a54c" stroke-width="1.8" filter="url(#shadow)"/>
+  <circle cx="72" cy="419" r="16" fill="#fef3e2" stroke="#e8a54c" stroke-width="1.2"/>
+  <text x="72" y="425" text-anchor="middle" class="title" font-size="16" fill="#c4893a">5</text>
+  <text x="98" y="413" class="title" font-size="15" fill="#3a3a3a">Render 渲染</text>
+  <text x="98" y="433" class="body" font-size="11" fill="#c4893a">themes list → inspect → preview → convert</text>
+  <text x="98" y="446" class="body" font-size="10" fill="#e8c9a0">委托 md2wechat · 或自研 Style Pack</text>
+
+  <!-- Step 6 GATE -->
+  <rect x="40" y="460" width="320" height="78" rx="12" fill="#fef2f2" stroke="#e07070" stroke-width="2.5" filter="url(#shadow)"/>
+  <circle cx="72" cy="499" r="18" fill="#fef2f2" stroke="#e07070" stroke-width="1.5"/>
+  <!-- 盾牌 -->
+  <path d="M72,488 C68,484 76,481 72,481 C68,481 76,484 72,488Z" fill="none" stroke="#e07070" stroke-width="1.2"/>
+  <path d="M65,492 C64,486 72,483 72,483 C72,483 80,486 79,492 C79,502 72,510 72,510 C72,510 65,502 65,492Z" fill="none" stroke="#d05050" stroke-width="1.5"/>
+  <path d="M67,495 L71,500 L78,489" fill="none" stroke="#a8c97b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="100" y="484" class="title" font-size="16" fill="#c05050">6  Gate 质量门（核心）</text>
+  <text x="100" y="503" class="body" font-size="11" fill="#c05050">6 项透明指标：封面/正文图/视觉节奏</text>
+  <text x="100" y="517" class="body" font-size="11" fill="#c05050">内联样式/颜色层级/alt 说明</text>
+  <text x="100" y="530" class="body" font-size="10" fill="#e8b0b0">任何一项不过即阻断</text>
+
+  <!-- Step 7 -->
+  <rect x="40" y="548" width="155" height="62" rx="10" fill="#fff" stroke="#a88cc9" stroke-width="1.8" filter="url(#shadow)"/>
+  <circle cx="72" cy="579" r="16" fill="#f3e8ff" stroke="#a88cc9" stroke-width="1.2"/>
+  <text x="72" y="585" text-anchor="middle" class="title" font-size="16" fill="#8a6ab5">7</text>
+  <text x="98" y="573" class="title" font-size="14" fill="#3a3a3a">Blog 博客</text>
+  <text x="98" y="591" class="body" font-size="10" fill="#8a6ab5">Hexo 发布</text>
+  <text x="98" y="604" class="body" font-size="10" fill="#c9b0dd">npm run build</text>
+
+  <!-- Step 8 -->
+  <rect x="205" y="548" width="155" height="62" rx="10" fill="#fff" stroke="#e07070" stroke-width="1.8" filter="url(#shadow)"/>
+  <circle cx="237" cy="579" r="16" fill="#fef2f2" stroke="#e07070" stroke-width="1.2"/>
+  <text x="237" y="585" text-anchor="middle" class="title" font-size="16" fill="#c05050">8</text>
+  <text x="263" y="573" class="title" font-size="14" fill="#3a3a3a">平台草稿</text>
+  <text x="263" y="591" class="body" font-size="10" fill="#c05050">委托 baoyu</text>
+  <text x="263" y="604" class="body" font-size="10" fill="#e8b0b0">默认只存草稿</text>
+
+  <!-- 流程箭头 -->
+  <g stroke="#9ab8cc" stroke-width="1.2" fill="none" stroke-dasharray="3,2">
+    <line x1="200" y1="162" x2="200" y2="172"/>
+    <line x1="200" y1="234" x2="200" y2="244"/>
+    <line x1="200" y1="306" x2="200" y2="316"/>
+    <line x1="200" y1="378" x2="200" y2="388"/>
+    <line x1="200" y1="450" x2="200" y2="460"/>
+    <line x1="200" y1="538" x2="200" y2="548"/>
+  </g>
+  <line x1="195" y1="579" x2="205" y2="579" stroke="#9ab8cc" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+  <!-- 右侧：三大原则 -->
+  <text x="600" y="100" class="title" font-size="20" fill="#3a3a3a">三大设计原则</text>
+  <text x="600" y="120" class="body" font-size="11" fill="#8b7355">不写进代码就一定会忘的规则</text>
+
+  <!-- 原则一 -->
+  <rect x="400" y="140" width="520" height="160" rx="14" fill="#fff" stroke="#7ba8c9" stroke-width="2" filter="url(#shadow)"/>
+  <circle cx="440" cy="180" r="20" fill="#e3f0f7" stroke="#7ba8c9" stroke-width="1.5"/>
+  <!-- 放大镜 icon -->
+  <circle cx="438" cy="178" r="9" fill="none" stroke="#5a8faf" stroke-width="1.5"/>
+  <line x1="445" y1="185" x2="451" y2="191" stroke="#5a8faf" stroke-width="2" stroke-linecap="round"/>
+
+  <text x="475" y="172" class="title" font-size="16" fill="#5a8faf">原则一：Discovery-First 发现优先</text>
+  <text x="475" y="190" class="body" font-size="11" fill="#3a3a3a">必须先跑 md2wechat themes list --json</text>
+  <text x="475" y="206" class="body" font-size="11" fill="#3a3a3a">获取最新可用列表，再从中挑选</text>
+  <text x="415" y="232" class="body" font-size="11" fill="#8b7355">▸ 为什么：52 个主题会随版本更新增删</text>
+  <text x="415" y="250" class="body" font-size="11" fill="#8b7355">▸ 硬编码 --theme github-readme 升级后可能 404</text>
+  <text x="415" y="268" class="body" font-size="11" fill="#8b7355">▸ 发现驱动让编排器始终与底层能力同步</text>
+  <text x="415" y="288" class="body" font-size="10" fill="#c9b896">不能从记忆或文档中猜测</text>
+
+  <!-- 原则二 -->
+  <rect x="400" y="310" width="520" height="160" rx="14" fill="#fff" stroke="#e07070" stroke-width="2" filter="url(#shadow)"/>
+  <circle cx="440" cy="350" r="20" fill="#fef2f2" stroke="#e07070" stroke-width="1.5"/>
+  <!-- 盾牌 -->
+  <path d="M432,355 C431,348 440,344 440,344 C440,344 449,348 448,355 C448,365 440,374 440,374 C440,374 432,365 432,355Z" fill="none" stroke="#d05050" stroke-width="1.8"/>
+  <path d="M434,355 L439,360 L446,348" fill="none" stroke="#a8c97b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <text x="475" y="342" class="title" font-size="16" fill="#c05050">原则二：Inspect-Gate 硬阻断</text>
+  <text x="475" y="360" class="body" font-size="11" fill="#3a3a3a">读取 data.readiness.targets.draft</text>
+  <text x="475" y="376" class="body" font-size="11" fill="#3a3a3a">为 false 时列出 blockers 并停止</text>
+  <text x="415" y="402" class="body" font-size="11" fill="#8b7355">▸ 为什么：曾在 cover_missing 时仍走 draft</text>
+  <text x="415" y="420" class="body" font-size="11" fill="#8b7355">▸ 结果后台显示封面为空</text>
+  <text x="415" y="438" class="body" font-size="11" fill="#8b7355">▸ 从此 gate 不过即停</text>
+  <text x="415" y="458" class="body" font-size="10" fill="#e8b0b0">绝不能静默降级</text>
+
+  <!-- 原则三 -->
+  <rect x="400" y="480" width="520" height="160" rx="14" fill="#fff" stroke="#e8a54c" stroke-width="2" filter="url(#shadow)"/>
+  <circle cx="440" cy="520" r="20" fill="#fef3e2" stroke="#e8a54c" stroke-width="1.5"/>
+  <!-- 循环箭头 -->
+  <path d="M440,508 A12,12 0 1,1 428,520" fill="none" stroke="#c4893a" stroke-width="1.8" stroke-linecap="round"/>
+  <polygon points="428,516 424,522 432,521" fill="#c4893a"/>
+  <path d="M440,532 A12,12 0 1,1 452,520" fill="none" stroke="#c4893a" stroke-width="1.8" stroke-linecap="round"/>
+  <polygon points="452,524 456,518 448,519" fill="#c4893a"/>
+
+  <text x="475" y="512" class="title" font-size="16" fill="#c4893a">原则三：Idempotent 幂等重跑</text>
+  <text x="475" y="530" class="body" font-size="11" fill="#3a3a3a">写入 state.json：markdown SHA256</text>
+  <text x="475" y="546" class="body" font-size="11" fill="#3a3a3a">已上传图片 hash · media_id 复用</text>
+  <text x="415" y="572" class="body" font-size="11" fill="#8b7355">▸ 为什么：调试时经常中断重跑</text>
+  <text x="415" y="590" class="body" font-size="11" fill="#8b7355">▸ 没幂等性时每次都重新上传图片</text>
+  <text x="415" y="608" class="body" font-size="11" fill="#8b7355">▸ 导致素材库堆积重复资源</text>
+  <text x="415" y="628" class="body" font-size="10" fill="#e8c9a0">重跑时复用已有结果</text>
+
+  <!-- 底部说明 -->
+  <text x="200" y="660" text-anchor="middle" class="body" font-size="11" fill="#8b7355">8 步流程</text>
+  <text x="200" y="676" text-anchor="middle" class="body" font-size="10" fill="#c9b896">每一步都有所有者，质量门不过即停</text>
+
+  <!-- 装饰 -->
+  <g fill="#e8c36a" opacity="0.5">
+    <path d="M30,80 l2,-6 2,6 -6,-2 6,0 -6,2z"/>
+    <circle cx="930" cy="120" r="2.5"/>
+    <path d="M930,680 l2,-5 2,5 -5,-2 5,0 -5,2z"/>
+  </g>
+</svg>

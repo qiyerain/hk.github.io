@@ -1,0 +1,19 @@
+{
+  "template_id": "github-weekly-warm-paper-v1-handdrawn",
+  "template_name": "GitHub weekly warm paper handdrawn",
+  "renderer": "html-svg",
+  "aspect": "cover",
+  "canvas": {"width": 1600, "height": 900, "ratio": "16:9"},
+  "series_scope": "GitHub weekly only",
+  "brief": "暖白方格纸、黑色超粗标题、GitHub 绿与橙红强调，浏览器框架和手绘线条承载 2026 第 41 周 TOP 5。",
+  "thesis": "智能体工具正从单点能力转向持久协作生态",
+  "required_canvases": [
+    "1600x900 blog cover",
+    "1080x460 WeChat cover",
+    "1080x1350 TOP 5 poster",
+    "1200x675 trend map",
+    "1200x675 openrig workflow",
+    "1200x675 selection matrix"
+  ],
+  "overlay_contract": {"base_has_readable_text": false, "text_added_after_base": true, "safe_margin_percent": 7}
+}

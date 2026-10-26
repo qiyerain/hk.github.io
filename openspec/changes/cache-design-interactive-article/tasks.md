@@ -1,0 +1,4 @@
+- [x] Extract and verify the DOCX's cache design facts and select illustrations.
+- [x] Write the article and article-scoped interaction assets.
+- [x] Verify generated HTML and simulator on desktop and mobile.
+- [x] Run build and repository hygiene audit; record results.

@@ -1,0 +1,17 @@
+{
+  "template_id": "github-weekly-warm-paper-v1-handdrawn",
+  "renderer": "html-svg",
+  "aspect": "cover",
+  "canvas": {
+    "blog": "1600x900",
+    "wechat": "1080x460",
+    "poster": "1080x1350",
+    "infographics": [
+      "1200x675",
+      "1200x675",
+      "1200x675"
+    ]
+  },
+  "thesis": "智能体正在从单点能力走向可复用协作基础设施",
+  "safe_margin_percent": 7
+}

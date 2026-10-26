@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560">
+  <rect width="1000" height="560" rx="30" fill="#fffaf3"/>
+  <text x="54" y="70" fill="#1f2926" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="34" font-weight="800">核心流程：让文章从内容变成可发布资产</text>
+  <g font-family="PingFang SC, Microsoft YaHei, Arial" font-size="22" font-weight="700">
+    <rect x="60" y="130" width="150" height="84" rx="22" fill="#39786e"/>
+    <text x="92" y="181" fill="#fffaf3">联网调研</text>
+    <rect x="250" y="130" width="150" height="84" rx="22" fill="#d59c47"/>
+    <text x="282" y="181" fill="#211f1b">理解续写</text>
+    <rect x="440" y="130" width="150" height="84" rx="22" fill="#8f3f2f"/>
+    <text x="472" y="181" fill="#fffaf3">图文排版</text>
+    <rect x="630" y="130" width="150" height="84" rx="22" fill="#254d46"/>
+    <text x="662" y="181" fill="#fffaf3">体验验证</text>
+    <rect x="820" y="130" width="120" height="84" rx="22" fill="#6f472f"/>
+    <text x="845" y="181" fill="#fffaf3">发布</text>
+  </g>
+  <g stroke="#92867a" stroke-width="4" stroke-linecap="round">
+    <path d="M214 172H246"/>
+    <path d="M404 172H436"/>
+    <path d="M594 172H626"/>
+    <path d="M784 172H816"/>
+  </g>
+  <g fill="#92867a">
+    <path d="M246 172l-12-8v16z"/>
+    <path d="M436 172l-12-8v16z"/>
+    <path d="M626 172l-12-8v16z"/>
+    <path d="M816 172l-12-8v16z"/>
+  </g>
+  <rect x="72" y="278" width="856" height="196" rx="26" fill="#f3eadf"/>
+  <text x="104" y="334" fill="#39786e" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="28" font-weight="800">三层原理</text>
+  <text x="104" y="384" fill="#211f1b" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="24">1. 内容层：来源、观点、结构和证据先成立</text>
+  <text x="104" y="424" fill="#211f1b" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="24">2. 表现层：海报、正文图、颜色层次和移动端节奏</text>
+  <text x="104" y="464" fill="#211f1b" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="24">3. 发布层：博客沉淀、微信预览、草稿上传和发布确认</text>
+</svg>

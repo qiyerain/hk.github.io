@@ -1,0 +1,134 @@
+{
+  "success": true,
+  "code": "INSPECT_COMPLETED",
+  "message": "Inspect completed",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "source_file": "drafts/wechat/2026-06-22-skill-orchestrator/article.md",
+    "source_dir": "drafts/wechat/2026-06-22-skill-orchestrator",
+    "context": {
+      "mode": "api",
+      "theme": "default",
+      "font_size": "medium",
+      "background_type": "none",
+      "upload": false,
+      "draft": false
+    },
+    "metadata": {
+      "title": {
+        "value": "写一次，博客和公众号草稿同时就绪：我的内容工作流",
+        "source": "frontmatter.title",
+        "limit": 32,
+        "length": 24,
+        "valid": true
+      },
+      "author": {
+        "value": "",
+        "source": "fallback.empty",
+        "limit": 16,
+        "length": 0,
+        "valid": true
+      },
+      "digest": {
+        "value": "我把研究、写作、封面、博客构建、公众号排版和草稿上传串成了一条可检查、可中断、可继续的个人内容工作流。",
+        "source": "frontmatter.description",
+        "limit": 128,
+        "length": 51,
+        "valid": true
+      }
+    },
+    "structure": {
+      "body_h1": {
+        "present": false
+      },
+      "duplicate_title_risk": false,
+      "headings": [
+        {
+          "level": 2,
+          "text": "先看结果：我最终拿到什么"
+        },
+        {
+          "level": 2,
+          "text": "三个 Skill，不是三个“万能引擎”"
+        },
+        {
+          "level": 2,
+          "text": "稳定，不等于“一键无脑跑完”"
+        },
+        {
+          "level": 2,
+          "text": "图片不是装饰，它要先回答问题"
+        },
+        {
+          "level": 2,
+          "text": "真正遇到故障时，会发生什么"
+        },
+        {
+          "level": 2,
+          "text": "9 月 13 日那次失败，反而说明它有用"
+        },
+        {
+          "level": 2,
+          "text": "你不必复刻整套系统"
+        },
+        {
+          "level": 2,
+          "text": "文末工具箱"
+        }
+      ],
+      "images": {
+        "total": 2,
+        "local": 0,
+        "remote": 2,
+        "ai": 0
+      }
+    },
+    "assets": [
+      {
+        "index": 0,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/workflow-dual-output-1200x675.png",
+        "exists": true
+      },
+      {
+        "index": 1,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/failure-resume-1200x675.png",
+        "exists": true
+      }
+    ],
+    "readiness": {
+      "convert_ready": true,
+      "upload_ready": true,
+      "draft_ready": false,
+      "preview_fidelity": "exact",
+      "schema_version": "v1",
+      "targets": {
+        "preview": "ready",
+        "convert": "ready",
+        "upload": "not_requested",
+        "draft": "not_requested"
+      },
+      "blockers": []
+    },
+    "checks": [
+      {
+        "level": "info",
+        "code": "DIGEST_METADATA_ONLY",
+        "message": "Digest affects draft metadata, not body HTML rendering",
+        "field": "digest",
+        "suggested_fix": "use body content or theme behavior to control visible article summary inside the HTML"
+      },
+      {
+        "level": "info",
+        "code": "IMAGE_REPLACEMENT_REQUIRES_UPLOAD_OR_DRAFT",
+        "message": "Images are only uploaded and replaced during upload or draft flows",
+        "field": "images",
+        "suggested_fix": "use --upload or --draft when you need local/remote/AI image references rewritten to published URLs"
+      }
+    ]
+  }
+}
+

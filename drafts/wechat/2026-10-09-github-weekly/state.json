@@ -1,0 +1,99 @@
+{
+  "run_id": "2026-10-09-github-weekly",
+  "execution_id": "github-20261009T180218+0800",
+  "updated_at": "2026-10-12T08:41:19+08:00",
+  "markdown_path": "source/_posts/每周GitHub趋势/2026-10-09-GitHub趋势.md",
+  "markdown_sha256": "14e639d2ed86dd13250be45ebb402065fc57e27318c08e6f87e496f50a6ff94e",
+  "wechat_html_path": "drafts/wechat/2026-10-09-github-weekly/wechat.html",
+  "wechat_html_sha256": "a4c45c135bac099564c906452de1e959a545420fabb751110ed1f8b7f9693ca6",
+  "stages": {
+    "research": {
+      "ok": true,
+      "status": "completed",
+      "source": "https://github.com/trending?since=weekly",
+      "captured_at": "2026-10-09T19:37:11+08:00",
+      "visible_repository_count": 11,
+      "snapshot": "drafts/wechat/2026-10-09-github-weekly/research.json"
+    },
+    "visuals": {
+      "ok": true,
+      "status": "completed",
+      "visual_plan": "drafts/wechat/2026-10-09-github-weekly/visual-plan.json",
+      "template": "github-weekly-warm-paper-v1-handdrawn",
+      "renderer": "html-svg",
+      "canvas_count": 6,
+      "dimension_check": "1600x900, 1080x460, 1080x1350, and three 1200x675 images verified",
+      "visual_review": "year/date/week/project names/weekly stars checked; no clipping, overlap, or garbled text"
+    },
+    "oss_upload": {
+      "ok": true,
+      "status": "completed",
+      "image_count": 6,
+      "script": "scripts_py/picgo_upload.py"
+    },
+    "blog": {
+      "ok": false,
+      "status": "pushed_pending_live",
+      "built": true,
+      "audit_passed": true,
+      "pushed": true,
+      "commit": "8ba2d785f12a3188a834a29dcbafaf242f934e02",
+      "remote_head_verified": true,
+      "live_url": "https://blog.pengfanao.top/2026/10/09/每周GitHub趋势/2026-10-09-GitHub趋势/",
+      "live_verified": false,
+      "http_status": 404,
+      "reason": "origin/master points to the content commit, but three post-push checks still returned the site's not-found page"
+    },
+    "wechat_render": {
+      "ok": true,
+      "status": "completed",
+      "theme": "github-readme",
+      "md2wechat_mode": "api",
+      "md2wechat_result": "blocked by invalid API key format",
+      "fallback": "project Style Pack C with green series override",
+      "experience_validation": true,
+      "ul_count": 0,
+      "li_count": 0,
+      "image_count": 6,
+      "anchor_count": 17,
+      "content_safety_hits": []
+    },
+    "draft": {
+      "ok": false,
+      "status": "blocked",
+      "reason": "WeChat access-token precheck returned errcode 40164; no media upload or draft API mutation attempted",
+      "last_retry_at": "2026-10-12T08:41:19+08:00",
+      "last_retry_errcode": 40164,
+      "last_retry_egress_ip": "175.0.202.1",
+      "last_retry_request_id": "6acc2ca7-7e464ebd-03d2f1d4"
+    }
+  },
+  "assets": [
+    {"path": ".cache/github-weekly-2026-10-09/visuals/final/github-weekly-2026-10-09-cover-1600x900.png", "sha256": "e40a57c92effa699c6dc6ac20689cf209f695f73b7b80fc4261b27bb0eadf569", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-09-cover-1600x900.png"},
+    {"path": ".cache/github-weekly-2026-10-09/visuals/final/github-weekly-2026-10-09-openrig-flow-1200x675.png", "sha256": "04024da3f3efa9844b47dd82d2a8f47ac4e367bc5f2fa062c498692da6f8a63d", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-09-openrig-flow-1200x675.png"},
+    {"path": ".cache/github-weekly-2026-10-09/visuals/final/github-weekly-2026-10-09-poster-1080x1350.png", "sha256": "76b83b73aa43f3f2a2a78c1c6a87ce37dba7cc4078d5b0bb3b79f92cab80d64c", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-09-poster-1080x1350.png"},
+    {"path": ".cache/github-weekly-2026-10-09/visuals/final/github-weekly-2026-10-09-selection-matrix-1200x675.png", "sha256": "ad08a62ab438432ce1289ec6b689650fe0ae937628b1a469215074c345e5b974", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-09-selection-matrix-1200x675.png"},
+    {"path": ".cache/github-weekly-2026-10-09/visuals/final/github-weekly-2026-10-09-trend-map-1200x675.png", "sha256": "522c8243b57c75e99c34005ba00a6d719c1d042ac5d8eee10bffda44388e8c0f", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-09-trend-map-1200x675.png"},
+    {"path": ".cache/github-weekly-2026-10-09/visuals/final/github-weekly-2026-10-09-wechat-cover-1080x460.png", "sha256": "583a059f864557ab6f13b581d0150b18b426524df9288caf76474df622fdfa2e", "url": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-09-wechat-cover-1080x460.png"}
+  ],
+  "md2wechat_readiness": {
+    "version": "2.6.0",
+    "overall": "ready",
+    "draft": true,
+    "default_mode": "ai"
+  },
+  "wechat_token_precheck": {
+    "ok": false,
+    "checked_at": "2026-10-12T08:41:19+08:00",
+    "errcode": 40164,
+    "egress_ip": "175.0.202.1",
+    "request_id": "6acc2ca7-7e464ebd-03d2f1d4",
+    "action": "wechat chain stopped before media upload and draft API calls"
+  },
+  "collection": {
+    "name": "每周 GitHub",
+    "album_id": "4695616659267780619",
+    "archived": false,
+    "reason": "draft mutation blocked by errcode 40164; no collection action attempted"
+  }
+}

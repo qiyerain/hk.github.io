@@ -1,0 +1,139 @@
+{
+  "success": true,
+  "code": "INSPECT_COMPLETED",
+  "message": "Inspect completed",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "source_file": "drafts/wechat/2026-10-24-openrouter-free/source.md",
+    "source_dir": "drafts/wechat/2026-10-24-openrouter-free",
+    "context": {
+      "mode": "ai",
+      "theme": "autumn-warm",
+      "font_size": "medium",
+      "background_type": "none",
+      "upload": false,
+      "draft": true
+    },
+    "metadata": {
+      "title": {
+        "value": "OpenRouter 免费模型：18 个能聊，17 个能调工具",
+        "source": "frontmatter.title",
+        "limit": 32,
+        "length": 31,
+        "valid": true
+      },
+      "author": {
+        "value": "",
+        "source": "fallback.empty",
+        "limit": 16,
+        "length": 0,
+        "valid": true
+      },
+      "digest": {
+        "value": "469 个模型里 20 个零价条目：18 个能聊天，17 个支持工具调用。按任务挑、按客户端接、按证据验收，再说免费换来的四个约束。",
+        "source": "frontmatter.description",
+        "limit": 128,
+        "length": 66,
+        "valid": true
+      }
+    },
+    "structure": {
+      "body_h1": {
+        "present": false
+      },
+      "duplicate_title_risk": false,
+      "headings": [
+        {
+          "level": 2,
+          "text": "一、先把账算清楚"
+        },
+        {
+          "level": 2,
+          "text": "二、按任务挑模型"
+        },
+        {
+          "level": 2,
+          "text": "三、三条接入路径"
+        },
+        {
+          "level": 2,
+          "text": "四、接上之后怎么验收"
+        },
+        {
+          "level": 2,
+          "text": "五、免费的四个约束"
+        },
+        {
+          "level": 2,
+          "text": "六、我的使用策略"
+        },
+        {
+          "level": 2,
+          "text": "清单"
+        },
+        {
+          "level": 2,
+          "text": "引用"
+        }
+      ],
+      "images": {
+        "total": 3,
+        "local": 0,
+        "remote": 3,
+        "ai": 0
+      }
+    },
+    "assets": [
+      {
+        "index": 0,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/openrouter-free-matrix-v2-1200x675.png",
+        "exists": true
+      },
+      {
+        "index": 1,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/openrouter-endpoint-paths-1200x675.png",
+        "exists": true
+      },
+      {
+        "index": 2,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/openrouter-checks-1200x675.png",
+        "exists": true
+      }
+    ],
+    "readiness": {
+      "convert_ready": true,
+      "upload_ready": true,
+      "draft_ready": true,
+      "preview_fidelity": "degraded",
+      "schema_version": "v1",
+      "targets": {
+        "preview": "degraded",
+        "convert": "ready",
+        "upload": "ready",
+        "draft": "ready"
+      },
+      "blockers": []
+    },
+    "checks": [
+      {
+        "level": "info",
+        "code": "DIGEST_METADATA_ONLY",
+        "message": "Digest affects draft metadata, not body HTML rendering",
+        "field": "digest",
+        "suggested_fix": "use body content or theme behavior to control visible article summary inside the HTML"
+      },
+      {
+        "level": "info",
+        "code": "AI_MODE_ACTION_REQUIRED",
+        "message": "AI mode produces a prompt/request instead of final HTML until an external model completes the flow",
+        "field": "mode",
+        "suggested_fix": "use --mode api for exact preview or complete the AI prompt externally"
+      }
+    ]
+  }
+}

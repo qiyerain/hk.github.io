@@ -1,0 +1,17 @@
+section.xa-tag-page
+  nav.xa-page-return(aria-label="页面导航")
+    button(type="button" data-xa-back data-fallback="/archives/")
+      i.anzhiyufont.anzhiyu-icon-chevron-left
+      span 返回上一页
+    .xa-page-crumb
+      a(href=url_for('/archives/')) 归档
+      span /
+      b 标签
+  header.xa-page-head
+    span.xa-kicker S — TAGS
+    h1 标签
+    p 从主题进入文章，也可以随时回到刚才的阅读路径。
+  .tag-cloud-list.is-center.xa-glass-panel(data-glass-spotlight)
+    #tag
+      #tag-page-tags
+        !=tags_page_list("tags")

@@ -1,0 +1,55 @@
+{
+  "pass": true,
+  "checks": [
+    {
+      "item": "cover_or_poster_remote",
+      "pass": true,
+      "detail": "cover='https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-23-cover-v3-1600x900.png' (must be http(s) URL or TODO; local paths fail per CLAUDE.md §5)"
+    },
+    {
+      "item": "in_article_images_remote",
+      "pass": true,
+      "detail": "image_count=3, local_paths=[]"
+    },
+    {
+      "item": "section_hierarchy",
+      "pass": true,
+      "detail": "heading_count=11"
+    },
+    {
+      "item": "visual_rhythm_per_600chars",
+      "pass": true,
+      "detail": "windows_without_break_idx=[] / total_windows=10"
+    },
+    {
+      "item": "mobile_paragraph_length",
+      "pass": true,
+      "detail": "long_paragraphs(>260chars)=[]"
+    },
+    {
+      "item": "html_inline_style_only",
+      "pass": true,
+      "detail": "forbidden_patterns_found=[]"
+    },
+    {
+      "item": "html_color_hierarchy",
+      "pass": true,
+      "detail": "distinct_colors=8 sample=['#1f2937', '#2563eb', '#4b5563', '#92400e', '#f5f7fa', '#fef3c7'] heading_inline_color=True"
+    },
+    {
+      "item": "html_images",
+      "pass": true,
+      "detail": "img_count=3"
+    },
+    {
+      "item": "html_callout_or_quote",
+      "pass": true,
+      "detail": "expected blockquote / callout / wx-highlight in HTML"
+    },
+    {
+      "item": "html_image_alt_or_caption",
+      "pass": true,
+      "detail": "images_without_alt_or_caption=[]"
+    }
+  ]
+}

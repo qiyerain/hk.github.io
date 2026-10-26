@@ -1,0 +1,92 @@
+
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| Pack | 名称 | 适合内容 | 调性关键词 | md2mp 备选 |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">|------|------|----------|-----------|---------------|</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| A | 灰阶玻璃 Mono Glass | 随笔/产品发布 | 墨色+玻璃质感+零干扰 | ink-minimal |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| B | 报刊编辑部 Editorial | 深度评论/技术史 | 米黄底+衬线+朱红序号 | nyt-classic |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| C | 光感卡片 Card Modern | 工具评测/教程/清单 | 蓝色+数字徽章+圆角卡片 | sspai-red |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| D | 暗夜终端 Cyber Local | AI/Agent/源码 | 深色容器+霓虹紫青 | github-readme |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| E | 莫兰迪生活 Muted Life | 周记/阅读/慢思考 | 奶油底+灰豆沙 | mint-fresh |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| F | 冲击标题 Bold Block | 热点/大新闻/立场 | 墨红满底色+金色 | bold-red |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">每套 Pack 是一个<strong style="color:#7c3aed;font-weight:700">完整的内联 CSS 视觉系统</strong>：H1/H2/H3/段落/引用/代码/分隔线/图片/CTA/页脚全覆盖。</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">输出 100% 内联样式 HTML，直接粘贴进平台编辑器零适配。</p>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">双端联动</h3>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><strong style="color:#7c3aed;font-weight:700">平台端</strong>：<code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">render_style_pack.py</code> 直接渲染出 HTML。</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><strong style="color:#7c3aed;font-weight:700">博客端</strong>：通过 Hexo AnZhiyu 主题的 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">body[data-style-pack=&quot;X&quot;]</code> CSS 作用域，同一篇文章在博客上自动应用对应 Pack 的博客版样式。设置方式：</p>
+<pre style="background:#0d1117;color:#e6edf3;border-radius:10px;padding:16px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.7;margin:18px 0;overflow:auto"><code># 文章 front matter
+meta:
+  - name: style-pack
+    content: C  # 用 Pack C 卡片风格</code></pre>
+<p style="text-align:center;color:#94a3b8;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;letter-spacing:4px;margin:28px 0">— ◆ —</p>
+<h2 style="font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:18px;font-weight:700;color:#0f172a;margin:32px 0 12px;line-height:1.5"><span style="color:#7c3aed">&gt; </span>五、三大设计原则</h2>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">在编排过程中，我提炼了三条&quot;不写进代码就一定会忘&quot;的原则：</p>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">原则一：Discovery-First 发现优先</h3>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><strong style="color:#7c3aed;font-weight:700">规则</strong>：选择 md2mp 的主题、版式模块时，必须先跑 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">md2mp themes list --json</code> 获取最新可用列表，再从中挑选。<strong style="color:#7c3aed;font-weight:700">不能从记忆或文档中猜测</strong>。</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><strong style="color:#7c3aed;font-weight:700">为什么</strong>：md2mp 的 52 个主题会随版本更新增删。如果硬编码 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">--theme github-readme</code>，升级后可能 404。发现驱动让编排器始终与底层引擎的能力保持同步。</p>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">原则二：Inspect-Gate 硬阻断</h3>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><strong style="color:#7c3aed;font-weight:700">规则</strong>：执行 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">md2mp inspect &lt;article.md&gt;</code> 后，必须读取 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">data.readiness.targets.draft</code>。如果为 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">false</code>，列出 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">blockers</code> 并停止——<strong style="color:#7c3aed;font-weight:700">绝不能静默降级</strong>。</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><strong style="color:#7c3aed;font-weight:700">为什么</strong>：有一次我在 inspect 报了 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">cover_missing</code> 的情况下继续走了 draft 路径，结果后台显示封面为空。从此之后，gate 不过即停，不允许&quot;看起来 OK 但其实不能发&quot;。</p>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">原则三：Idempotent 幂等重跑</h3>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><strong style="color:#7c3aed;font-weight:700">规则</strong>：每次运行写入 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">state.json</code>（记录 markdown SHA256、已上传图片 hash、<code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">thumb_media_id</code>、<code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">draft_media_id</code>），重跑时复用已有结果。</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><strong style="color:#7c3aed;font-weight:700">为什么</strong>：调试时经常中断重跑。没有幂等性时，每次重跑都重新上传图片、重新创建草稿，导致素材库堆积重复资源。</p>
+<p style="text-align:center;color:#94a3b8;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;letter-spacing:4px;margin:28px 0">— ◆ —</p>
+<h2 style="font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:18px;font-weight:700;color:#0f172a;margin:32px 0 12px;line-height:1.5"><span style="color:#7c3aed">&gt; </span>六、踩坑与收获</h2>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">坑 1：平台 HTML 兼容性是&quot;伪命题&quot;</h3>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">平台编辑器会吃掉 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">&lt;style&gt;</code> 块、class 选择器、<code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">&lt;head&gt;</code>/<code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">&lt;body&gt;</code> 标签、自定义字体声明、JS、SVG——几乎所有&quot;正常&quot;网页的写法都不行。</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><strong style="color:#7c3aed;font-weight:700">结论</strong>：所有视觉必须靠<strong style="color:#7c3aed;font-weight:700">内联 style 属性 + 颜色块 + 边框 + 字号字重</strong>做层级，不能靠 CSS 选择器或效果。Style Pack 的每一条 CSS 规则都要&quot;摊平&quot;到每个元素上。</p>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">坑 2：视觉节奏检查的 false positive</h3>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">初版的 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">visual_rhythm_per_600chars</code> 用 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">^</code> 正则锚点检测视觉打断，但在去除空格后的文本窗口中 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">^</code> 永远不匹配，导致每篇文章都报&quot;没有视觉打断&quot;。</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><strong style="color:#7c3aed;font-weight:700">修复</strong>：重写为 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">visual_break_positions()</code> ——在原始 Markdown 中定位所有打断点（H2+、引用、列表、代码块、图片、分隔线），映射到压缩坐标后再检查每个 600 字窗口。</p>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">坑 3：浏览器打开渲染结果乱码</h3>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">render_style_pack.py</code> 输出的 HTML 是裸 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">&lt;section&gt;</code> 片段（没有 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">&lt;html&gt;</code>/<code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">&lt;head&gt;</code>/<code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">&lt;meta charset&gt;</code>），直接用浏览器打开会默认 Latin-1 编码，中文全乱码。</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0"><strong style="color:#7c3aed;font-weight:700">修复</strong>：输出文件时包裹完整的 HTML 壳（含 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">&lt;meta charset=&quot;utf-8&quot;&gt;</code>），粘贴到编辑器时只用 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">&lt;section&gt;</code> 内部内容。</p>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">收获：编排 &gt; 重造</h3>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">最核心的认知转变是：<strong style="color:#7c3aed;font-weight:700">不要自研已经有人做好的事</strong>。</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">md2mp 有 52 个主题 + 43 个版式模块，baoyu 有三通道发布 + 多账号 + 远程隧道，这些我自己写要几周。而编排器只需要 400 行 Python 就把它们的最佳能力串起来了。</p>
+<p style="text-align:center;color:#94a3b8;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;letter-spacing:4px;margin:28px 0">— ◆ —</p>
+<h2 style="font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:18px;font-weight:700;color:#0f172a;margin:32px 0 12px;line-height:1.5"><span style="color:#7c3aed">&gt; </span>七、内容安全风控</h2>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">这一节是实战踩出来的经验。在向内容平台提交草稿时，我遇到了 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">45166 invalid content</code> 错误——文章被平台审核系统拦截，但没有任何具体原因提示。</p>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">7.1 触发审核的常见词</h3>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">以下词汇在技术文章中很常见，但在平台审核中可能触发风控：</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| 敏感词 | 安全替换 | 说明 |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">|--------|----------|------|</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| 内容平台 | 内容平台 / 公众平台 | 品牌词直接出现容易触发 |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| 平台 | 平台 / 编辑后台 | 同上 |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| 接口 | 接口 / 服务端接口 | 技术术语但审核敏感 |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| 远程隧道 / 安全通道 | 远程隧道 / 安全通道 | 网络穿透相关 |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| 网络访问控制 | 网络访问控制 | 安全相关 |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| 令牌 | 凭证 / 令牌 | 认证相关 |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| 浏览器自动化 | 浏览器自动化 | 自动化相关 |</p>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">| 配置密钥 / 密钥 | 配置项 / 凭证 | 密钥类 |</p>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">7.2 风控检查步骤</h3>
+<p style="font-size:16px;line-height:1.75;color:#0f172a;margin:14px 0">我在编排器的 Quality Gate 中增加了一步<strong style="color:#7c3aed;font-weight:700">内容安全预检</strong>，在提交草稿之前自动扫描：</p>
+<ul style="margin:14px 0;padding-left:1.4em;color:#0f172a">
+<li style="margin:6px 0;line-height:1.8">扫描 Markdown 和渲染后 HTML 中的敏感词列表</li>
+<li style="margin:6px 0;line-height:1.8">命中时输出警告和替换建议</li>
+<li style="margin:6px 0;line-height:1.8">自动替换或人工确认后才能继续</li>
+</ul>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">7.3 给编排器开发者的建议</h3>
+<ul style="margin:14px 0;padding-left:1.4em;color:#0f172a">
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#7c3aed;font-weight:700">写稿时就注意措辞</strong>：不要等到提交时才发现被拦截，改起来很痛苦</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#7c3aed;font-weight:700">双版本策略</strong>：博客版可以用完整技术术语，平台版需要安全替换</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#7c3aed;font-weight:700">审核错误码 45166</strong>：这是&quot;内容不合规&quot;的通用错误，平台不会告诉你具体哪里有问题，只能自己排查</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#7c3aed;font-weight:700">重试策略</strong>：替换后重试，每次只改一处，逐步定位触发词</li>
+</ul>
+<p style="text-align:center;color:#94a3b8;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;letter-spacing:4px;margin:28px 0">— ◆ —</p>
+<h2 style="font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:18px;font-weight:700;color:#0f172a;margin:32px 0 12px;line-height:1.5"><span style="color:#7c3aed">&gt; </span>八、开源地址与后续计划</h2>
+<ul style="margin:14px 0;padding-left:1.4em;color:#0f172a">
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#7c3aed;font-weight:700">md2mp</strong>：<code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">github.com/geekjourneyx/md2mp-skill</code></li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#7c3aed;font-weight:700">baoyu-publisher</strong>：<code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">github.com/anthropics/claude-code</code>（Skill 生态）</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#7c3aed;font-weight:700">编排器 + 6 套 Style Pack</strong>：随本博客仓库开源</li>
+</ul>
+<h3 style="font-size:16px;font-weight:600;color:#0f172a;margin:20px 0 8px">后续计划</h3>
+<ul style="margin:14px 0;padding-left:1.4em;color:#0f172a">
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#7c3aed;font-weight:700">Style Pack 可视化选配器</strong>：在博客端做一个交互式预览页面，选 Pack → 实时预览效果</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#7c3aed;font-weight:700">更多 Pack</strong>：基于读者反馈增加中式编辑（红黑宋体）、手账 Sketchnote 等</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#7c3aed;font-weight:700">测试覆盖</strong>：给 <code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">render_style_pack.py</code>、<code style="background:#f1f5f9;color:#7c3aed;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px">validate_article_experience.py</code> 补自动化测试</li>
+<li style="margin:6px 0;line-height:1.8"><strong style="color:#7c3aed;font-weight:700">内容安全预检</strong>：在 Quality Gate 中集成敏感词扫描，提交前自动替换或告警</li>
+</ul>
+<p style="text-align:center;color:#94a3b8;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;letter-spacing:4px;margin:28px 0">— ◆ —</p>
+<blockquote style="background:#0d1117;color:#e6edf3;border-left:3px solid #22d3ee;padding:14px 18px;margin:18px 0;border-radius:8px;font-size:15px;line-height:1.75">如果你也想让 AI 帮你自动排版，核心就一句话：<strong style="color:#7c3aed;font-weight:700">别造轮子，编引擎</strong>。找到好的渲染和发布工具，然后专注做好编排和质控——这才是你自己的差异化价值。</blockquote>
+<section style="background:#0d1117;color:#e6edf3;border-radius:10px;padding:18px 20px;margin:28px 0;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:14px;line-height:1.8"><strong style="color:#22d3ee;display:block">↗ 关注 · 下次更新 push 给你</strong></section>
+<p style="text-align:center;color:#94a3b8;font-family:'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;font-size:12px;letter-spacing:1px;margin:32px 0 8px">&gt;&gt;&gt; end_of_post · v2026.06</p>
+</section>

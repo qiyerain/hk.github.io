@@ -1,0 +1,181 @@
+{
+  "success": true,
+  "code": "PREVIEW_READY",
+  "message": "Preview ready",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "inspect": {
+      "source_file": "source/_posts/每周GitHub趋势/2026-10-16-GitHub趋势.md",
+      "source_dir": "source/_posts/每周GitHub趋势",
+      "context": {
+        "mode": "api",
+        "theme": "github-readme",
+        "font_size": "medium",
+        "background_type": "none",
+        "upload": false,
+        "draft": false
+      },
+      "metadata": {
+        "title": {
+          "value": "GitHub 开源趋势周报 2026-10-16",
+          "source": "frontmatter.title",
+          "limit": 32,
+          "length": 24,
+          "valid": true
+        },
+        "author": {
+          "value": "",
+          "source": "fallback.empty",
+          "limit": 16,
+          "length": 0,
+          "valid": true
+        },
+        "digest": {
+          "value": "智能体正在从单点能力走向可复用协作基础设施。本期看反向工程、跨平台移植、工程 Skills、视频渲染与图表设计。",
+          "source": "frontmatter.description",
+          "limit": 128,
+          "length": 56,
+          "valid": true
+        }
+      },
+      "structure": {
+        "body_h1": {
+          "present": false
+        },
+        "duplicate_title_risk": false,
+        "headings": [
+          {
+            "level": 2,
+            "text": "本周概览"
+          },
+          {
+            "level": 2,
+            "text": "TOP 5 快览"
+          },
+          {
+            "level": 2,
+            "text": "AI 项目重点"
+          },
+          {
+            "level": 3,
+            "text": "1. [morluto/rea](https://github.com/morluto/rea)"
+          },
+          {
+            "level": 3,
+            "text": "2. [boykopovar/AnyPS5](https://github.com/boykopovar/AnyPS5)"
+          },
+          {
+            "level": 3,
+            "text": "3. [mattpocock/skills](https://github.com/mattpocock/skills)"
+          },
+          {
+            "level": 3,
+            "text": "4. [heygen-com/hyperframes](https://github.com/heygen-com/hyperframes)"
+          },
+          {
+            "level": 3,
+            "text": "5. [cathrynlavery/diagram-design](https://github.com/cathrynlavery/diagram-design)"
+          },
+          {
+            "level": 2,
+            "text": "其他热门项目"
+          },
+          {
+            "level": 2,
+            "text": "本周最值得看"
+          },
+          {
+            "level": 2,
+            "text": "趋势观察"
+          },
+          {
+            "level": 2,
+            "text": "本周榜单摘要海报"
+          },
+          {
+            "level": 2,
+            "text": "来源"
+          }
+        ],
+        "images": {
+          "total": 5,
+          "local": 0,
+          "remote": 5,
+          "ai": 0
+        }
+      },
+      "assets": [
+        {
+          "index": 0,
+          "kind": "online",
+          "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-16-poster-1080x1350.png",
+          "exists": true
+        },
+        {
+          "index": 1,
+          "kind": "online",
+          "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-16-trend-map-1200x675.png",
+          "exists": true
+        },
+        {
+          "index": 2,
+          "kind": "online",
+          "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-16-rea-flow-1200x675.png",
+          "exists": true
+        },
+        {
+          "index": 3,
+          "kind": "online",
+          "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-16-selection-matrix-1200x675.png",
+          "exists": true
+        },
+        {
+          "index": 4,
+          "kind": "online",
+          "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-10-16-poster-1080x1350.png",
+          "exists": true
+        }
+      ],
+      "readiness": {
+        "convert_ready": true,
+        "upload_ready": true,
+        "draft_ready": false,
+        "preview_fidelity": "degraded",
+        "schema_version": "v1",
+        "targets": {
+          "preview": "ready",
+          "convert": "ready",
+          "upload": "not_requested",
+          "draft": "not_requested"
+        },
+        "blockers": []
+      },
+      "checks": [
+        {
+          "level": "info",
+          "code": "DIGEST_METADATA_ONLY",
+          "message": "Digest affects draft metadata, not body HTML rendering",
+          "field": "digest",
+          "suggested_fix": "use body content or theme behavior to control visible article summary inside the HTML"
+        },
+        {
+          "level": "info",
+          "code": "IMAGE_REPLACEMENT_REQUIRES_UPLOAD_OR_DRAFT",
+          "message": "Images are only uploaded and replaced during upload or draft flows",
+          "field": "images",
+          "suggested_fix": "use --upload or --draft when you need local/remote/AI image references rewritten to published URLs"
+        }
+      ]
+    },
+    "output_file": "drafts/wechat/2026-10-16-github-weekly/preview.html",
+    "render": {
+      "error": "API call failed: API_ERROR: API returned error code 401: Invalid API Key format. Supported prefixes: wme_, wme2_, wmt_.",
+      "exact_html": false,
+      "fidelity": "degraded",
+      "mode": "api",
+      "theme": "github-readme"
+    }
+  }
+}

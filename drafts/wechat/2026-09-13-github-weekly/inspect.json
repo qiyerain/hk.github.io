@@ -1,0 +1,158 @@
+{
+  "success": true,
+  "code": "INSPECT_COMPLETED",
+  "message": "Inspect completed",
+  "schema_version": "v1",
+  "status": "completed",
+  "retryable": false,
+  "data": {
+    "source_file": "source/_posts/每日GitHub趋势/2026-09-13-GitHub趋势.md",
+    "source_dir": "source/_posts/每日GitHub趋势",
+    "context": {
+      "mode": "api",
+      "theme": "github-readme",
+      "font_size": "medium",
+      "background_type": "none",
+      "upload": false,
+      "draft": true
+    },
+    "metadata": {
+      "title": {
+        "value": "GitHub 开源趋势周报 2026-09-13",
+        "source": "frontmatter.title",
+        "limit": 32,
+        "length": 24,
+        "valid": true
+      },
+      "author": {
+        "value": "",
+        "source": "fallback.empty",
+        "limit": 16,
+        "length": 0,
+        "valid": true
+      },
+      "digest": {
+        "value": "本周开源热度从模型能力转向智能体工作方法，TOP 5 由 i-have-adhd、gods-eye-view、archify、ponytail 与 ECC 领衔。",
+        "source": "frontmatter.description",
+        "limit": 128,
+        "length": 81,
+        "valid": true
+      }
+    },
+    "structure": {
+      "body_h1": {
+        "present": false
+      },
+      "duplicate_title_risk": false,
+      "headings": [
+        {
+          "level": 2,
+          "text": "本周概览"
+        },
+        {
+          "level": 2,
+          "text": "TOP 5 快览"
+        },
+        {
+          "level": 2,
+          "text": "AI 项目重点"
+        },
+        {
+          "level": 3,
+          "text": "1. [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)"
+        },
+        {
+          "level": 3,
+          "text": "3. [tt-a1i/archify](https://github.com/tt-a1i/archify)"
+        },
+        {
+          "level": 3,
+          "text": "4. [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)"
+        },
+        {
+          "level": 3,
+          "text": "5. [affaan-m/ECC](https://github.com/affaan-m/ECC)"
+        },
+        {
+          "level": 2,
+          "text": "其他热门项目"
+        },
+        {
+          "level": 3,
+          "text": "2. [bilawalsidhu/gods-eye-view](https://github.com/bilawalsidhu/gods-eye-view)"
+        },
+        {
+          "level": 2,
+          "text": "本周最值得看"
+        },
+        {
+          "level": 2,
+          "text": "趋势观察"
+        },
+        {
+          "level": 2,
+          "text": "本周榜单摘要海报"
+        },
+        {
+          "level": 2,
+          "text": "来源"
+        }
+      ],
+      "images": {
+        "total": 4,
+        "local": 0,
+        "remote": 4,
+        "ai": 0
+      }
+    },
+    "assets": [
+      {
+        "index": 0,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-poster-1080x1350.png",
+        "exists": true
+      },
+      {
+        "index": 1,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-trend-map-1200x675.png",
+        "exists": true
+      },
+      {
+        "index": 2,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-first-place-1200x675.png",
+        "exists": true
+      },
+      {
+        "index": 3,
+        "kind": "online",
+        "source": "https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/github-weekly-2026-09-13-action-matrix-1200x675.png",
+        "exists": true
+      }
+    ],
+    "readiness": {
+      "convert_ready": true,
+      "upload_ready": true,
+      "draft_ready": true,
+      "preview_fidelity": "exact",
+      "schema_version": "v1",
+      "targets": {
+        "preview": "ready",
+        "convert": "ready",
+        "upload": "ready",
+        "draft": "ready"
+      },
+      "blockers": []
+    },
+    "checks": [
+      {
+        "level": "info",
+        "code": "DIGEST_METADATA_ONLY",
+        "message": "Digest affects draft metadata, not body HTML rendering",
+        "field": "digest",
+        "suggested_fix": "use body content or theme behavior to control visible article summary inside the HTML"
+      }
+    ]
+  }
+}

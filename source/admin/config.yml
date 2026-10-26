@@ -1,0 +1,73 @@
+backend:
+  name: github
+  repo: wwrtpfa/wwrtpfa.github.io
+  branch: master
+  # OAuth 配置
+  # 注意：生产环境需要配置 OAuth 代理服务
+  # 参考文档：https://decapcms.org/docs/github-backend/
+  base_url: https://api.github.com
+  # client_id 和 client_secret 需要通过 OAuth 代理服务配置
+  # 切勿将 client_secret 提交到公开仓库
+
+# 媒体资源配置
+media_folder: "source/images"
+public_folder: "/images"
+
+# 站点配置
+site_url: https://blog.pengfanao.top
+display_url: https://blog.pengfanao.top
+logo_url: /img/favicon.png
+
+# 本地开发模式
+# 本地运行 npx hexo server 后访问 http://localhost:4000/admin/
+local_backend: true
+
+# 编辑器配置
+editor:
+  preview: true
+
+# 文章集合
+collections:
+  # 后端分类文章
+  - name: "backend"
+    label: "后端文章"
+    folder: "source/_posts/后端"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "发布日期", name: "date", widget: "datetime", format: "YYYY-MM-DD HH:mm:ss" }
+      - { label: "更新日期", name: "updated", widget: "datetime", format: "YYYY-MM-DD HH:mm:ss", required: false }
+      - { label: "分类", name: "categories", widget: "list", default: ["后端"] }
+      - { label: "标签", name: "tags", widget: "list", default: [] }
+      - { label: "封面图片", name: "cover", widget: "image", required: false }
+      - { label: "文章摘要", name: "description", widget: "text", required: false }
+      - { label: "正文", name: "body", widget: "markdown" }
+
+  # 默认文章集合（无分类或根目录文章）
+  - name: "posts"
+    label: "其他文章"
+    folder: "source/_posts"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "发布日期", name: "date", widget: "datetime", format: "YYYY-MM-DD HH:mm:ss" }
+      - { label: "更新日期", name: "updated", widget: "datetime", format: "YYYY-MM-DD HH:mm:ss", required: false }
+      - { label: "分类", name: "categories", widget: "list", default: [] }
+      - { label: "标签", name: "tags", widget: "list", default: [] }
+      - { label: "封面图片", name: "cover", widget: "image", required: false }
+      - { label: "文章摘要", name: "description", widget: "text", required: false }
+      - { label: "正文", name: "body", widget: "markdown" }
+
+  # 页面集合
+  - name: "pages"
+    label: "页面"
+    folder: "source"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "类型", name: "type", widget: "hidden", default: "page" }
+      - { label: "日期", name: "date", widget: "datetime", format: "YYYY-MM-DD HH:mm:ss" }
+      - { label: "正文", name: "body", widget: "markdown" }

@@ -1,0 +1,67 @@
+name: Build and Deploy to deploy branch
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run clean
+
+      - run: npm run audit:repo
+
+      - run: npm run audit:demos
+
+      - name: Verify backend compatibility
+        env:
+          BLOG_API_BASE_URL: https://blogadmin.pengfanao.top
+        run: |
+          node --input-type=module <<'NODE'
+          const base = String(process.env.BLOG_API_BASE_URL || '').replace(/\/$/, '');
+          if (!base) throw new Error('Production backend URL is required');
+          const probeId = '00000000-0000-4000-8000-000000000000';
+          const response = await fetch(`${base}/api/v1/analytics/pages/${probeId}`, {
+            headers: { Accept: 'application/json' },
+            signal: AbortSignal.timeout(15000)
+          });
+          if (!response.ok) throw new Error(`backend compatibility check failed: HTTP ${response.status}`);
+          const body = await response.json();
+          if (body?.success !== true || body?.data?.articleId !== probeId) {
+            throw new Error('backend must be deployed before frontend: decoupled analytics API is unavailable');
+          }
+          console.log('Backend compatibility check passed.');
+          NODE
+
+      - name: Build static site
+        env:
+          NODE_ENV: production
+          BLOG_API_BASE_URL: https://blogadmin.pengfanao.top
+        run: npm run build
+
+      - name: Queue knowledge synchronization
+        env:
+          BLOG_API_BASE_URL: https://blogadmin.pengfanao.top
+          BLOG_SYNC_TOKEN: ${{ secrets.BLOG_SYNC_TOKEN }}
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+          GITHUB_SHA: ${{ github.sha }}
+          KNOWLEDGE_SYNC_MODE: incremental
+        run: npm run knowledge:sync
+
+      - name: Deploy to deploy branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: deploy

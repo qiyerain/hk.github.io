@@ -1,0 +1,9 @@
+{
+  "success": false,
+  "code": "CONVERT_FAILED",
+  "message": "conversion failed: API call failed: API_ERROR: API returned error code 401: Invalid API Key format. Supported prefixes: wme_, wme2_, wmt_.",
+  "schema_version": "v1",
+  "status": "failed",
+  "retryable": false,
+  "error": "conversion failed: API call failed: API_ERROR: API returned error code 401: Invalid API Key format. Supported prefixes: wme_, wme2_, wmt_."
+}

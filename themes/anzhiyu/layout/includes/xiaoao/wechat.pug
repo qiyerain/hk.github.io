@@ -1,0 +1,48 @@
+- const xaWechatPosts = featured_posts(site.posts, { limit: 6 })
+header.xa-page-head
+  span.xa-kicker S — WECHAT
+  h1 公众号
+  p 博客的延伸：把技术、工具与成长写成适合在微信里慢慢读的版本。
+section.xa-wechat-hero
+  .xa-wechat-copy
+    span.xa-kicker 小遨的个人博客
+    h2 在公众号，写一些更贴近读者的东西。
+    p 主要更新 AI Agent、Java 工程、效率工具和个人成长。文章不追热点，尽量提供能落地、能复查的经验。
+    .xa-wechat-stats
+      div
+        strong= featured_posts(site.posts, { limit: 0 }).length
+        span 博客文章
+      div
+        strong WEEKLY
+        span 更新节奏
+      div
+        strong 0 ADS
+        span 广告与群发
+  figure.xa-qr-card
+    img(src=url_for('/img/wechat/qrcode.jpg') alt="小遨公众号二维码" loading="lazy")
+    figcaption 微信扫码关注
+section.xa-home-section
+  .xa-section-heading
+    span.xa-kicker EDITOR'S PICK
+    h2 精选文章
+  .xa-wechat-picks(data-wechat-picks)
+    .xa-editorial-list.xa-glass-panel(data-glass-spotlight)
+      each article, index in xaWechatPosts
+        - const pickCover = article.cover || `/img/curated/anime/anime-${String((index % 11) + 1).padStart(2, '0')}.webp`
+        a.xa-editorial-row(class=index === 0 ? 'is-active' : '' href=url_for(article.path) style=`--xa-row-cover:url('${url_for(pickCover)}')` data-preview-src=url_for(pickCover) data-preview-title=article.title data-preview-date=date(article.date, 'YYYY / MM / DD'))
+          span.xa-editorial-row__index= String(index + 1).padStart(2, '0')
+          span.xa-editorial-row__title= article.title
+          span.xa-editorial-row__meta= date(article.date, 'MM / DD')
+          span.xa-editorial-row__arrow ↗
+    figure.xa-wechat-preview.xa-glass-panel(data-glass-tilt data-glass-spotlight)
+      - const firstPick = xaWechatPosts[0]
+      - const firstCover = firstPick && (firstPick.cover || 'https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/anime-01.webp')
+      if firstPick
+        img(class="nolazyload" src=url_for(firstCover) alt=`${firstPick.title} 封面预览`)
+        figcaption
+          time= date(firstPick.date, 'YYYY / MM / DD')
+          strong= firstPick.title
+section.xa-wechat-close
+  span.xa-kicker KEEP IN TOUCH
+  h2 长按保存二维码，或回到首页继续阅读。
+  a.xa-primary-link(href=url_for('/')) 返回首页 ↗

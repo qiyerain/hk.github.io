@@ -1,0 +1,4 @@
+- [x] Add the content-first cover decision order to `CLAUDE.md`.
+- [x] Document the daily-album fallback categories and selection checks.
+- [x] Document provenance, OSS, and `cover_alt` requirements.
+- [x] Run repository hygiene validation.

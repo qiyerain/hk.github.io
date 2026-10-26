@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="460" viewBox="0 0 1080 460">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#163c37"/>
+      <stop offset="0.52" stop-color="#39786e"/>
+      <stop offset="1" stop-color="#d59c47"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fffaf3" stop-opacity="0.96"/>
+      <stop offset="1" stop-color="#f3eadf" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="460" rx="38" fill="url(#bg)"/>
+  <circle cx="920" cy="40" r="170" fill="#fffaf3" opacity="0.12"/>
+  <circle cx="140" cy="390" r="150" fill="#211f1b" opacity="0.13"/>
+  <rect x="62" y="64" width="956" height="332" rx="34" fill="url(#card)"/>
+  <text x="102" y="135" fill="#39786e" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="28" font-weight="700">公众号文章工作流升级验证</text>
+  <text x="102" y="214" fill="#1f2926" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="58" font-weight="800">从好内容到好阅读</text>
+  <text x="104" y="275" fill="#6f472f" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="27" font-weight="700">调研 · 写作 · 图文排版 · 博客沉淀 · 草稿发布</text>
+  <rect x="104" y="319" width="150" height="42" rx="21" fill="#39786e"/>
+  <text x="137" y="348" fill="#fffaf3" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="22" font-weight="700">工作流</text>
+  <rect x="274" y="319" width="176" height="42" rx="21" fill="#d59c47"/>
+  <text x="316" y="348" fill="#211f1b" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="22" font-weight="700">本地排版</text>
+  <rect x="474" y="319" width="160" height="42" rx="21" fill="#8f3f2f"/>
+  <text x="510" y="348" fill="#fffaf3" font-family="PingFang SC, Microsoft YaHei, Arial" font-size="22" font-weight="700">体验验证</text>
+  <g transform="translate(740 142)">
+    <rect x="0" y="0" width="168" height="184" rx="22" fill="#ffffff" opacity="0.78"/>
+    <rect x="24" y="30" width="120" height="18" rx="9" fill="#39786e"/>
+    <rect x="24" y="64" width="92" height="12" rx="6" fill="#d59c47"/>
+    <rect x="24" y="94" width="120" height="48" rx="12" fill="#39786e" opacity="0.22"/>
+    <rect x="24" y="154" width="120" height="10" rx="5" fill="#211f1b" opacity="0.34"/>
+  </g>
+</svg>

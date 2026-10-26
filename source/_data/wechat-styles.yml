@@ -1,0 +1,181 @@
+# WeChat / Hexo Style Packs Catalog
+#
+# 6 套品牌专属 Style Pack 的机读目录。供 wechat-article-generator skill
+# 在选 theme 时按 `intent` / `column` 自动定位 Pack（再去 references/style-packs.md
+# 取 inline-CSS 片段）。
+#
+# 使用：在 EXTEND.md 设置 `default_style_pack: A` 或在文章 front matter 写
+# `style_pack: D`。orchestrator 会按下方表查 fallback md2wechat theme。
+
+version: 1
+default_pack: A         # 默认 Pack（品牌一致性首选）
+fallback_color: blue    # baoyu-post-to-wechat 颜色预设兜底
+
+packs:
+  - id: A
+    name: 灰阶玻璃 Mono Glass
+    vibe: 极简日系 × Apple keynote × ReactBits 灰阶
+    target_reader: 设计师 / 独立开发者 / 深度读者
+    best_for:
+      - 默认
+      - 产品发布
+      - 年度盘点
+      - 个人随笔
+      - AI 工具测评
+    md2wechat_theme: ink-minimal
+    baoyu_theme: simple
+    baoyu_color: black
+    palette:
+      bg: "#ffffff"
+      text: "#0f0f0f"
+      sub_text: "#444444"
+      faint: "#8a8a8a"
+      divider: "rgba(0,0,0,0.08)"
+      card_bg: "#f4f4f4"
+      accent: "#0f0f0f"
+    feasibility: high
+
+  - id: B
+    name: 报刊编辑部 Editorial Serif
+    vibe: NYT × 三联 × 衬线大标
+    target_reader: 长文 / 深度 / 文化向读者
+    best_for:
+      - AI 行业评论
+      - 人物访谈
+      - 技术史
+      - 读书笔记
+    md2wechat_theme: nyt-classic
+    baoyu_theme: grace
+    baoyu_color: vermilion
+    palette:
+      bg: "#fbf6ec"
+      text: "#1a1a1a"
+      sub_text: "#5a5550"
+      accent_red: "#8c1f1f"
+      divider: "#d8cdb8"
+    feasibility: high
+
+  - id: C
+    name: 光感卡片 Card Modern
+    vibe: 少数派 × Notion × Stripe 文档
+    target_reader: 工具党 / 效率读者 / PM
+    best_for:
+      - 工具评测
+      - 教程
+      - 清单文
+      - AI 新产品速读
+    md2wechat_theme: sspai-red
+    baoyu_theme: modern
+    baoyu_color: blue
+    palette:
+      bg: "#ffffff"
+      card_bg: "#f5f7fa"
+      primary: "#2563eb"
+      accent_orange: "#ea580c"
+      text: "#1f2937"
+      sub_text: "#4b5563"
+    feasibility: high
+
+  - id: D
+    name: 暗夜终端 Cyber Local
+    vibe: 终端 × Linear × github-readme 暗黑变体
+    target_reader: AI / 技术 / Hacker 读者
+    best_for:
+      - AI Agent 解析
+      - 源码阅读
+      - prompt 工程
+      - CLI 工具
+    md2wechat_theme: github-readme
+    baoyu_theme: default
+    baoyu_color: purple
+    palette:
+      page_bg: "#ffffff"
+      text: "#0f172a"
+      dark_container_bg: "#0d1117"
+      dark_container_text: "#e6edf3"
+      neon_purple: "#7c3aed"
+      neon_cyan: "#22d3ee"
+      success_green: "#22c55e"
+    feasibility: medium
+    notes: 公众号正文默认浅色，整页深底不可行，把"暗黑感"压在代码块/引用/Hero 容器里。
+
+  - id: E
+    name: 莫兰迪生活 Muted Life
+    vibe: 生活方式杂志 × Pinterest × 慢思考
+    target_reader: 生活方式 / 阅读 / 女性向读者
+    best_for:
+      - 周记
+      - 好物
+      - 阅读笔记
+      - 慢思考
+    md2wechat_theme: mint-fresh   # 备选: lavender-dream
+    baoyu_theme: grace
+    baoyu_color: rose
+    palette:
+      bg: "#faf7f2"
+      text: "#3d3a36"
+      sub_text: "#7a746c"
+      divider: "#e8e2d5"
+      accent_options:
+        haze_blue: "#a8b8c5"
+        bean_pink: "#c9a89a"
+        sage: "#a8b5a0"
+        light_lotus: "#d6c4cf"
+    feasibility: high
+    notes: 整篇只锁定 1 个主色，不要混用。
+
+  - id: F
+    name: 冲击标题 Bold Block
+    vibe: 营销号头部 × 强标题党
+    target_reader: 时效性 / 立场鲜明评论
+    best_for:
+      - 热点
+      - AI 大新闻
+      - 立场评论
+    md2wechat_theme: bold-red   # 备选: bold-navy
+    baoyu_theme: modern
+    baoyu_color: red
+    palette:
+      bg: "#ffffff"
+      text: "#111111"
+      primary_options:
+        ink_red: "#b91c1c"
+        deep_navy: "#1e3a8a"
+      gold: "#fbbf24"
+    feasibility: high
+
+# orchestrator 选 Pack 的规则（intent 优先，column 兜底）
+routing:
+  by_intent:
+    annual_recap: A
+    product_release: A
+    essay: A
+    editorial: B
+    interview: B
+    book_notes: B
+    tool_review: C
+    tutorial: C
+    listicle: C
+    tech_deep_dive: D
+    ai_agent: D
+    source_reading: D
+    lifestyle: E
+    weekly: E
+    reading: E
+    hot_take: F
+    breaking_news: F
+    opinion: F
+
+# 通用规范（与 references/style-packs.md "跨 Pack 通用规范" 一致）
+universal_rules:
+  - one_pack_per_article: true
+  - max_effects_per_heading: 1            # 满底色 / 渐变 / 阴影 三选一
+  - max_emoji_total: 6
+  - image_aspect_ratios:
+      - "1.6-2.0:1 (横)"
+      - "1:1 (方)"
+  - min_body_color: "#333"
+  - min_meta_color: "#666"
+  - code_block_requires_visual_boundary: true
+  - cta_must_not_simulate_clickable_button: true
+  - pre_upload_grep_must_be_empty: "<style|class=|<head|<body|<!doctype"

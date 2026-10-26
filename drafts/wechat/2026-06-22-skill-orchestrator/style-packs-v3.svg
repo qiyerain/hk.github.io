@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720">
+  <defs>
+    <filter id="paper" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise" result="gray"/>
+      <feBlend in="SourceGraphic" in2="gray" mode="multiply" result="blend"/>
+      <feComponentTransfer in="blend"><feFuncA type="linear" slope="0.08"/></feComponentTransfer>
+    </filter>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-color="#c4a97d" flood-opacity="0.18"/>
+    </filter>
+    <style>
+      .title{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;font-weight:700;}
+      .body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+    </style>
+  </defs>
+
+  <rect width="960" height="720" fill="#faf5ed"/>
+  <rect width="960" height="720" fill="#f5ede0" opacity="0.3" filter="url(#paper)"/>
+  <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+    <circle cx="12" cy="12" r="0.6" fill="#d4c9b8"/>
+  </pattern>
+  <rect width="960" height="720" fill="url(#dots)" opacity="0.5"/>
+
+  <!-- 标题 -->
+  <text x="480" y="44" text-anchor="middle" class="title" font-size="26" fill="#3a3a3a">6 套专属 Style Pack</text>
+  <text x="480" y="68" text-anchor="middle" class="body" font-size="13" fill="#8b7355">完整内联 CSS 视觉系统 · 100% 内联样式 HTML · 零适配</text>
+
+  <!-- Pack A: Mono Glass -->
+  <rect x="40" y="100" width="285" height="180" rx="14" fill="#fff" stroke="#8b8b8b" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="40" y="100" width="285" height="40" rx="14" fill="#f0f0f0"/>
+  <rect x="40" y="126" width="285" height="14" fill="#f0f0f0"/>
+  <circle cx="68" cy="120" r="14" fill="#e8e8e8" stroke="#555" stroke-width="1.5"/>
+  <text x="68" y="125" text-anchor="middle" class="title" font-size="14" fill="#333">A</text>
+  <text x="92" y="118" class="title" font-size="14" fill="#3a3a3a">灰阶玻璃 Mono Glass</text>
+  <text x="92" y="134" class="body" font-size="10" fill="#777">墨色 + 玻璃质感 + 零干扰</text>
+
+  <text x="56" y="160" class="title" font-size="12" fill="#3a3a3a">适合：随笔 · 产品发布</text>
+  <text x="56" y="180" class="body" font-size="11" fill="#666">md2wechat 备选：ink-minimal</text>
+
+  <rect x="56" y="194" width="253" height="50" rx="6" fill="rgba(240,240,240,0.5)" stroke="#ccc" stroke-width="0.8"/>
+  <rect x="64" y="202" width="100" height="5" rx="2" fill="#666"/>
+  <rect x="64" y="214" width="180" height="3" rx="1.5" fill="#bbb"/>
+  <rect x="64" y="223" width="160" height="3" rx="1.5" fill="#ccc"/>
+  <rect x="64" y="232" width="190" height="3" rx="1.5" fill="#ccc"/>
+
+  <text x="56" y="262" class="body" font-size="10" fill="#888">关键词：墨色 / 玻璃 / 极简</text>
+
+  <!-- Pack B: Editorial -->
+  <rect x="335" y="100" width="285" height="180" rx="14" fill="#fff" stroke="#c4956a" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="335" y="100" width="285" height="40" rx="14" fill="#fdf6ee"/>
+  <rect x="335" y="126" width="285" height="14" fill="#fdf6ee"/>
+  <circle cx="363" cy="120" r="14" fill="#fef3e2" stroke="#a07030" stroke-width="1.5"/>
+  <text x="363" y="125" text-anchor="middle" class="title" font-size="14" fill="#a07030">B</text>
+  <text x="387" y="118" class="title" font-size="14" fill="#3a3a3a">报刊编辑部 Editorial</text>
+  <text x="387" y="134" class="body" font-size="10" fill="#a07030">米黄底 + 衬线 + 朱红序号</text>
+
+  <text x="351" y="160" class="title" font-size="12" fill="#3a3a3a">适合：深度评论 · 技术史</text>
+  <text x="351" y="180" class="body" font-size="11" fill="#a07030">md2wechat 备选：nyt-classic</text>
+
+  <rect x="351" y="194" width="253" height="50" rx="6" fill="#fef9f2" stroke="#d4b896" stroke-width="0.8"/>
+  <rect x="359" y="202" width="120" height="5" rx="2" fill="#8b6914"/>
+  <rect x="359" y="214" width="180" height="3" rx="1.5" fill="#c4a97d"/>
+  <rect x="359" y="223" width="160" height="3" rx="1.5" fill="#d4c0a8"/>
+  <rect x="555" y="200" width="40" height="6" rx="2" fill="#c44444"/>
+
+  <text x="351" y="262" class="body" font-size="10" fill="#a07030">关键词：米黄 / 衬线 / 朱红</text>
+
+  <!-- Pack C: Card Modern -->
+  <rect x="630" y="100" width="285" height="180" rx="14" fill="#fff" stroke="#7ba8c9" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="630" y="100" width="285" height="40" rx="14" fill="#e8f2fb"/>
+  <rect x="630" y="126" width="285" height="14" fill="#e8f2fb"/>
+  <circle cx="658" cy="120" r="14" fill="#e3f0f7" stroke="#4a7fa5" stroke-width="1.5"/>
+  <text x="658" y="125" text-anchor="middle" class="title" font-size="14" fill="#4a7fa5">C</text>
+  <text x="682" y="118" class="title" font-size="14" fill="#3a3a3a">光感卡片 Card Modern</text>
+  <text x="682" y="134" class="body" font-size="10" fill="#4a7fa5">蓝色 + 数字徽章 + 圆角卡片</text>
+
+  <text x="646" y="160" class="title" font-size="12" fill="#3a3a3a">适合：工具评测 · 教程 · 清单</text>
+  <text x="646" y="180" class="body" font-size="11" fill="#4a7fa5">md2wechat 备选：sspai-red</text>
+
+  <rect x="646" y="194" width="78" height="50" rx="6" fill="#e3f0f7" stroke="#9ab8cc" stroke-width="0.8"/>
+  <circle cx="685" cy="210" r="6" fill="#4a7fa5"/>
+  <text x="685" y="214" text-anchor="middle" class="title" font-size="9" fill="#fff">1</text>
+  <rect x="654" y="222" width="60" height="3" rx="1.5" fill="#9ab8cc"/>
+  <rect x="654" y="230" width="50" height="3" rx="1.5" fill="#c9dde8"/>
+
+  <rect x="734" y="194" width="78" height="50" rx="6" fill="#e3f0f7" stroke="#9ab8cc" stroke-width="0.8"/>
+  <circle cx="773" cy="210" r="6" fill="#4a7fa5"/>
+  <text x="773" y="214" text-anchor="middle" class="title" font-size="9" fill="#fff">2</text>
+  <rect x="742" y="222" width="60" height="3" rx="1.5" fill="#9ab8cc"/>
+
+  <rect x="822" y="194" width="78" height="50" rx="6" fill="#e3f0f7" stroke="#9ab8cc" stroke-width="0.8"/>
+  <circle cx="861" cy="210" r="6" fill="#4a7fa5"/>
+  <text x="861" y="214" text-anchor="middle" class="title" font-size="9" fill="#fff">3</text>
+  <rect x="830" y="222" width="60" height="3" rx="1.5" fill="#9ab8cc"/>
+
+  <text x="646" y="262" class="body" font-size="10" fill="#4a7fa5">关键词：蓝色 / 卡片 / 数字</text>
+
+  <!-- Pack D: Cyber Local -->
+  <rect x="40" y="300" width="285" height="180" rx="14" fill="#fff" stroke="#a88cc9" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="40" y="300" width="285" height="40" rx="14" fill="#1a1a2e"/>
+  <rect x="40" y="326" width="285" height="14" fill="#1a1a2e"/>
+  <circle cx="68" cy="320" r="14" fill="#2a2a4e" stroke="#a88cc9" stroke-width="1.5"/>
+  <text x="68" y="325" text-anchor="middle" class="title" font-size="14" fill="#c8a8e8">D</text>
+  <text x="92" y="318" class="title" font-size="14" fill="#fff">暗夜终端 Cyber Local</text>
+  <text x="92" y="334" class="body" font-size="10" fill="#c8a8e8">深色容器 + 霓虹紫青</text>
+
+  <text x="56" y="360" class="title" font-size="12" fill="#3a3a3a">适合：AI · Agent · 源码</text>
+  <text x="56" y="380" class="body" font-size="11" fill="#8a6ab5">md2wechat 备选：github-readme</text>
+
+  <rect x="56" y="394" width="253" height="50" rx="6" fill="#0d0d1a" stroke="#4a4a6e" stroke-width="0.8"/>
+  <circle cx="68" cy="405" r="3" fill="#e07070"/>
+  <circle cx="80" cy="405" r="3" fill="#e8a54c"/>
+  <circle cx="92" cy="405" r="3" fill="#a8c97b"/>
+  <rect x="64" y="416" width="40" height="3" rx="1" fill="#a88cc9"/>
+  <rect x="112" y="416" width="60" height="3" rx="1" fill="#6ec6a0"/>
+  <rect x="64" y="424" width="30" height="3" rx="1" fill="#7ba8c9"/>
+  <rect x="100" y="424" width="100" height="3" rx="1" fill="#4a4a6e"/>
+  <rect x="64" y="432" width="60" height="3" rx="1" fill="#e8a54c"/>
+
+  <text x="56" y="462" class="body" font-size="10" fill="#8a6ab5">关键词：暗色 / 终端 / 霓虹</text>
+
+  <!-- Pack E: Muted Life -->
+  <rect x="335" y="300" width="285" height="180" rx="14" fill="#fff" stroke="#b5a898" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="335" y="300" width="285" height="40" rx="14" fill="#f5f0ea"/>
+  <rect x="335" y="326" width="285" height="14" fill="#f5f0ea"/>
+  <circle cx="363" cy="320" r="14" fill="#eee8e0" stroke="#8a7e70" stroke-width="1.5"/>
+  <text x="363" y="325" text-anchor="middle" class="title" font-size="14" fill="#8a7e70">E</text>
+  <text x="387" y="318" class="title" font-size="14" fill="#3a3a3a">莫兰迪生活 Muted Life</text>
+  <text x="387" y="334" class="body" font-size="10" fill="#8a7e70">奶油底 + 灰豆沙</text>
+
+  <text x="351" y="360" class="title" font-size="12" fill="#3a3a3a">适合：周记 · 阅读 · 慢思考</text>
+  <text x="351" y="380" class="body" font-size="11" fill="#8a7e70">md2wechat 备选：mint-fresh</text>
+
+  <rect x="351" y="394" width="253" height="50" rx="6" fill="#faf7f3" stroke="#d4ccc0" stroke-width="0.8"/>
+  <rect x="359" y="402" width="80" height="4" rx="2" fill="#b5a898"/>
+  <rect x="359" y="414" width="160" height="3" rx="1.5" fill="#d4ccc0"/>
+  <rect x="359" y="423" width="140" height="3" rx="1.5" fill="#e0d8cc"/>
+  <rect x="359" y="432" width="170" height="3" rx="1.5" fill="#e0d8cc"/>
+  <circle cx="555" cy="412" r="4" fill="#d4c4b0"/>
+  <path d="M572,422 C578,416 582,424 578,428 C574,432 570,426 572,422Z" fill="#c4d4b0"/>
+
+  <text x="351" y="462" class="body" font-size="10" fill="#8a7e70">关键词：奶油 / 豆沙 / 柔和</text>
+
+  <!-- Pack F: Bold Block -->
+  <rect x="630" y="300" width="285" height="180" rx="14" fill="#fff" stroke="#c04444" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="630" y="300" width="285" height="40" rx="14" fill="#8b1a1a"/>
+  <rect x="630" y="326" width="285" height="14" fill="#8b1a1a"/>
+  <circle cx="658" cy="320" r="14" fill="#a02020" stroke="#ffd700" stroke-width="1.5"/>
+  <text x="658" y="325" text-anchor="middle" class="title" font-size="14" fill="#ffd700">F</text>
+  <text x="682" y="318" class="title" font-size="14" fill="#fff">冲击标题 Bold Block</text>
+  <text x="682" y="334" class="body" font-size="10" fill="#ffd700">墨红满底色 + 金色</text>
+
+  <text x="646" y="360" class="title" font-size="12" fill="#3a3a3a">适合：热点 · 大新闻 · 立场</text>
+  <text x="646" y="380" class="body" font-size="11" fill="#c04444">md2wechat 备选：bold-red</text>
+
+  <rect x="646" y="394" width="253" height="50" rx="6" fill="#8b1a1a" stroke="#6e1515" stroke-width="0.8"/>
+  <rect x="654" y="402" width="100" height="7" rx="2" fill="#ffd700"/>
+  <rect x="654" y="416" width="160" height="3" rx="1.5" fill="rgba(255,255,255,0.5)"/>
+  <rect x="654" y="425" width="120" height="3" rx="1.5" fill="rgba(255,255,255,0.3)"/>
+  <rect x="654" y="434" width="140" height="3" rx="1.5" fill="rgba(255,255,255,0.3)"/>
+  <path d="M850,415 l4,-10 4,10 -10,-6 12,0 -10,6z" fill="#ffd700"/>
+
+  <text x="646" y="462" class="body" font-size="10" fill="#c04444">关键词：墨红 / 金色 / 冲击</text>
+
+  <!-- 底部说明 -->
+  <rect x="40" y="510" width="880" height="180" rx="14" fill="#fff" stroke="#c9b896" stroke-width="1.8" stroke-dasharray="6,3" filter="url(#shadow)"/>
+  <text x="480" y="540" text-anchor="middle" class="title" font-size="18" fill="#3a3a3a">双端联动机制</text>
+
+  <!-- 平台端 -->
+  <rect x="80" y="560" width="380" height="110" rx="10" fill="#fef3e2" stroke="#e8a54c" stroke-width="1.2"/>
+  <text x="100" y="585" class="title" font-size="14" fill="#c4893a">平台端</text>
+  <text x="100" y="608" class="body" font-size="12" fill="#3a3a3a">render_style_pack.py 直接渲染 HTML</text>
+  <text x="100" y="628" class="body" font-size="11" fill="#8b7355">→ 100% 内联样式 · 粘贴零适配</text>
+  <rect x="100" y="640" width="340" height="20" rx="4" fill="#fff" stroke="#e8c9a0" stroke-width="0.8"/>
+  <text x="110" y="654" class="body" font-size="10" fill="#c4893a" font-family="monospace">python render_style_pack.py article.md --pack C</text>
+
+  <!-- 博客端 -->
+  <rect x="500" y="560" width="380" height="110" rx="10" fill="#f3e8ff" stroke="#a88cc9" stroke-width="1.2"/>
+  <text x="520" y="585" class="title" font-size="14" fill="#8a6ab5">博客端</text>
+  <text x="520" y="608" class="body" font-size="12" fill="#3a3a3a">body[data-style-pack="X"] CSS 作用域</text>
+  <text x="520" y="628" class="body" font-size="11" fill="#8b7355">→ 同篇文章自动应用博客版样式</text>
+  <rect x="520" y="640" width="340" height="20" rx="4" fill="#fff" stroke="#c9b0dd" stroke-width="0.8"/>
+  <text x="530" y="654" class="body" font-size="10" fill="#8a6ab5" font-family="monospace">meta: - name: style-pack  content: C</text>
+
+  <!-- 装饰 -->
+  <g fill="#e8c36a" opacity="0.5">
+    <path d="M30,80 l2,-6 2,6 -6,-2 6,0 -6,2z"/>
+    <circle cx="930" cy="80" r="2.5"/>
+    <path d="M930,680 l2,-5 2,5 -5,-2 5,0 -5,2z"/>
+  </g>
+</svg>

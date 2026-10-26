@@ -1,0 +1,65 @@
+- const xaTrendPosts = trend_posts(site.posts)
+- const xaLatestTrend = xaTrendPosts[0]
+- const xaTrendGroups = {}
+- xaTrendPosts.forEach(function (post) { const key = date(post.date, 'YYYY / MM'); if (!xaTrendGroups[key]) xaTrendGroups[key] = []; xaTrendGroups[key].push(post) })
+
+nav.xa-page-return(aria-label="页面导航")
+  button(type="button" data-xa-back data-fallback="/")
+    i.anzhiyufont.anzhiyu-icon-chevron-left
+    span 返回上一页
+  .xa-page-crumb
+    a(href=url_for('/')) 首页
+    span /
+    b GitHub趋势
+header.xa-page-head.xa-trends-head
+  span.xa-kicker AUTOMATED EDITION · GITHUB
+  h1 GitHub趋势
+  p 按周整理的开源趋势独立存放在这里。原创文章、公众号精选和主 RSS 均不会被趋势栏目占据。
+  .xa-trends-stats
+    div
+      strong= xaTrendPosts.length
+      span 已归档周报
+    div
+      strong= Object.keys(xaTrendGroups).length
+      span 覆盖月份
+    div
+      strong WEEKLY
+      span 自动更新
+
+if xaLatestTrend
+  - const latestCover = xaLatestTrend.cover || page.cover
+  - const latestCoverAlt = xaLatestTrend.cover_alt || `${xaLatestTrend.title} 封面`
+  section.xa-trends-latest
+    .xa-trends-latest__copy
+      span.xa-kicker LATEST SNAPSHOT
+      time(datetime=date_xml(xaLatestTrend.date))= date(xaLatestTrend.date, 'YYYY / MM / DD')
+      h2= xaLatestTrend.title
+      p= strip_html(xaLatestTrend.description || xaLatestTrend.content || '').replace(/\s+/g, ' ').slice(0, 140)
+      a.xa-primary-link(href=url_for(xaLatestTrend.path)) 阅读最新一期 ↗
+    a.xa-trends-latest__cover(href=url_for(xaLatestTrend.path) aria-label=`阅读 ${xaLatestTrend.title}`)
+      img(src=url_for(latestCover) alt=latestCoverAlt)
+
+section.xa-trends-archive(aria-labelledby="xa-trends-archive-title")
+  .xa-section-heading
+    span.xa-kicker ARCHIVE
+    h2#xa-trends-archive-title 全部周报
+  if xaTrendPosts.length
+    each posts, group in xaTrendGroups
+      section.xa-trends-month
+        header
+          h3= group
+          span #{posts.length} 期
+        .xa-trends-list
+          each article in posts
+            a.xa-trends-row(href=url_for(article.path))
+              time(datetime=date_xml(article.date))= date(article.date, 'MM / DD')
+              strong= article.title
+              span 阅读 ↗
+  else
+    p.xa-trends-empty 暂无周报。
+
+footer.xa-trends-feed
+  div
+    span.xa-kicker SEPARATE FEED
+    h2 只订阅你需要的内容
+  a.xa-primary-link(href=url_for('/github-trends/rss.xml')) 订阅周报 RSS ↗

@@ -1,0 +1,4 @@
+- [x] Generate local 16:9 WebP derivatives from archived technology originals.
+- [x] Replace repeated and placeholder post cover references with unique local paths.
+- [x] Run content, build, image, and repository hygiene checks.
+- [x] Record validation and remaining caveats in execution-report.md.

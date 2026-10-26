@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>小遨的个人博客 · 原创文章</title>
-    <link>https://blog.pengfanao.top</link>
+    <title>hk的个人博客 · 原创文章</title>
+    <link>https://qiyerain.github.io</link>
     <description>技术、工具与成长主题的原创文章更新。</description>
     <language>zh-CN</language>
     <lastBuildDate>Sat, 24 Oct 2026 06:10:00 GMT</lastBuildDate>
     
     <item>
-      <guid isPermalink="true">https://blog.pengfanao.top/2026/10/24/agent/Archify-%E6%8A%8A%E9%A1%B9%E7%9B%AE%E7%94%BB%E6%88%90%E8%83%BD%E4%BA%A4%E4%BB%98%E7%9A%84%E5%9B%BE/</guid>
+      <guid isPermalink="true">https://qiyerain.github.io/2026/10/24/agent/Archify-%E6%8A%8A%E9%A1%B9%E7%9B%AE%E7%94%BB%E6%88%90%E8%83%BD%E4%BA%A4%E4%BB%98%E7%9A%84%E5%9B%BE/</guid>
       <title>用 Archify 把项目画成能交付的图：安装、用法与一次真实产出</title>
-      <link>https://blog.pengfanao.top/2026/10/24/agent/Archify-%E6%8A%8A%E9%A1%B9%E7%9B%AE%E7%94%BB%E6%88%90%E8%83%BD%E4%BA%A4%E4%BB%98%E7%9A%84%E5%9B%BE/</link>
+      <link>https://qiyerain.github.io/2026/10/24/agent/Archify-%E6%8A%8A%E9%A1%B9%E7%9B%AE%E7%94%BB%E6%88%90%E8%83%BD%E4%BA%A4%E4%BB%98%E7%9A%84%E5%9B%BE/</link>
       <pubDate>Sat, 24 Oct 2026 06:10:00 GMT</pubDate>
       <category>Archify</category><category>Skill</category><category>架构图</category><category>可视化</category><category>开源</category>
       <description><![CDATA[<blockquote>
@@ -257,9 +257,9 @@
     </item>
     
     <item>
-      <guid isPermalink="true">https://blog.pengfanao.top/2026/10/24/%E5%B7%A5%E5%85%B7/OpenRouter-%E5%85%8D%E8%B4%B9%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E7%94%A8/</guid>
+      <guid isPermalink="true">https://qiyerain.github.io/2026/10/24/%E5%B7%A5%E5%85%B7/OpenRouter-%E5%85%8D%E8%B4%B9%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E7%94%A8/</guid>
       <title>OpenRouter 的免费模型怎么用：18 个能聊天，17 个能进 agent</title>
-      <link>https://blog.pengfanao.top/2026/10/24/%E5%B7%A5%E5%85%B7/OpenRouter-%E5%85%8D%E8%B4%B9%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E7%94%A8/</link>
+      <link>https://qiyerain.github.io/2026/10/24/%E5%B7%A5%E5%85%B7/OpenRouter-%E5%85%8D%E8%B4%B9%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E7%94%A8/</link>
       <pubDate>Sat, 24 Oct 2026 05:40:00 GMT</pubDate>
       <category>Agent</category><category>LLM</category><category>OpenRouter</category><category>免费模型</category><category>API</category>
       <description><![CDATA[<blockquote>
@@ -473,9 +473,9 @@
     </item>
     
     <item>
-      <guid isPermalink="true">https://blog.pengfanao.top/2026/10/24/agent/DeepSeek-Harness-%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/</guid>
+      <guid isPermalink="true">https://qiyerain.github.io/2026/10/24/agent/DeepSeek-Harness-%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/</guid>
       <title>DeepSeek Harness 学习手册：从 363 个包里找到一条主线</title>
-      <link>https://blog.pengfanao.top/2026/10/24/agent/DeepSeek-Harness-%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/</link>
+      <link>https://qiyerain.github.io/2026/10/24/agent/DeepSeek-Harness-%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/</link>
       <pubDate>Sat, 24 Oct 2026 05:10:00 GMT</pubDate>
       <category>DeepSeek Harness</category><category>Cordis</category><category>源码阅读</category><category>Agent</category><category>架构</category>
       <description><![CDATA[<blockquote>
@@ -644,9 +644,9 @@
     </item>
     
     <item>
-      <guid isPermalink="true">https://blog.pengfanao.top/2026/10/18/%E5%90%8E%E7%AB%AF/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%98/</guid>
+      <guid isPermalink="true">https://qiyerain.github.io/2026/10/18/%E5%90%8E%E7%AB%AF/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%98/</guid>
       <title>Java 缓存怎么选：从为什么缓存到 Caffeine、Redis 与一致性</title>
-      <link>https://blog.pengfanao.top/2026/10/18/%E5%90%8E%E7%AB%AF/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%98/</link>
+      <link>https://qiyerain.github.io/2026/10/18/%E5%90%8E%E7%AB%AF/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%98/</link>
       <pubDate>Sun, 18 Oct 2026 16:00:00 GMT</pubDate>
       <category>缓存</category><category>Caffeine</category><category>Redis</category><category>Spring Cache</category>
       <description><![CDATA[<p>一个商品详情页每秒收到几千次请求，但商品名称和图片一天只改几次。如果每次请求都查数据库，大部分查询是在重复做同一件事。缓存把近期用过的数据放在读取更快的位置，让重复请求少走一段路。</p>
@@ -819,9 +819,9 @@
     </item>
     
     <item>
-      <guid isPermalink="true">https://blog.pengfanao.top/2026/09/22/%E5%B7%A5%E5%85%B7/Codex%E6%9B%B4%E6%8D%A2%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%BB%E9%A2%98/</guid>
+      <guid isPermalink="true">https://qiyerain.github.io/2026/09/22/%E5%B7%A5%E5%85%B7/Codex%E6%9B%B4%E6%8D%A2%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%BB%E9%A2%98/</guid>
       <title>Codex更换自定义主题</title>
-      <link>https://blog.pengfanao.top/2026/09/22/%E5%B7%A5%E5%85%B7/Codex%E6%9B%B4%E6%8D%A2%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%BB%E9%A2%98/</link>
+      <link>https://qiyerain.github.io/2026/09/22/%E5%B7%A5%E5%85%B7/Codex%E6%9B%B4%E6%8D%A2%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%BB%E9%A2%98/</link>
       <pubDate>Tue, 22 Sep 2026 19:10:00 GMT</pubDate>
       <category>Codex</category><category>macOS</category><category>DreamSkin</category><category>FFmpeg</category><category>WebP</category>
       <description><![CDATA[<p>最近给 Codex 换了一套背景。折腾下来，静态主题其实很简单，真正费时间的是动态背景：原视频很清楚，一转成 WebP，体积和画质就开始打架。</p>
@@ -943,9 +943,9 @@
     </item>
     
     <item>
-      <guid isPermalink="true">https://blog.pengfanao.top/2026/09/20/%E5%B7%A5%E5%85%B7/%E5%AE%89%E5%8D%93%E6%8A%95%E5%B1%8Fmac/</guid>
+      <guid isPermalink="true">https://qiyerain.github.io/2026/09/20/%E5%B7%A5%E5%85%B7/%E5%AE%89%E5%8D%93%E6%8A%95%E5%B1%8Fmac/</guid>
       <title>安卓投屏mac</title>
-      <link>https://blog.pengfanao.top/2026/09/20/%E5%B7%A5%E5%85%B7/%E5%AE%89%E5%8D%93%E6%8A%95%E5%B1%8Fmac/</link>
+      <link>https://qiyerain.github.io/2026/09/20/%E5%B7%A5%E5%85%B7/%E5%AE%89%E5%8D%93%E6%8A%95%E5%B1%8Fmac/</link>
       <pubDate>Sun, 20 Sep 2026 08:59:57 GMT</pubDate>
       
       <description><![CDATA[<p>可以直接下载，不必依赖 Homebrew。你这台 Mac 是 Apple Silicon（<code>arm64</code>），下载官方的 Apple Silicon 版本：</p>
@@ -989,9 +989,9 @@
     </item>
     
     <item>
-      <guid isPermalink="true">https://blog.pengfanao.top/2026/06/22/agent/%E5%BD%93AI%E5%AD%A6%E4%BC%9A%E6%8E%92%E7%89%88-3%E4%B8%AA%E5%BC%80%E6%BA%90Skill%E7%BC%96%E6%8E%92%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E5%BC%95%E6%93%8E/</guid>
+      <guid isPermalink="true">https://qiyerain.github.io/2026/06/22/agent/%E5%BD%93AI%E5%AD%A6%E4%BC%9A%E6%8E%92%E7%89%88-3%E4%B8%AA%E5%BC%80%E6%BA%90Skill%E7%BC%96%E6%8E%92%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E5%BC%95%E6%93%8E/</guid>
       <title>写一次，博客和公众号草稿同时就绪：我的内容工作流</title>
-      <link>https://blog.pengfanao.top/2026/06/22/agent/%E5%BD%93AI%E5%AD%A6%E4%BC%9A%E6%8E%92%E7%89%88-3%E4%B8%AA%E5%BC%80%E6%BA%90Skill%E7%BC%96%E6%8E%92%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E5%BC%95%E6%93%8E/</link>
+      <link>https://qiyerain.github.io/2026/06/22/agent/%E5%BD%93AI%E5%AD%A6%E4%BC%9A%E6%8E%92%E7%89%88-3%E4%B8%AA%E5%BC%80%E6%BA%90Skill%E7%BC%96%E6%8E%92%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E5%BC%95%E6%93%8E/</link>
       <pubDate>Mon, 22 Jun 2026 02:30:00 GMT</pubDate>
       <category>AI</category><category>技能编排</category><category>md2wechat</category><category>内容工作流</category><category>自动化</category>
       <description><![CDATA[<blockquote>
@@ -1069,9 +1069,9 @@
     </item>
     
     <item>
-      <guid isPermalink="true">https://blog.pengfanao.top/2026/06/22/agent/LangChain-Agent-03-%E5%AE%9E%E6%88%98%E7%AF%87-%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA%E4%BB%A3%E7%A0%81%E5%8A%A9%E6%89%8BAgent/</guid>
+      <guid isPermalink="true">https://qiyerain.github.io/2026/06/22/agent/LangChain-Agent-03-%E5%AE%9E%E6%88%98%E7%AF%87-%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA%E4%BB%A3%E7%A0%81%E5%8A%A9%E6%89%8BAgent/</guid>
       <title>LangChain Agent 系列(三)：从零搭建代码助手 Agent</title>
-      <link>https://blog.pengfanao.top/2026/06/22/agent/LangChain-Agent-03-%E5%AE%9E%E6%88%98%E7%AF%87-%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA%E4%BB%A3%E7%A0%81%E5%8A%A9%E6%89%8BAgent/</link>
+      <link>https://qiyerain.github.io/2026/06/22/agent/LangChain-Agent-03-%E5%AE%9E%E6%88%98%E7%AF%87-%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA%E4%BB%A3%E7%A0%81%E5%8A%A9%E6%89%8BAgent/</link>
       <pubDate>Mon, 22 Jun 2026 00:00:00 GMT</pubDate>
       <category>Agent</category><category>LangChain</category><category>AI教程</category><category>Python</category><category>实战</category>
       <description><![CDATA[<h2 id="终于到动手环节了。"><a href="#终于到动手环节了。" class="headerlink" title="终于到动手环节了。"></a>终于到动手环节了。</h2><p>前两篇讲了 Agent 的概念和架构，这一篇我们从头写一个能读文件、写代码、执行 Shell 的代码助手 Agent。跟着一步步来，大约 20 分钟能跑通。</p>
@@ -1224,9 +1224,9 @@
     </item>
     
     <item>
-      <guid isPermalink="true">https://blog.pengfanao.top/2026/06/21/agent/Claude-Code-Codex-agent-browser-%E6%AE%8B%E7%95%99%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/</guid>
+      <guid isPermalink="true">https://qiyerain.github.io/2026/06/21/agent/Claude-Code-Codex-agent-browser-%E6%AE%8B%E7%95%99%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/</guid>
       <title>Mac 发热？AI 可能忘了关浏览器</title>
-      <link>https://blog.pengfanao.top/2026/06/21/agent/Claude-Code-Codex-agent-browser-%E6%AE%8B%E7%95%99%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/</link>
+      <link>https://qiyerain.github.io/2026/06/21/agent/Claude-Code-Codex-agent-browser-%E6%AE%8B%E7%95%99%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/</link>
       <pubDate>Sun, 21 Jun 2026 17:30:00 GMT</pubDate>
       <category>Claude Code</category><category>Codex</category><category>agent-browser</category><category>Chrome</category><category>CDP</category><category>macOS</category>
       <description><![CDATA[<blockquote>
@@ -1400,9 +1400,9 @@
     </item>
     
     <item>
-      <guid isPermalink="true">https://blog.pengfanao.top/2026/06/19/agent/LangChain-Agent-02-%E6%9E%B6%E6%9E%84%E7%AF%87-LangChain%E5%86%85%E9%83%A8%E6%80%8E%E4%B9%88%E8%BD%AC%E7%9A%84/</guid>
+      <guid isPermalink="true">https://qiyerain.github.io/2026/06/19/agent/LangChain-Agent-02-%E6%9E%B6%E6%9E%84%E7%AF%87-LangChain%E5%86%85%E9%83%A8%E6%80%8E%E4%B9%88%E8%BD%AC%E7%9A%84/</guid>
       <title>LangChain Agent 系列(二)：LangChain Agent 内部怎么转的？</title>
-      <link>https://blog.pengfanao.top/2026/06/19/agent/LangChain-Agent-02-%E6%9E%B6%E6%9E%84%E7%AF%87-LangChain%E5%86%85%E9%83%A8%E6%80%8E%E4%B9%88%E8%BD%AC%E7%9A%84/</link>
+      <link>https://qiyerain.github.io/2026/06/19/agent/LangChain-Agent-02-%E6%9E%B6%E6%9E%84%E7%AF%87-LangChain%E5%86%85%E9%83%A8%E6%80%8E%E4%B9%88%E8%BD%AC%E7%9A%84/</link>
       <pubDate>Fri, 19 Jun 2026 00:00:00 GMT</pubDate>
       <category>Agent</category><category>架构</category><category>LangChain</category><category>AI教程</category>
       <description><![CDATA[<h2 id="上一篇我们讲了-Agent-的”道”——Think-→-Act-→-Observe-循环。这一篇讲”术”——LangChain-是怎么把这套机制实现出来的。"><a href="#上一篇我们讲了-Agent-的”道”——Think-→-Act-→-Observe-循环。这一篇讲”术”——LangChain-是怎么把这套机制实现出来的。" class="headerlink" title="上一篇我们讲了 Agent 的”道”——Think → Act → Observe 循环。这一篇讲”术”——LangChain 是怎么把这套机制实现出来的。"></a>上一篇我们讲了 Agent 的”道”——Think → Act → Observe 循环。这一篇讲”术”——LangChain 是怎么把这套机制实现出来的。</h2><p>如果你读完了第一篇，你已经知道 Agent 的核心思想了：LLM 是大脑，工具是手和眼睛，决策循环让 Agent 不断思考、执行、观察、调整，直到任务完成。</p>

@@ -256,435 +256,6 @@ source 要指向真正支撑这条断言的位置。挂一个文件开头当”�
       </tags>
   </entry>
   <entry>
-    <title>Mac 发热？AI 可能忘了关浏览器</title>
-    <url>/2026/06/21/agent/Claude-Code-Codex-agent-browser-%E6%AE%8B%E7%95%99%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/</url>
-    <content><![CDATA[
-Claude Code、Codex 明明已经停下来了，Mac 风扇却还在转，内存也迟迟不降。问题可能不在当前会话，而在一批没有正常收尾的 agent-browser daemon 与自动化 Chrome。
-
-这次我在本机清理了 8 组遗留的 agent-browser &#x2F; Chrome 后台实例及其子进程。普通 Chrome 标签页没有动，机器热量很快就降了下来。
-这不是一个玄学问题，也不能简单归咎于“Chrome 太吃内存”。真正要理解的是：AI 编程工具、浏览器自动化工具、CDP、daemon 和 session 之间，到底是谁启动了谁，又该由谁负责关掉。
-
-
-30 秒结论先给赶时间的人答案：
-
-agent-browser 采用 CLI + 后台 daemon + Chrome 的架构，daemon 会故意跨命令常驻，以便下一条指令不用重新启动浏览器。
-每个独立 session 都可能拥有自己的浏览器实例。Claude Code、Codex 并发执行多个 agent 或工具任务时，session 数量很容易叠加。
-如果任务异常中断、会话被强制停止，或者调用方忘了执行 agent-browser close，后台进程就可能继续存在。
-CDP 只是控制通道，不是泄漏的根因。根因是 浏览器生命周期没有闭环。
-最优先执行官方收尾命令：agent-browser close --all。只有正常关闭失败，才按特征匹配并发送 TERM，最后才考虑 KILL。
-长期方案是设置空闲超时、复用 session，并要求每个自动化任务在 finally 或 shell trap 中关闭自己的 session。
-
-目录
-一、现象：AI 停了，浏览器却没停
-二、根因：常驻 daemon 遇上并发 session
-三、先确认，不要上来就 kill
-四、三层清理：官方关闭、温和终止、强制清理
-五、怎样保证不误伤普通 Chrome
-六、从源头预防：让生命周期闭环
-七、可直接收藏的排查清单
-
-一、现象：AI 停了，浏览器却没停典型场景是这样的：
-
-你让 Claude Code 或 Codex 通过 skill、MCP、shell 工具打开网页；
-自动化任务创建了多个命名 session，甚至并行跑了多个子 agent；
-任务完成或会话终止后，终端已经安静；
-但“活动监视器”里仍有多组 Chrome、Chrome Helper、GPU、Renderer 或 agent-browser 进程；
-合上几次窗口也没用，Mac 继续发热，内存和 CPU 占用居高不下。
-
-最迷惑的一点是：这些进程通常没有可见窗口。你看到的普通 Chrome 标签页可能只有几个，但后台自动化 Chrome 使用的是独立临时用户目录，它们和日常浏览器不是同一组实例。
-因此，“我已经关掉 Chrome 窗口了”并不能证明自动化浏览器已经退出。
-二、根因：常驻 daemon 遇上并发 session以本机安装的 agent-browser 0.27.0 为例，官方说明明确写了两件事：
-
-它采用 client-daemon 架构，Rust CLI 负责接收命令，Rust daemon 通过 CDP 控制 Chrome；
-daemon 会在第一次命令时自动启动，并在后续命令之间保持运行，以换取更快的响应。
-
-与此同时，官方 session 文档也说明：每个 session 都有独立的浏览器实例、Cookie、存储、历史记录和认证状态。
-这两点放到多 agent 场景里，就形成了下面的链路：
-
-Claude Code / Codex        │        ├─ Agent A → session A → daemon A → Chrome A → Renderer / GPU / Network        ├─ Agent B → session B → daemon B → Chrome B → Renderer / GPU / Network        └─ Agent C → session C → daemon C → Chrome C → Renderer / GPU / Network
-
-单看一组并不可怕。真正吃资源的是“多组浏览器进程树一起常驻”。一个 Chrome 主进程还会派生渲染、GPU、网络等子进程，所以 8 个遗留实例在活动监视器里看起来可能远不止 8 行。
-CDP 是不是罪魁祸首？不是。
-CDP（Chrome DevTools Protocol）只是自动化工具与 Chrome 之间的控制协议。它负责导航、点击、读取 DOM、截图等操作，但不会替调用方决定“任务什么时候算结束”。
-真正缺失的是这条生命周期：
-创建 session → 使用浏览器 → 任务成功或失败 → 关闭 session → 回收 daemon 和 Chrome
-
-如果最后两步没有执行，前面的资源就可能继续留在后台。
-
-关键判断： 不是 AI “还在思考”，而是 AI 启动的外部进程已经脱离了当前对话的可见范围。
-
-三、先确认，不要上来就 kill清理前先分清三件事：有多少活动 session、有哪些 agent-browser daemon、哪些 Chrome 使用了 agent-browser 的临时用户目录。
-1. 查看 agent-browser 自己记录的活动 sessionagent-browser session list
-
-如果版本支持 JSON：
-agent-browser session list --json
-
-这一步最可信，因为它从工具自己的会话视角回答“现在认为谁还活着”。
-2. 查看 daemon 和自动化 ChromemacOS 上可以使用：
-pgrep -fl &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;pgrep -fl &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;
-
-第二条命令的关键不是进程名“Google Chrome”，而是启动参数中的：
---user-data-dir=.../agent-browser-chrome-...
-
-它说明这个 Chrome 使用的是 agent-browser 创建的隔离用户目录，而不是你日常使用的默认 Chrome Profile。
-3. 按 CPU、内存和运行时间查看完整进程树ps -axo pid,ppid,%cpu,%mem,rss,etime,command \  | grep -E &#x27;[a]gent-browser-darwin|[a]gent-browser-chrome-&#x27;
-
-字段含义：
-
-PID：当前进程编号，后续终止时使用。
-PPID：父进程编号，用来判断 daemon 与 Chrome 的父子关系。
-%CPU：CPU 占用，观察它是否持续让机器发热。
-%MEM &#x2F; RSS：内存占用，确认多个实例是否不断叠加。
-ETIME：已运行时间，判断它是否早已超过当前 AI 任务时长。
-COMMAND：完整启动命令，确认是否带有 agent-browser 特征参数。
-
-不要只看 ~/.agent-browser 下有没有 .pid、.sock 文件。它们可能只是过期的 sidecar 文件，并不等于进程仍然存活。进程是否活着，最终以 session list、ps 和 pgrep 为准。
-四、三层清理：官方关闭、温和终止、强制清理
-第一层：让 agent-browser 自己收尾优先执行：
-agent-browser close --all
-
-然后清理过期的 pid、socket、version 等 sidecar 文件：
-agent-browser doctor --offline --quick
-
-当前版本的 doctor 会自动清理陈旧的 daemon sidecar 文件；--fix 还可能执行重装 Chrome、清理旧状态等破坏性修复，因此日常排查先不要加 --fix。
-再次验证：
-agent-browser session listpgrep -fl &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;pgrep -fl &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;
-
-如果没有输出，说明已经清干净。
-第二层：发送 TERM，让进程有机会优雅退出只有官方关闭失败时再执行：
-pgrep -f &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27; \  | xargs -n 1 kill -TERM 2&gt;/dev/null || truepgrep -f &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27; \  | xargs -n 1 kill -TERM 2&gt;/dev/null || true
-
-TERM 会给进程处理退出、关闭文件和回收子进程的机会。执行后等 3 秒，再跑一次检查命令。
-第三层：只对仍残留的目标使用 KILLpgrep -f &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27; \  | xargs -n 1 kill -KILL 2&gt;/dev/null || truepgrep -f &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27; \  | xargs -n 1 kill -KILL 2&gt;/dev/null || true
-
-KILL 不允许进程执行清理逻辑，只适合处理已经卡死、无法响应 TERM 的残留。正在进行的自动化、下载、表单填写和未保存状态都会立即丢失。
-仓库里放一个可重复使用的脚本本文配套脚本已放在：
-scripts_py/agent_browser_cleanup.sh
-
-使用方式：
-./scripts_py/agent_browser_cleanup.sh status./scripts_py/agent_browser_cleanup.sh close./scripts_py/agent_browser_cleanup.sh force
-
-三条命令依次对应：只查看、官方关闭并清理 sidecar、官方关闭失败后的分级强制清理。
-五、怎样保证不误伤普通 Chrome不要使用下面这种“大锤”：
-killall &#x27;Google Chrome&#x27;pkill -f &#x27;Google Chrome&#x27;
-
-它们会把普通 Chrome 窗口和日常标签页一起关掉。
-本文脚本采用两层限制：
-
-daemon 必须匹配 agent-browser-darwin-arm64 或 agent-browser-darwin-x64 的安装路径；
-Chrome 必须带有 --user-data-dir=.../agent-browser-chrome-... 参数。
-
-也就是说，它针对的是 agent-browser 创建的隔离 Chrome，不是所有名为 Google Chrome 的进程。
-不过还有一个例外需要注意：如果你主动使用 --cdp 或 --auto-connect 连接了日常 Chrome，那么自动化 session 与普通浏览器之间的边界会变得更近。此时先用 session list 和完整命令行确认，不要直接执行强制清理。
-六、从源头预防：让生命周期闭环清理脚本只是灭火器。更好的办法是让每个任务都负责关掉自己打开的浏览器。
-
-1. 设置 daemon 空闲自动退出官方提供了 AGENT_BROWSER_IDLE_TIMEOUT_MS。例如 10 分钟无命令后自动关闭浏览器并退出 daemon：
-export AGENT_BROWSER_IDLE_TIMEOUT_MS=600000
-
-长期使用可以写入 ~/.zshrc：
-echo &#x27;export AGENT_BROWSER_IDLE_TIMEOUT_MS=600000&#x27; &gt;&gt; ~/.zshrcsource ~/.zshrc
-
-10 分钟只是一个稳妥起点。频繁执行长任务可以设为 30 分钟；偶尔使用、机器资源紧张时可以设为 3 到 5 分钟。
-2. 不要为每一步创建新 session同一个任务尽量复用一个语义明确的 session：
-agent-browser --session blog-research open https://example.comagent-browser --session blog-research snapshot -iagent-browser --session blog-research close
-
-并发任务确实需要隔离时，可以创建多个 session，但每个任务结束后都要单独关闭。
-3. 在 shell 脚本里用 trap 兜底set -euo pipefailSESSION=&quot;research-$$&quot;cleanup() &#123;  agent-browser --session &quot;$SESSION&quot; close &gt;/dev/null 2&gt;&amp;1 || true&#125;trap cleanup EXIT INT TERMagent-browser --session &quot;$SESSION&quot; open https://example.comagent-browser --session &quot;$SESSION&quot; snapshot -i
-
-无论脚本正常结束、报错，还是收到中断信号，cleanup 都会尝试关闭对应 session。
-4. 给 Claude Code &#x2F; Codex 的浏览器 skill 加退出规则长期指令里应明确写上：
-浏览器自动化任务结束后，必须关闭本任务创建的 agent-browser session。成功、失败、取消和超时都要执行清理；不得依赖用户手动回收后台进程。并发任务必须记录各自的 session 名称，只关闭自己创建的 session。
-
-这比“任务结束后记得关浏览器”更有效，因为它定义了成功、失败和取消三条路径。
-5. 定期做轻量检查如果你经常让多个 agent 并发操作网页，可以在结束工作前运行：
-agent-browser session list./scripts_py/agent_browser_cleanup.sh status
-
-发现不认识、运行时间异常长的 session，再决定是否关闭。不要把 force 放进高频定时任务，因为它可能打断仍在工作的自动化。
-七、可直接收藏的排查清单遇到 Mac 突然发热、内存异常时，按这个顺序走：
-
-打开“活动监视器”，确认是否有多组无窗口的 Chrome &#x2F; agent-browser。
-运行 agent-browser session list，确认活动 session。
-用 pgrep -fl 或 ps 检查 daemon 与 agent-browser-chrome- 用户目录。
-先执行 agent-browser close --all。
-再执行 agent-browser doctor --offline --quick 清理陈旧 sidecar。
-等待几秒并复查 CPU、内存和进程。
-仍有残留时先 TERM，最后才 KILL。
-设置 AGENT_BROWSER_IDLE_TIMEOUT_MS。
-在每个自动化脚本或 skill 中加入 finally &#x2F; trap 清理。
-避免 killall Google Chrome 这类会误伤普通标签页的命令。
-
-最后浏览器自动化最容易被忽略的，不是“怎么打开网页”，而是“谁负责关闭网页背后的整棵进程树”。
-Claude Code 和 Codex 能把网页操作拆成工具调用，却不会天然替所有第三方工具完成生命周期管理。只要调用链中存在 daemon、session 和独立 Chrome，就应该把清理当成任务的一部分，而不是任务结束后的家务。
-
-真正可靠的自动化，不只要能启动，还要能在成功、失败和取消时都干净退出。
-
-如果你的 Mac 也曾在 AI 会话结束后莫名发热，先别急着重启。跑一下本文的检查命令，很可能几分钟就能找到那批“已经下班，但进程还没打卡”的浏览器。
-参考资料
-agent-browser 官方仓库
-agent-browser README：命令、Session 与 Architecture
-Chrome for Testing 官方介绍
-Chrome DevTools：远程调试
-
-]]></content>
-      <categories>
-        <category>Agent</category>
-      </categories>
-      <tags>
-        <tag>Claude Code</tag>
-        <tag>Codex</tag>
-        <tag>agent-browser</tag>
-        <tag>Chrome</tag>
-        <tag>CDP</tag>
-        <tag>macOS</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Claude Code 从零到上手——安装、模型配置、Skill 与效率工具全指南</title>
-    <url>/2026/06/10/agent/Claude%20Code%20%E4%BB%8E%E9%9B%B6%E5%88%B0%E4%B8%8A%E6%89%8B/</url>
-    <content><![CDATA[目录
-一、为什么选 Claude Code
-二、快速安装
-2.1 安装 Node.js
-2.2 安装 Claude Code
-
-
-三、模型厂商与 Coding Plan 对比
-3.1 阿里百炼
-3.2 腾讯云混元
-3.3 百度千帆
-3.4 DeepSeek
-3.5 火山引擎（字节）
-3.6 MiniMax
-3.7 智谱 GLM
-3.8 月之暗面 Kimi
-
-
-四、模型厂商切换：CC Switch
-五、Skill：Claude Code 的核心扩展机制
-5.1 什么是 Skill
-5.2 常用 Skill 安装
-5.3 Skill 路径
-5.4 Skill 仓库与超市
-
-
-六、辅助工具推荐
-6.1 Starship：终端美化
-6.2 gstack：工程团队工具集
-6.3 Claude HUD：可视化监控面板
-6.4 跳过权限确认
-
-
-七、2026 年值得关注的新工具
-八、总结
-引用
-
-
-一、为什么选 Claude CodeClaude Code 是 Anthropic 推出的终端原生 AI 编程助手。相比 IDE 插件，它有几点核心优势：
-
-终端原生：直接在你的 shell 里运行，能操作文件系统、执行命令、管理 git，不需要 IDE 作为中间层。
-Skill 机制：通过 Skill 文件扩展 Agent 能力，类似”给 Agent 写操作手册”，比传统插件更灵活。
-MCP 协议：通过 MCP (Model Context Protocol) 连接外部工具和数据源，生态开放。
-多模型后端：官方使用 Claude 系列模型，但通过 CC Switch 等工具可以切换到国内模型厂商。
-
-下面从安装开始，一步步配好你的 Claude Code 开发环境。
-
-二、快速安装2.1 安装 Node.jsClaude Code 是一个 npm 包，需要 Node.js 环境。推荐用 nvm 管理 Node 版本：
-# 安装 nvmcurl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash# 加载 nvm\. &quot;$HOME/.nvm/nvm.sh&quot;# 安装 Node 24nvm install 24# 验证node -v   # 应输出 v24.16.0npm -v    # 应输出 11.13.0
-
-2.2 安装 Claude Code# 安装npm install -g @anthropic-ai/claude-code# 查看版本claude --version# 后续升级claude update
-
-安装完成后在终端输入 claude 即可启动交互式会话。官方文档：設定 Claude Code
-
-三、模型厂商与 Coding Plan 对比Claude Code 原生使用 Anthropic 的 Claude 系列模型，但国内用户可以通过第三方工具切换到国产模型。以下是主流模型厂商的 Coding Plan 概览：
-3.1 阿里百炼阿里云百炼平台提供 Qwen 系列等模型，支持 Coding Plan 订阅。
-
-控制台：阿里云百炼
-
-3.2 腾讯云混元腾讯混元大模型提供 Coding Plan，适合腾讯云生态用户。
-
-购买页：腾讯云混元
-
-3.3 百度千帆百度智能云千帆大模型平台，提供文心系列模型。
-
-控制台：百度千帆
-
-3.4 DeepSeekDeepSeek 独立平台，以高性价比和强代码能力著称。
-
-用量页：DeepSeek Platform
-
-3.5 火山引擎（字节）火山方舟 Coding Plan 支持的模型最丰富：DeepSeek-V4 系列、GLM-5.1、Doubao-Seed-2.0 系列、Kimi-K2.6、MiniMax-M2.7 等。订阅叠加 9.5 折，低至 38 元。
-
-订阅链接：https://volcengine.com/L/ooEqNrnaXdU/
-邀请码：KGRNLDMJ
-
-3.6 MiniMaxMiniMax 提供 M2 系列模型，也有 Coding Plan 可供选择。
-
-订阅方式同上（火山方舟渠道也支持 MiniMax 模型）
-
-3.7 智谱 GLM智谱 GLM Coding Plan 适配 20+ 主流工具，性价比突出。
-
-拼好模活动：https://www.bigmodel.cn/glm-coding?ic=FVAXRFATIM
-
-3.8 月之暗面 KimiKimi 提供会员订阅模式，可在 Kimi 首页侧边栏进入。
-
-定价页：Kimi 会员
-
-
-四、模型厂商切换：CC SwitchClaude Code 默认对接 Anthropic API，要使用国内模型，需要借助 CC Switch 做 API 代理和模型映射。
-
-项目地址：CC Switch Releases（当前最新 v3.16.2，2026-06-08 发布）
-
-CC Switch 的核心原理是在本地启动一个代理服务，将 Claude Code 发往 Anthropic API 的请求拦截并转发到你配置的国内模型厂商 API，同时做请求&#x2F;响应格式的兼容转换。目前 CC Switch 已不限于 Claude Code，同时支持 Codex、OpenCode、Gemini CLI 等工具。
-基本使用流程：
-
-从 Release 页下载对应平台的二进制文件
-配置目标模型厂商的 API Key 和 Endpoint
-启动 CC Switch 代理
-设置环境变量让 Claude Code 走代理
-
-这样 Claude Code 实际调用的就是国产模型，但交互体验保持一致。
-
-五、Skill：Claude Code 的核心扩展机制5.1 什么是 SkillSkill 是 Claude Code 的扩展机制——本质上是给 Agent 注入一段专业领域的 System Prompt，告诉它”遇到某类任务时应该怎么做”。一个 Skill 就是一个 Markdown 文件，放在特定目录下即可被 Claude Code 自动发现和加载。
-相比传统插件的优势：
-
-声明式：不需要写代码，写清楚流程和规则即可
-可组合：多个 Skill 可以同时生效
-用户可控：Skill 优先级低于用户指令，用户始终拥有最终控制权
-
-更多原理参考：
-
-Claude Code Skills 详解（一）
-Claude Code Skills 详解（二）
-
-5.2 常用 Skill 安装# 前端设计/plugin install frontend-design@claude-plugins-official# 代码审查/plugin install code-review@claude-plugins-official# 代码简化/plugin install code-simplifier@claude-plugins-official# UI/UX 设计claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skillclaude plugin install ui-ux-pro-max@ui-ux-pro-max-skill# SDD (Superpowers Driven Development)claude plugin install superpowers@claude-plugins-official# agent-browser（浏览器自动化）npx skills add https://github.com/vercel-labs/agent-browser --skill agent-browser# skill-creator（创建自定义 Skill）npx skills add https://github.com/anthropics/skills --skill skill-creator# Brave Search（搜索集成）cp -r brave-search-skills/skills/* ~/.agents/skills/    # 用户级cp -r brave-search-skills/skills/* .agents/skills/       # 项目级
-
-5.3 Skill 路径Skill 文件存放在以下位置：
-
-
-
-平台
-路径
-
-
-
-macOS
-~/.claude/skills
-
-
-Windows
-E:\Users\&lt;用户名&gt;\.claude\skills
-
-
-用户级 Skill 对所有项目生效，项目级 Skill（.claude/skills/）只对当前项目生效。
-5.4 Skill 仓库与超市如果你不想自己写 Skill，可以从社区仓库找现成的：
-
-Awesome Claude Skills：GitHub — 精选 Skill 列表，涵盖开发、设计、运维等场景
-SkillsMP：skillsmp.com — Skill 超市，可直接浏览和下载
-
-
-六、辅助工具推荐6.1 Starship：终端美化Starship 是一个跨 shell 的轻量级提示符，能让终端显示 git 分支、Node 版本、命令耗时等信息，Claude Code 场景下特别实用——一眼就能看到当前项目状态。
-# 先安装 Homebrew（如已安装可跳过）/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;echo &#x27;eval &quot;$(/opt/homebrew/bin/brew shellenv)&quot;&#x27; &gt;&gt; ~/.zprofileeval &quot;$(/opt/homebrew/bin/brew shellenv)&quot;# 安装 Starshipbrew install starship# 配置 ~/.zshrc，在文件末尾追加echo &#x27;eval &quot;$(starship init zsh)&quot;&#x27; &gt;&gt; ~/.zshrc# 生效source ~/.zshrc
-
-6.2 gstack：工程团队工具集gstack 是一套面向工程团队的 Claude Code Skill 集合，提供 CEO 审查、设计评审、QA 测试、安全审计、部署等 23+ 个 Skill，远不止搜索功能。
-前置要求： 需要安装 Bun v1.0+。
-# 安装 Bun（如未安装）curl -fsSL https://bun.sh/install | bash# 克隆 gstack 并自动安装git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstackcd ~/.claude/skills/gstack &amp;&amp; ./setup
-
-详细使用参考：gstack 使用指南
-6.3 Claude HUD：可视化监控面板Claude HUD 是一个在终端内嵌的 HUD（抬头显示）面板，可以实时显示上下文用量、活跃工具、运行中的 Agent 和 Todo 进度，让你对 Claude Code 的运行状态一目了然。
-# Claude Code 内执行/plugin marketplace add jarrodwatts/claude-hud# 安装插件/plugin install claude-hud# 初始化/claude-hud:setup
-
-详细使用参考：Claude HUD 介绍
-6.4 跳过权限确认Claude Code 在执行文件操作、运行命令时会弹出权限确认。如果你在安全环境下希望减少打断，可以：
-claude --dangerously-skip-permissions
-
-
-⚠️ 这个参数会跳过所有权限确认，只在完全信任的环境中（如个人开发机）使用。Claude Code 还提供了更温和的 --allow-dangerously-skip-permissions 参数，仅允许跳过权限但不默认开启，安全性更高。
-
-
-七、2026 年值得关注的新工具2026 年 Claude Code 生态涌现了不少新工具，这里推荐几个实用的：
-
-
-
-工具
-用途
-Stars
-
-
-
-skillshare
-跨工具同步 Skill（Claude Code、Codex、OpenClaw 等）
-2,190
-
-
-skills-manager
-桌面端 Skill 管理器，支持 15+ 编程工具
-2,053
-
-
-awesome-claude-code-toolkit
-135 Agents + 35 Skills + 42 Commands + 176+ Plugins 合集
-2,002
-
-
-open-cowork
-开源桌面应用，一键启动 Claude Code + MCP + Skills
-1,543
-
-
-
-八、总结
-
-
-环节
-推荐方案
-
-
-
-运行时
-Node 24 + Claude Code 最新版
-
-
-模型
-海外用 Anthropic 官方，国内用火山方舟（模型最全）或智谱 GLM Coding Plan（性价比高）
-
-
-模型切换
-CC Switch
-
-
-扩展
-Skill（前端设计、代码审查、浏览器自动化、搜索等）
-
-
-辅助
-Starship（终端美化）+ gstack（工程工具集）+ Claude HUD（监控）
-
-
-Claude Code 的核心理念是”终端即 IDE”——不是替代 VS Code，而是提供一种更轻量、更脚本化、更 Agent 友好的编程方式。配合 Skill 和 MCP，它能做的不只是补全代码，而是真正帮你完成多步骤的工程任务。
-
-引用
-Claude Code 官方文档
-CC Switch
-Awesome Claude Skills
-SkillsMP
-gstack 使用指南
-Claude HUD 介绍
-Claude Code Skills 详解
-
-]]></content>
-      <categories>
-        <category>工具</category>
-        <category>AI</category>
-      </categories>
-      <tags>
-        <tag>Skill</tag>
-        <tag>Claude Code</tag>
-        <tag>AI Agent</tag>
-        <tag>MCP</tag>
-        <tag>开发工具</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Claude 使用技巧</title>
     <url>/2026/05/19/agent/Claude%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/</url>
     <content><![CDATA[Claude 使用技巧目录
@@ -1014,10 +585,10 @@ Comet Skill 的出现，为开发者在 AI 时代的 Spec Coding 提供了新的
       <tags>
         <tag>Skill</tag>
         <tag>Claude Code</tag>
-        <tag>AI Agent</tag>
         <tag>Spec Coding</tag>
         <tag>OpenSpec</tag>
         <tag>Superpowers</tag>
+        <tag>AI Agent</tag>
       </tags>
   </entry>
   <entry>
@@ -1538,6 +1109,189 @@ WebSocket + Extension 转发有额外的序列化开销，但瓶颈不在这一�
       </tags>
   </entry>
   <entry>
+    <title>Mac 发热？AI 可能忘了关浏览器</title>
+    <url>/2026/06/21/agent/Claude-Code-Codex-agent-browser-%E6%AE%8B%E7%95%99%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/</url>
+    <content><![CDATA[
+Claude Code、Codex 明明已经停下来了，Mac 风扇却还在转，内存也迟迟不降。问题可能不在当前会话，而在一批没有正常收尾的 agent-browser daemon 与自动化 Chrome。
+
+这次我在本机清理了 8 组遗留的 agent-browser &#x2F; Chrome 后台实例及其子进程。普通 Chrome 标签页没有动，机器热量很快就降了下来。
+这不是一个玄学问题，也不能简单归咎于“Chrome 太吃内存”。真正要理解的是：AI 编程工具、浏览器自动化工具、CDP、daemon 和 session 之间，到底是谁启动了谁，又该由谁负责关掉。
+
+
+30 秒结论先给赶时间的人答案：
+
+agent-browser 采用 CLI + 后台 daemon + Chrome 的架构，daemon 会故意跨命令常驻，以便下一条指令不用重新启动浏览器。
+每个独立 session 都可能拥有自己的浏览器实例。Claude Code、Codex 并发执行多个 agent 或工具任务时，session 数量很容易叠加。
+如果任务异常中断、会话被强制停止，或者调用方忘了执行 agent-browser close，后台进程就可能继续存在。
+CDP 只是控制通道，不是泄漏的根因。根因是 浏览器生命周期没有闭环。
+最优先执行官方收尾命令：agent-browser close --all。只有正常关闭失败，才按特征匹配并发送 TERM，最后才考虑 KILL。
+长期方案是设置空闲超时、复用 session，并要求每个自动化任务在 finally 或 shell trap 中关闭自己的 session。
+
+目录
+一、现象：AI 停了，浏览器却没停
+二、根因：常驻 daemon 遇上并发 session
+三、先确认，不要上来就 kill
+四、三层清理：官方关闭、温和终止、强制清理
+五、怎样保证不误伤普通 Chrome
+六、从源头预防：让生命周期闭环
+七、可直接收藏的排查清单
+
+一、现象：AI 停了，浏览器却没停典型场景是这样的：
+
+你让 Claude Code 或 Codex 通过 skill、MCP、shell 工具打开网页；
+自动化任务创建了多个命名 session，甚至并行跑了多个子 agent；
+任务完成或会话终止后，终端已经安静；
+但“活动监视器”里仍有多组 Chrome、Chrome Helper、GPU、Renderer 或 agent-browser 进程；
+合上几次窗口也没用，Mac 继续发热，内存和 CPU 占用居高不下。
+
+最迷惑的一点是：这些进程通常没有可见窗口。你看到的普通 Chrome 标签页可能只有几个，但后台自动化 Chrome 使用的是独立临时用户目录，它们和日常浏览器不是同一组实例。
+因此，“我已经关掉 Chrome 窗口了”并不能证明自动化浏览器已经退出。
+二、根因：常驻 daemon 遇上并发 session以本机安装的 agent-browser 0.27.0 为例，官方说明明确写了两件事：
+
+它采用 client-daemon 架构，Rust CLI 负责接收命令，Rust daemon 通过 CDP 控制 Chrome；
+daemon 会在第一次命令时自动启动，并在后续命令之间保持运行，以换取更快的响应。
+
+与此同时，官方 session 文档也说明：每个 session 都有独立的浏览器实例、Cookie、存储、历史记录和认证状态。
+这两点放到多 agent 场景里，就形成了下面的链路：
+
+Claude Code / Codex        │        ├─ Agent A → session A → daemon A → Chrome A → Renderer / GPU / Network        ├─ Agent B → session B → daemon B → Chrome B → Renderer / GPU / Network        └─ Agent C → session C → daemon C → Chrome C → Renderer / GPU / Network
+
+单看一组并不可怕。真正吃资源的是“多组浏览器进程树一起常驻”。一个 Chrome 主进程还会派生渲染、GPU、网络等子进程，所以 8 个遗留实例在活动监视器里看起来可能远不止 8 行。
+CDP 是不是罪魁祸首？不是。
+CDP（Chrome DevTools Protocol）只是自动化工具与 Chrome 之间的控制协议。它负责导航、点击、读取 DOM、截图等操作，但不会替调用方决定“任务什么时候算结束”。
+真正缺失的是这条生命周期：
+创建 session → 使用浏览器 → 任务成功或失败 → 关闭 session → 回收 daemon 和 Chrome
+
+如果最后两步没有执行，前面的资源就可能继续留在后台。
+
+关键判断： 不是 AI “还在思考”，而是 AI 启动的外部进程已经脱离了当前对话的可见范围。
+
+三、先确认，不要上来就 kill清理前先分清三件事：有多少活动 session、有哪些 agent-browser daemon、哪些 Chrome 使用了 agent-browser 的临时用户目录。
+1. 查看 agent-browser 自己记录的活动 sessionagent-browser session list
+
+如果版本支持 JSON：
+agent-browser session list --json
+
+这一步最可信，因为它从工具自己的会话视角回答“现在认为谁还活着”。
+2. 查看 daemon 和自动化 ChromemacOS 上可以使用：
+pgrep -fl &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;pgrep -fl &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;
+
+第二条命令的关键不是进程名“Google Chrome”，而是启动参数中的：
+--user-data-dir=.../agent-browser-chrome-...
+
+它说明这个 Chrome 使用的是 agent-browser 创建的隔离用户目录，而不是你日常使用的默认 Chrome Profile。
+3. 按 CPU、内存和运行时间查看完整进程树ps -axo pid,ppid,%cpu,%mem,rss,etime,command \  | grep -E &#x27;[a]gent-browser-darwin|[a]gent-browser-chrome-&#x27;
+
+字段含义：
+
+PID：当前进程编号，后续终止时使用。
+PPID：父进程编号，用来判断 daemon 与 Chrome 的父子关系。
+%CPU：CPU 占用，观察它是否持续让机器发热。
+%MEM &#x2F; RSS：内存占用，确认多个实例是否不断叠加。
+ETIME：已运行时间，判断它是否早已超过当前 AI 任务时长。
+COMMAND：完整启动命令，确认是否带有 agent-browser 特征参数。
+
+不要只看 ~/.agent-browser 下有没有 .pid、.sock 文件。它们可能只是过期的 sidecar 文件，并不等于进程仍然存活。进程是否活着，最终以 session list、ps 和 pgrep 为准。
+四、三层清理：官方关闭、温和终止、强制清理
+第一层：让 agent-browser 自己收尾优先执行：
+agent-browser close --all
+
+然后清理过期的 pid、socket、version 等 sidecar 文件：
+agent-browser doctor --offline --quick
+
+当前版本的 doctor 会自动清理陈旧的 daemon sidecar 文件；--fix 还可能执行重装 Chrome、清理旧状态等破坏性修复，因此日常排查先不要加 --fix。
+再次验证：
+agent-browser session listpgrep -fl &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;pgrep -fl &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;
+
+如果没有输出，说明已经清干净。
+第二层：发送 TERM，让进程有机会优雅退出只有官方关闭失败时再执行：
+pgrep -f &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27; \  | xargs -n 1 kill -TERM 2&gt;/dev/null || truepgrep -f &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27; \  | xargs -n 1 kill -TERM 2&gt;/dev/null || true
+
+TERM 会给进程处理退出、关闭文件和回收子进程的机会。执行后等 3 秒，再跑一次检查命令。
+第三层：只对仍残留的目标使用 KILLpgrep -f &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27; \  | xargs -n 1 kill -KILL 2&gt;/dev/null || truepgrep -f &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27; \  | xargs -n 1 kill -KILL 2&gt;/dev/null || true
+
+KILL 不允许进程执行清理逻辑，只适合处理已经卡死、无法响应 TERM 的残留。正在进行的自动化、下载、表单填写和未保存状态都会立即丢失。
+仓库里放一个可重复使用的脚本本文配套脚本已放在：
+scripts_py/agent_browser_cleanup.sh
+
+使用方式：
+./scripts_py/agent_browser_cleanup.sh status./scripts_py/agent_browser_cleanup.sh close./scripts_py/agent_browser_cleanup.sh force
+
+三条命令依次对应：只查看、官方关闭并清理 sidecar、官方关闭失败后的分级强制清理。
+五、怎样保证不误伤普通 Chrome不要使用下面这种“大锤”：
+killall &#x27;Google Chrome&#x27;pkill -f &#x27;Google Chrome&#x27;
+
+它们会把普通 Chrome 窗口和日常标签页一起关掉。
+本文脚本采用两层限制：
+
+daemon 必须匹配 agent-browser-darwin-arm64 或 agent-browser-darwin-x64 的安装路径；
+Chrome 必须带有 --user-data-dir=.../agent-browser-chrome-... 参数。
+
+也就是说，它针对的是 agent-browser 创建的隔离 Chrome，不是所有名为 Google Chrome 的进程。
+不过还有一个例外需要注意：如果你主动使用 --cdp 或 --auto-connect 连接了日常 Chrome，那么自动化 session 与普通浏览器之间的边界会变得更近。此时先用 session list 和完整命令行确认，不要直接执行强制清理。
+六、从源头预防：让生命周期闭环清理脚本只是灭火器。更好的办法是让每个任务都负责关掉自己打开的浏览器。
+
+1. 设置 daemon 空闲自动退出官方提供了 AGENT_BROWSER_IDLE_TIMEOUT_MS。例如 10 分钟无命令后自动关闭浏览器并退出 daemon：
+export AGENT_BROWSER_IDLE_TIMEOUT_MS=600000
+
+长期使用可以写入 ~/.zshrc：
+echo &#x27;export AGENT_BROWSER_IDLE_TIMEOUT_MS=600000&#x27; &gt;&gt; ~/.zshrcsource ~/.zshrc
+
+10 分钟只是一个稳妥起点。频繁执行长任务可以设为 30 分钟；偶尔使用、机器资源紧张时可以设为 3 到 5 分钟。
+2. 不要为每一步创建新 session同一个任务尽量复用一个语义明确的 session：
+agent-browser --session blog-research open https://example.comagent-browser --session blog-research snapshot -iagent-browser --session blog-research close
+
+并发任务确实需要隔离时，可以创建多个 session，但每个任务结束后都要单独关闭。
+3. 在 shell 脚本里用 trap 兜底set -euo pipefailSESSION=&quot;research-$$&quot;cleanup() &#123;  agent-browser --session &quot;$SESSION&quot; close &gt;/dev/null 2&gt;&amp;1 || true&#125;trap cleanup EXIT INT TERMagent-browser --session &quot;$SESSION&quot; open https://example.comagent-browser --session &quot;$SESSION&quot; snapshot -i
+
+无论脚本正常结束、报错，还是收到中断信号，cleanup 都会尝试关闭对应 session。
+4. 给 Claude Code &#x2F; Codex 的浏览器 skill 加退出规则长期指令里应明确写上：
+浏览器自动化任务结束后，必须关闭本任务创建的 agent-browser session。成功、失败、取消和超时都要执行清理；不得依赖用户手动回收后台进程。并发任务必须记录各自的 session 名称，只关闭自己创建的 session。
+
+这比“任务结束后记得关浏览器”更有效，因为它定义了成功、失败和取消三条路径。
+5. 定期做轻量检查如果你经常让多个 agent 并发操作网页，可以在结束工作前运行：
+agent-browser session list./scripts_py/agent_browser_cleanup.sh status
+
+发现不认识、运行时间异常长的 session，再决定是否关闭。不要把 force 放进高频定时任务，因为它可能打断仍在工作的自动化。
+七、可直接收藏的排查清单遇到 Mac 突然发热、内存异常时，按这个顺序走：
+
+打开“活动监视器”，确认是否有多组无窗口的 Chrome &#x2F; agent-browser。
+运行 agent-browser session list，确认活动 session。
+用 pgrep -fl 或 ps 检查 daemon 与 agent-browser-chrome- 用户目录。
+先执行 agent-browser close --all。
+再执行 agent-browser doctor --offline --quick 清理陈旧 sidecar。
+等待几秒并复查 CPU、内存和进程。
+仍有残留时先 TERM，最后才 KILL。
+设置 AGENT_BROWSER_IDLE_TIMEOUT_MS。
+在每个自动化脚本或 skill 中加入 finally &#x2F; trap 清理。
+避免 killall Google Chrome 这类会误伤普通标签页的命令。
+
+最后浏览器自动化最容易被忽略的，不是“怎么打开网页”，而是“谁负责关闭网页背后的整棵进程树”。
+Claude Code 和 Codex 能把网页操作拆成工具调用，却不会天然替所有第三方工具完成生命周期管理。只要调用链中存在 daemon、session 和独立 Chrome，就应该把清理当成任务的一部分，而不是任务结束后的家务。
+
+真正可靠的自动化，不只要能启动，还要能在成功、失败和取消时都干净退出。
+
+如果你的 Mac 也曾在 AI 会话结束后莫名发热，先别急着重启。跑一下本文的检查命令，很可能几分钟就能找到那批“已经下班，但进程还没打卡”的浏览器。
+参考资料
+agent-browser 官方仓库
+agent-browser README：命令、Session 与 Architecture
+Chrome for Testing 官方介绍
+Chrome DevTools：远程调试
+
+]]></content>
+      <categories>
+        <category>Agent</category>
+      </categories>
+      <tags>
+        <tag>Claude Code</tag>
+        <tag>Codex</tag>
+        <tag>agent-browser</tag>
+        <tag>Chrome</tag>
+        <tag>CDP</tag>
+        <tag>macOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Kimi WebBridge 原理</title>
     <url>/2026/05/18/agent/Kimi%20WebBridge%E5%8E%9F%E7%90%86/</url>
     <content><![CDATA[Kimi WebBridge 原理目录
@@ -1849,6 +1603,252 @@ LangChain Agent 系列文章：
         <tag>LangChain</tag>
         <tag>LLM</tag>
         <tag>AI教程</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Claude Code 从零到上手——安装、模型配置、Skill 与效率工具全指南</title>
+    <url>/2026/06/10/agent/Claude%20Code%20%E4%BB%8E%E9%9B%B6%E5%88%B0%E4%B8%8A%E6%89%8B/</url>
+    <content><![CDATA[目录
+一、为什么选 Claude Code
+二、快速安装
+2.1 安装 Node.js
+2.2 安装 Claude Code
+
+
+三、模型厂商与 Coding Plan 对比
+3.1 阿里百炼
+3.2 腾讯云混元
+3.3 百度千帆
+3.4 DeepSeek
+3.5 火山引擎（字节）
+3.6 MiniMax
+3.7 智谱 GLM
+3.8 月之暗面 Kimi
+
+
+四、模型厂商切换：CC Switch
+五、Skill：Claude Code 的核心扩展机制
+5.1 什么是 Skill
+5.2 常用 Skill 安装
+5.3 Skill 路径
+5.4 Skill 仓库与超市
+
+
+六、辅助工具推荐
+6.1 Starship：终端美化
+6.2 gstack：工程团队工具集
+6.3 Claude HUD：可视化监控面板
+6.4 跳过权限确认
+
+
+七、2026 年值得关注的新工具
+八、总结
+引用
+
+
+一、为什么选 Claude CodeClaude Code 是 Anthropic 推出的终端原生 AI 编程助手。相比 IDE 插件，它有几点核心优势：
+
+终端原生：直接在你的 shell 里运行，能操作文件系统、执行命令、管理 git，不需要 IDE 作为中间层。
+Skill 机制：通过 Skill 文件扩展 Agent 能力，类似”给 Agent 写操作手册”，比传统插件更灵活。
+MCP 协议：通过 MCP (Model Context Protocol) 连接外部工具和数据源，生态开放。
+多模型后端：官方使用 Claude 系列模型，但通过 CC Switch 等工具可以切换到国内模型厂商。
+
+下面从安装开始，一步步配好你的 Claude Code 开发环境。
+
+二、快速安装2.1 安装 Node.jsClaude Code 是一个 npm 包，需要 Node.js 环境。推荐用 nvm 管理 Node 版本：
+# 安装 nvmcurl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash# 加载 nvm\. &quot;$HOME/.nvm/nvm.sh&quot;# 安装 Node 24nvm install 24# 验证node -v   # 应输出 v24.16.0npm -v    # 应输出 11.13.0
+
+2.2 安装 Claude Code# 安装npm install -g @anthropic-ai/claude-code# 查看版本claude --version# 后续升级claude update
+
+安装完成后在终端输入 claude 即可启动交互式会话。官方文档：設定 Claude Code
+
+三、模型厂商与 Coding Plan 对比Claude Code 原生使用 Anthropic 的 Claude 系列模型，但国内用户可以通过第三方工具切换到国产模型。以下是主流模型厂商的 Coding Plan 概览：
+3.1 阿里百炼阿里云百炼平台提供 Qwen 系列等模型，支持 Coding Plan 订阅。
+
+控制台：阿里云百炼
+
+3.2 腾讯云混元腾讯混元大模型提供 Coding Plan，适合腾讯云生态用户。
+
+购买页：腾讯云混元
+
+3.3 百度千帆百度智能云千帆大模型平台，提供文心系列模型。
+
+控制台：百度千帆
+
+3.4 DeepSeekDeepSeek 独立平台，以高性价比和强代码能力著称。
+
+用量页：DeepSeek Platform
+
+3.5 火山引擎（字节）火山方舟 Coding Plan 支持的模型最丰富：DeepSeek-V4 系列、GLM-5.1、Doubao-Seed-2.0 系列、Kimi-K2.6、MiniMax-M2.7 等。订阅叠加 9.5 折，低至 38 元。
+
+订阅链接：https://volcengine.com/L/ooEqNrnaXdU/
+邀请码：KGRNLDMJ
+
+3.6 MiniMaxMiniMax 提供 M2 系列模型，也有 Coding Plan 可供选择。
+
+订阅方式同上（火山方舟渠道也支持 MiniMax 模型）
+
+3.7 智谱 GLM智谱 GLM Coding Plan 适配 20+ 主流工具，性价比突出。
+
+拼好模活动：https://www.bigmodel.cn/glm-coding?ic=FVAXRFATIM
+
+3.8 月之暗面 KimiKimi 提供会员订阅模式，可在 Kimi 首页侧边栏进入。
+
+定价页：Kimi 会员
+
+
+四、模型厂商切换：CC SwitchClaude Code 默认对接 Anthropic API，要使用国内模型，需要借助 CC Switch 做 API 代理和模型映射。
+
+项目地址：CC Switch Releases（当前最新 v3.16.2，2026-06-08 发布）
+
+CC Switch 的核心原理是在本地启动一个代理服务，将 Claude Code 发往 Anthropic API 的请求拦截并转发到你配置的国内模型厂商 API，同时做请求&#x2F;响应格式的兼容转换。目前 CC Switch 已不限于 Claude Code，同时支持 Codex、OpenCode、Gemini CLI 等工具。
+基本使用流程：
+
+从 Release 页下载对应平台的二进制文件
+配置目标模型厂商的 API Key 和 Endpoint
+启动 CC Switch 代理
+设置环境变量让 Claude Code 走代理
+
+这样 Claude Code 实际调用的就是国产模型，但交互体验保持一致。
+
+五、Skill：Claude Code 的核心扩展机制5.1 什么是 SkillSkill 是 Claude Code 的扩展机制——本质上是给 Agent 注入一段专业领域的 System Prompt，告诉它”遇到某类任务时应该怎么做”。一个 Skill 就是一个 Markdown 文件，放在特定目录下即可被 Claude Code 自动发现和加载。
+相比传统插件的优势：
+
+声明式：不需要写代码，写清楚流程和规则即可
+可组合：多个 Skill 可以同时生效
+用户可控：Skill 优先级低于用户指令，用户始终拥有最终控制权
+
+更多原理参考：
+
+Claude Code Skills 详解（一）
+Claude Code Skills 详解（二）
+
+5.2 常用 Skill 安装# 前端设计/plugin install frontend-design@claude-plugins-official# 代码审查/plugin install code-review@claude-plugins-official# 代码简化/plugin install code-simplifier@claude-plugins-official# UI/UX 设计claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skillclaude plugin install ui-ux-pro-max@ui-ux-pro-max-skill# SDD (Superpowers Driven Development)claude plugin install superpowers@claude-plugins-official# agent-browser（浏览器自动化）npx skills add https://github.com/vercel-labs/agent-browser --skill agent-browser# skill-creator（创建自定义 Skill）npx skills add https://github.com/anthropics/skills --skill skill-creator# Brave Search（搜索集成）cp -r brave-search-skills/skills/* ~/.agents/skills/    # 用户级cp -r brave-search-skills/skills/* .agents/skills/       # 项目级
+
+5.3 Skill 路径Skill 文件存放在以下位置：
+
+
+
+平台
+路径
+
+
+
+macOS
+~/.claude/skills
+
+
+Windows
+E:\Users\&lt;用户名&gt;\.claude\skills
+
+
+用户级 Skill 对所有项目生效，项目级 Skill（.claude/skills/）只对当前项目生效。
+5.4 Skill 仓库与超市如果你不想自己写 Skill，可以从社区仓库找现成的：
+
+Awesome Claude Skills：GitHub — 精选 Skill 列表，涵盖开发、设计、运维等场景
+SkillsMP：skillsmp.com — Skill 超市，可直接浏览和下载
+
+
+六、辅助工具推荐6.1 Starship：终端美化Starship 是一个跨 shell 的轻量级提示符，能让终端显示 git 分支、Node 版本、命令耗时等信息，Claude Code 场景下特别实用——一眼就能看到当前项目状态。
+# 先安装 Homebrew（如已安装可跳过）/bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)&quot;echo &#x27;eval &quot;$(/opt/homebrew/bin/brew shellenv)&quot;&#x27; &gt;&gt; ~/.zprofileeval &quot;$(/opt/homebrew/bin/brew shellenv)&quot;# 安装 Starshipbrew install starship# 配置 ~/.zshrc，在文件末尾追加echo &#x27;eval &quot;$(starship init zsh)&quot;&#x27; &gt;&gt; ~/.zshrc# 生效source ~/.zshrc
+
+6.2 gstack：工程团队工具集gstack 是一套面向工程团队的 Claude Code Skill 集合，提供 CEO 审查、设计评审、QA 测试、安全审计、部署等 23+ 个 Skill，远不止搜索功能。
+前置要求： 需要安装 Bun v1.0+。
+# 安装 Bun（如未安装）curl -fsSL https://bun.sh/install | bash# 克隆 gstack 并自动安装git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstackcd ~/.claude/skills/gstack &amp;&amp; ./setup
+
+详细使用参考：gstack 使用指南
+6.3 Claude HUD：可视化监控面板Claude HUD 是一个在终端内嵌的 HUD（抬头显示）面板，可以实时显示上下文用量、活跃工具、运行中的 Agent 和 Todo 进度，让你对 Claude Code 的运行状态一目了然。
+# Claude Code 内执行/plugin marketplace add jarrodwatts/claude-hud# 安装插件/plugin install claude-hud# 初始化/claude-hud:setup
+
+详细使用参考：Claude HUD 介绍
+6.4 跳过权限确认Claude Code 在执行文件操作、运行命令时会弹出权限确认。如果你在安全环境下希望减少打断，可以：
+claude --dangerously-skip-permissions
+
+
+⚠️ 这个参数会跳过所有权限确认，只在完全信任的环境中（如个人开发机）使用。Claude Code 还提供了更温和的 --allow-dangerously-skip-permissions 参数，仅允许跳过权限但不默认开启，安全性更高。
+
+
+七、2026 年值得关注的新工具2026 年 Claude Code 生态涌现了不少新工具，这里推荐几个实用的：
+
+
+
+工具
+用途
+Stars
+
+
+
+skillshare
+跨工具同步 Skill（Claude Code、Codex、OpenClaw 等）
+2,190
+
+
+skills-manager
+桌面端 Skill 管理器，支持 15+ 编程工具
+2,053
+
+
+awesome-claude-code-toolkit
+135 Agents + 35 Skills + 42 Commands + 176+ Plugins 合集
+2,002
+
+
+open-cowork
+开源桌面应用，一键启动 Claude Code + MCP + Skills
+1,543
+
+
+
+八、总结
+
+
+环节
+推荐方案
+
+
+
+运行时
+Node 24 + Claude Code 最新版
+
+
+模型
+海外用 Anthropic 官方，国内用火山方舟（模型最全）或智谱 GLM Coding Plan（性价比高）
+
+
+模型切换
+CC Switch
+
+
+扩展
+Skill（前端设计、代码审查、浏览器自动化、搜索等）
+
+
+辅助
+Starship（终端美化）+ gstack（工程工具集）+ Claude HUD（监控）
+
+
+Claude Code 的核心理念是”终端即 IDE”——不是替代 VS Code，而是提供一种更轻量、更脚本化、更 Agent 友好的编程方式。配合 Skill 和 MCP，它能做的不只是补全代码，而是真正帮你完成多步骤的工程任务。
+
+引用
+Claude Code 官方文档
+CC Switch
+Awesome Claude Skills
+SkillsMP
+gstack 使用指南
+Claude HUD 介绍
+Claude Code Skills 详解
+
+]]></content>
+      <categories>
+        <category>工具</category>
+        <category>AI</category>
+      </categories>
+      <tags>
+        <tag>Skill</tag>
+        <tag>Claude Code</tag>
+        <tag>AI Agent</tag>
+        <tag>MCP</tag>
+        <tag>开发工具</tag>
       </tags>
   </entry>
   <entry>
@@ -2274,6 +2274,92 @@ LangChain Agent 系列文章：
       </tags>
   </entry>
   <entry>
+    <title>写一次，博客和公众号草稿同时就绪：我的内容工作流</title>
+    <url>/2026/06/22/agent/%E5%BD%93AI%E5%AD%A6%E4%BC%9A%E6%8E%92%E7%89%88-3%E4%B8%AA%E5%BC%80%E6%BA%90Skill%E7%BC%96%E6%8E%92%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E5%BC%95%E6%93%8E/</url>
+    <content><![CDATA[
+我真正想省掉的，不是写作，而是写完之后那一串重复劳动。 维护一份 Markdown，就能得到一篇博客和一篇排好版的公众号草稿；某一步失败，也不必从头再来。
+
+每次写完文章，我都要重复同一套动作：找封面、处理正文图、上传图床、检查博客，再去公众号后台重新排一遍。
+写作只做了一次，搬运却像又写了一次。
+于是我把这些步骤串成了一条个人内容工作流。它不替我按下最终发布按钮，但会把成品送到按钮前，并告诉我哪里通过了、哪里应该停。
+
+一句话看懂：一份内容作为事实源，博客和公众号分别输出，失败从断点继续。
+
+先看结果：我最终拿到什么不是一堆中间文件，而是三个可以继续使用的结果。
+博客成品：标题、摘要、封面、正文图片、来源和分类都完整，Hexo 构建通过后才进入发布流程。
+公众号成品：不是裸 Markdown，而是适合手机阅读的内联样式 HTML；正文图和封面也会进入公众号素材流程。
+恢复记录：文章、图片和草稿状态被保存下来。网络或接口出错时，下次只重试没完成的部分。
+
+这张图就是整套流程：同一份原稿，走向两个发布端；每个关键步骤前都有检查点。
+三个 Skill，不是三个“万能引擎”我一开始也把它们讲复杂了。其实三个工具的关系非常简单：一个管全局，一个管排版，一个管送达。
+
+总控｜wechat-article-generator
+它像项目经理加质检员：理解选题、组织文章、规划图片、调用图床、生成 Hexo 文件，并判断下一步该调用谁。它关心的是整件事有没有闭环。
+
+
+排版｜md2wechat
+它把 Markdown 转成公众号兼容的 HTML，并负责主题、预览、封面和信息图等排版能力。文章已经写好、只想解决公众号排版的人，用这一段就够了。
+
+
+送达｜baoyu-post-to-wechat
+它处理正文图片、封面素材、账号配置和草稿创建。它只负责把成品安全送进编辑后台，默认不会替我发布或群发。
+
+所以，真正的关系不是“三个 AI 一起写文章”，而是：
+总控决定顺序，md2wechat 负责变好看，baoyu 负责放进草稿箱。
+稳定，不等于“一键无脑跑完”这套工作流真正有用的地方，是把容易忘、容易错的动作变成固定顺序。
+先写清楚。 总控先确认读者、核心结论和信息来源。涉及新闻、项目数据和产品能力时，必须保留来源，不能猜数字。
+再让图片解释内容。 封面负责让读者一眼看懂主题，正文图负责解释流程、架构或故障恢复，不拿无关“科技图”凑数。
+图片先进入 OSS。 博客只引用真实线上地址。上传失败时，流程停止，不偷偷改成本地路径，也不拿默认图顶上去。
+两个渠道分别渲染。 博客保留 Markdown，交给 Hexo；公众号生成全内联样式 HTML，避免进入编辑器后样式丢失。
+最后才检查交付。 封面、正文图、移动端字号、HTML 兼容性和博客构建全部通过，才算完成。
+
+自动化不是“什么都继续做”，而是该继续时继续，该停时明确停下。
+
+图片不是装饰，它要先回答问题我对封面的要求只有一个：用户只看这张图，也能知道文章在讲什么。
+因此，系统先从标题、摘要和正文里提炼一个主题与两到四个要点，再决定画面结构。图片模型只负责无文字底图或视觉框架，准确中文最后由可控排版叠加。
+主标题和关键信息保留 6% 到 8% 的安全边距，缩成手机封面后仍要看得清。
+如果生成服务不可用，才会选择同主题、来源明确的真实素材。技术文章只看技术类候选，不会从动漫、风景和人物图里随机抽一张。
+这不是“有图就行”，而是四道检查：主题相关、文字正确、画幅适配、来源可追溯。
+真正遇到故障时，会发生什么
+我把故障分成三种，不同故障有不同处理方式。
+能替代：封面生成服务不可用，可以换成同主题的真实素材，但必须重新检查构图和授权。
+能续跑：出口 IP 不在白名单，博客和微信 HTML 可以保留；网络恢复后，只重试草稿上传。
+必须停：图片没上传到 OSS、文章检查没通过、草稿条件不满足。此时不能伪造 URL，也不能为了“看起来完成了”而静默降级。
+state.json 记录文章哈希、素材和草稿结果。它不会让错误自动消失，但会让下一次清楚知道：哪些已经完成，哪些还没做。
+9 月 13 日那次失败，反而说明它有用那期 GitHub 周报第一次运行时，博客已经构建并推送成功，公众号却没有出现草稿。
+问题不在文章，而在代理改变了出口 IP，公众号令牌接口返回 40164，当前地址不在白名单。
+流程没有假装成功。文章、微信 HTML、封面和已上传图片都被保留下来。
+关闭代理后，我只重试了草稿阶段：重新检查令牌，上传正文图与封面，创建草稿，再核对标题、正文和阅读原文链接。
+没有重新研究，没有重新写稿，也没有再生成一篇博客。
+
+这比“全自动”更重要：失败时知道停在哪里，恢复时知道从哪里接着走。
+
+你不必复刻整套系统只做公众号排版，就拿走 md2wechat：Markdown 写完后，用它生成适合公众号的 HTML 和预览。
+已经有排好版的 Markdown 或 HTML，只差进入草稿箱，就用 baoyu-post-to-wechat。
+同时维护 Hexo、Hugo 等博客和公众号，再借鉴总控思路：保留一份主稿，为两个渠道分别输出，并给图片、排版和构建设置硬检查。
+如果只想改善封面，也只需要拿走一条原则：先让图片说清文章主题，再谈风格好不好看。
+文末工具箱
+wechat-article-generator：我的总控 Skill
+md2wechat：Markdown 转公众号 HTML、预览与视觉生成
+baoyu-post-to-wechat：公众号草稿上传与多通道发布
+PicGo：图片上传与图床客户端
+Hexo：静态博客生成器
+
+我最后留下的不是一个所有人都要照搬的方案，而是三个可以复用的原则：一份内容作为事实源，工具各做自己擅长的事，任何发布都要经过可验证的质量门。
+如果你也在做内容，你最想先省掉哪一步：排版、配图，还是草稿上传？
+]]></content>
+      <categories>
+        <category>agent</category>
+      </categories>
+      <tags>
+        <tag>AI</tag>
+        <tag>技能编排</tag>
+        <tag>md2wechat</tag>
+        <tag>内容工作流</tag>
+        <tag>自动化</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>nanobot核心架构</title>
     <url>/2026/05/25/agent/nanobot%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84/</url>
     <content><![CDATA[目录
@@ -2646,92 +2732,6 @@ ContextVars 会话隔离每个异步协程有独立的 ContextVar，存储 sessi
       </tags>
   </entry>
   <entry>
-    <title>写一次，博客和公众号草稿同时就绪：我的内容工作流</title>
-    <url>/2026/06/22/agent/%E5%BD%93AI%E5%AD%A6%E4%BC%9A%E6%8E%92%E7%89%88-3%E4%B8%AA%E5%BC%80%E6%BA%90Skill%E7%BC%96%E6%8E%92%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E5%BC%95%E6%93%8E/</url>
-    <content><![CDATA[
-我真正想省掉的，不是写作，而是写完之后那一串重复劳动。 维护一份 Markdown，就能得到一篇博客和一篇排好版的公众号草稿；某一步失败，也不必从头再来。
-
-每次写完文章，我都要重复同一套动作：找封面、处理正文图、上传图床、检查博客，再去公众号后台重新排一遍。
-写作只做了一次，搬运却像又写了一次。
-于是我把这些步骤串成了一条个人内容工作流。它不替我按下最终发布按钮，但会把成品送到按钮前，并告诉我哪里通过了、哪里应该停。
-
-一句话看懂：一份内容作为事实源，博客和公众号分别输出，失败从断点继续。
-
-先看结果：我最终拿到什么不是一堆中间文件，而是三个可以继续使用的结果。
-博客成品：标题、摘要、封面、正文图片、来源和分类都完整，Hexo 构建通过后才进入发布流程。
-公众号成品：不是裸 Markdown，而是适合手机阅读的内联样式 HTML；正文图和封面也会进入公众号素材流程。
-恢复记录：文章、图片和草稿状态被保存下来。网络或接口出错时，下次只重试没完成的部分。
-
-这张图就是整套流程：同一份原稿，走向两个发布端；每个关键步骤前都有检查点。
-三个 Skill，不是三个“万能引擎”我一开始也把它们讲复杂了。其实三个工具的关系非常简单：一个管全局，一个管排版，一个管送达。
-
-总控｜wechat-article-generator
-它像项目经理加质检员：理解选题、组织文章、规划图片、调用图床、生成 Hexo 文件，并判断下一步该调用谁。它关心的是整件事有没有闭环。
-
-
-排版｜md2wechat
-它把 Markdown 转成公众号兼容的 HTML，并负责主题、预览、封面和信息图等排版能力。文章已经写好、只想解决公众号排版的人，用这一段就够了。
-
-
-送达｜baoyu-post-to-wechat
-它处理正文图片、封面素材、账号配置和草稿创建。它只负责把成品安全送进编辑后台，默认不会替我发布或群发。
-
-所以，真正的关系不是“三个 AI 一起写文章”，而是：
-总控决定顺序，md2wechat 负责变好看，baoyu 负责放进草稿箱。
-稳定，不等于“一键无脑跑完”这套工作流真正有用的地方，是把容易忘、容易错的动作变成固定顺序。
-先写清楚。 总控先确认读者、核心结论和信息来源。涉及新闻、项目数据和产品能力时，必须保留来源，不能猜数字。
-再让图片解释内容。 封面负责让读者一眼看懂主题，正文图负责解释流程、架构或故障恢复，不拿无关“科技图”凑数。
-图片先进入 OSS。 博客只引用真实线上地址。上传失败时，流程停止，不偷偷改成本地路径，也不拿默认图顶上去。
-两个渠道分别渲染。 博客保留 Markdown，交给 Hexo；公众号生成全内联样式 HTML，避免进入编辑器后样式丢失。
-最后才检查交付。 封面、正文图、移动端字号、HTML 兼容性和博客构建全部通过，才算完成。
-
-自动化不是“什么都继续做”，而是该继续时继续，该停时明确停下。
-
-图片不是装饰，它要先回答问题我对封面的要求只有一个：用户只看这张图，也能知道文章在讲什么。
-因此，系统先从标题、摘要和正文里提炼一个主题与两到四个要点，再决定画面结构。图片模型只负责无文字底图或视觉框架，准确中文最后由可控排版叠加。
-主标题和关键信息保留 6% 到 8% 的安全边距，缩成手机封面后仍要看得清。
-如果生成服务不可用，才会选择同主题、来源明确的真实素材。技术文章只看技术类候选，不会从动漫、风景和人物图里随机抽一张。
-这不是“有图就行”，而是四道检查：主题相关、文字正确、画幅适配、来源可追溯。
-真正遇到故障时，会发生什么
-我把故障分成三种，不同故障有不同处理方式。
-能替代：封面生成服务不可用，可以换成同主题的真实素材，但必须重新检查构图和授权。
-能续跑：出口 IP 不在白名单，博客和微信 HTML 可以保留；网络恢复后，只重试草稿上传。
-必须停：图片没上传到 OSS、文章检查没通过、草稿条件不满足。此时不能伪造 URL，也不能为了“看起来完成了”而静默降级。
-state.json 记录文章哈希、素材和草稿结果。它不会让错误自动消失，但会让下一次清楚知道：哪些已经完成，哪些还没做。
-9 月 13 日那次失败，反而说明它有用那期 GitHub 周报第一次运行时，博客已经构建并推送成功，公众号却没有出现草稿。
-问题不在文章，而在代理改变了出口 IP，公众号令牌接口返回 40164，当前地址不在白名单。
-流程没有假装成功。文章、微信 HTML、封面和已上传图片都被保留下来。
-关闭代理后，我只重试了草稿阶段：重新检查令牌，上传正文图与封面，创建草稿，再核对标题、正文和阅读原文链接。
-没有重新研究，没有重新写稿，也没有再生成一篇博客。
-
-这比“全自动”更重要：失败时知道停在哪里，恢复时知道从哪里接着走。
-
-你不必复刻整套系统只做公众号排版，就拿走 md2wechat：Markdown 写完后，用它生成适合公众号的 HTML 和预览。
-已经有排好版的 Markdown 或 HTML，只差进入草稿箱，就用 baoyu-post-to-wechat。
-同时维护 Hexo、Hugo 等博客和公众号，再借鉴总控思路：保留一份主稿，为两个渠道分别输出，并给图片、排版和构建设置硬检查。
-如果只想改善封面，也只需要拿走一条原则：先让图片说清文章主题，再谈风格好不好看。
-文末工具箱
-wechat-article-generator：我的总控 Skill
-md2wechat：Markdown 转公众号 HTML、预览与视觉生成
-baoyu-post-to-wechat：公众号草稿上传与多通道发布
-PicGo：图片上传与图床客户端
-Hexo：静态博客生成器
-
-我最后留下的不是一个所有人都要照搬的方案，而是三个可以复用的原则：一份内容作为事实源，工具各做自己擅长的事，任何发布都要经过可验证的质量门。
-如果你也在做内容，你最想先省掉哪一步：排版、配图，还是草稿上传？
-]]></content>
-      <categories>
-        <category>agent</category>
-      </categories>
-      <tags>
-        <tag>AI</tag>
-        <tag>技能编排</tag>
-        <tag>md2wechat</tag>
-        <tag>内容工作流</tag>
-        <tag>自动化</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Flowable</title>
     <url>/2024/08/01/%E5%90%8E%E7%AB%AF/Flowable/</url>
     <content><![CDATA[Flowable目录
@@ -2903,30 +2903,6 @@ docker启动自动运行
       </categories>
       <tags>
         <tag>docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>并发编程</title>
-    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/Juc%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/</url>
-    <content><![CDATA[Juc并发编程目录
-JUC
-进程和线程
-并行与并发
-
-
-
-
-JUC进程和线程线程作为最小调度单位，进程作为资源分配的最小单位。
-并行与并发
-并发（concurrent）是同一时间应对（dealingwith）多件事情的能力—同一时间段
-并行（parallel）是同一时间动手做（doing）多件事情的能力—–同一时刻
-
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
@@ -3313,6 +3289,30 @@ IO多路复用是指通过一种机制，使一个进程能够监视多个文件
 静态代理：代理类在编译期就已确定，代理类和目标类实现相同的接口
 JDK动态代理：基于接口，通过Proxy.newProxyInstance()在运行时动态生成代理类
 CGLIB动态代理：基于继承，通过生成目标类的子类来实现代理，不需要接口
+
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>并发编程</title>
+    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/Juc%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/</url>
+    <content><![CDATA[Juc并发编程目录
+JUC
+进程和线程
+并行与并发
+
+
+
+
+JUC进程和线程线程作为最小调度单位，进程作为资源分配的最小单位。
+并行与并发
+并发（concurrent）是同一时间应对（dealingwith）多件事情的能力—同一时间段
+并行（parallel）是同一时间动手做（doing）多件事情的能力—–同一时刻
 
 ]]></content>
       <categories>
@@ -4263,180 +4263,44 @@ Kafka 核心组件和 API？
       </tags>
   </entry>
   <entry>
-    <title>SpringMVC</title>
-    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/Springmvc/</url>
-    <content><![CDATA[SpringMVC目录
-1. MVC设计模式
-2. SpringMVC执行流程
-3. 常用注解
-@RequestMapping
-@RequestParam
-@PathVariable
-@RequestBody
-@ResponseBody
-@Controller vs @RestController
+    <title>hexo博客框架</title>
+    <url>/2024/07/23/%E5%90%8E%E7%AB%AF/hexo%E5%85%A5%E9%97%A8/</url>
+    <content><![CDATA[hexo入门目录
+Quick Start
+Create a new post
+Run server
+Generate static files
+Deploy to remote sites
+
+
+
+
+Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
+Quick StartCreate a new post$ hexo new &quot;My New Post&quot;
+
+More info: Writing
+Run server$ hexo server
+
+More info: Server
+Generate static files$ hexo generate
+
+More info: Generating
+Deploy to remote sites$ hexo deploy
+
+More info: Deployment
+]]></content>
+      <categories>
+        <category>后端</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>git使用</title>
+    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/git%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[git使用#git代理配置git config --global http.http://github.com.proxy &#x27;http://127.0.0.1:10809&#x27;git config --global https.https://github.com.proxy &#x27;http://127.0.0.1:10809&#x27;
 
-
-4. 请求转发与重定向
-通过Servlet API实现
-通过SpringMVC实现（无视图解析器）
-通过SpringMVC实现（有视图解析器）
-
-
-5. 数据显示到前端
-第一种：通过ModelAndView
-第二种：通过ModelMap
-第三种：通过Model
-三者区别
-
-
-6. 拦截器
-Filter与Interceptor的区别
-
-
-7. 全局异常处理
-@ControllerAdvice + @ExceptionHandler
-
-
-8. 常见问题
-获取项目名
-DispatcherServlet屏蔽了html页面的访问
-中文乱码问题
-
-
-
-
-1. MVC设计模式MVC是一种设计规范，主要作用是降低了视图与业务逻辑间的双向耦合。
-
-Model（模型）：数据模型，提供要展示的数据，因此包含数据和行为，可以认为是领域模型或JavaBean组件（包含数据和行为），不过现在一般都分离开来：Value Object（数据Dao）和服务层（行为Service）。也就是模型提供了模型数据查询和模型数据的状态更新等功能，包括数据和业务。
-View（视图）：负责进行模型的展示，一般就是我们见到的用户界面，客户想看到的东西。
-Controller（控制器）：接收用户请求，委托给模型进行处理（状态改变），处理完毕后把返回的模型数据返回给视图，由视图负责展示。也就是说控制器做了个调度员的工作。
-
-最典型的MVC就是JSP + Servlet + JavaBean的模式。
-2. SpringMVC执行流程
-用户发送请求到DispatcherServlet（前端控制器）
-DispatcherServlet调用HandlerMapping（处理器映射器）根据URL找到对应的Handler
-HandlerMapping返回HandlerExecutionChain（包含Handler和拦截器链）
-DispatcherServlet调用HandlerAdapter（处理器适配器）执行Handler
-HandlerAdapter执行Controller中的业务方法，返回ModelAndView
-DispatcherServlet将ModelAndView传给ViewResolver（视图解析器）
-ViewResolver解析后返回具体的View（视图）
-DispatcherServlet对View进行渲染（将模型数据填充至视图中）
-DispatcherServlet响应结果给用户
-
-
-核心组件：DispatcherServlet、HandlerMapping、HandlerAdapter、ViewResolver
-
-3. 常用注解@RequestMapping映射访问路径，可指定请求方法：
-@RequestMapping(value = &quot;/hello&quot;, method = &#123;RequestMethod.GET&#125;)public String index2(Model model)&#123;    model.addAttribute(&quot;msg&quot;, &quot;hello!&quot;);    return &quot;test&quot;;&#125;
-
-衍生注解（简化写法）：
-
-@GetMapping：等价于 @RequestMapping(method = RequestMethod.GET)
-@PostMapping：等价于 @RequestMapping(method = RequestMethod.POST)
-@PutMapping、@DeleteMapping、@PatchMapping
-
-@RequestParam绑定请求参数到方法参数：
-@GetMapping(&quot;/user&quot;)public String getUser(@RequestParam(&quot;id&quot;) Long id,                      @RequestParam(value = &quot;name&quot;, required = false) String name) &#123;    // ...&#125;
-
-@PathVariable获取路径中的变量：
-@GetMapping(&quot;/user/&#123;id&#125;&quot;)public String getUser(@PathVariable(&quot;id&quot;) Long id) &#123;    // ...&#125;
-
-@RequestBody获取请求体中的JSON数据，常用于POST请求：
-@PostMapping(&quot;/user&quot;)public String addUser(@RequestBody User user) &#123;    // ...&#125;
-
-@ResponseBody将方法返回值直接作为响应体返回，而不是解析为视图名：
-@GetMapping(&quot;/api/user&quot;)@ResponseBodypublic User getUser() &#123;    return new User(&quot;张三&quot;, 20);&#125;
-
-@RestController &#x3D; @Controller + @ResponseBody
-@Controller vs @RestController
-@Controller：返回视图名，需要配合视图解析器使用
-@RestController：返回JSON&#x2F;XML数据，适用于RESTful API
-
-4. 请求转发与重定向通过Servlet API实现@Controllerpublic class ResultGo &#123;    // 直接输出    @RequestMapping(&quot;/result/t1&quot;)    public void test1(HttpServletRequest req, HttpServletResponse rsp) throws IOException &#123;        rsp.getWriter().println(&quot;Hello,Spring BY servlet API&quot;);    &#125;    // 重定向    @RequestMapping(&quot;/result/t2&quot;)    public void test2(HttpServletRequest req, HttpServletResponse rsp) throws IOException &#123;        rsp.sendRedirect(&quot;/index.jsp&quot;);    &#125;    // 请求转发    @RequestMapping(&quot;/result/t3&quot;)    public void test3(HttpServletRequest req, HttpServletResponse rsp) throws Exception &#123;        req.setAttribute(&quot;msg&quot;, &quot;/result/t3&quot;);        req.getRequestDispatcher(&quot;/WEB-INF/jsp/test.jsp&quot;).forward(req, rsp);    &#125;&#125;
-
-通过SpringMVC实现（无视图解析器）@Controllerpublic class ResultSpringMVC &#123;    @RequestMapping(&quot;/rsm/t1&quot;)    public String test1()&#123;        // 转发        return &quot;/index.jsp&quot;;    &#125;    @RequestMapping(&quot;/rsm/t2&quot;)    public String test2()&#123;        // 转发二        return &quot;forward:/index.jsp&quot;;    &#125;    @RequestMapping(&quot;/rsm/t3&quot;)    public String test3()&#123;        // 重定向        return &quot;redirect:/index.jsp&quot;;    &#125;&#125;
-
-通过SpringMVC实现（有视图解析器）@Controllerpublic class ResultSpringMVC2 &#123;    @RequestMapping(&quot;/rsm2/t1&quot;)    public String test1()&#123;        // 转发（视图解析器会拼接前缀后缀）        return &quot;test&quot;;    &#125;    @RequestMapping(&quot;/rsm2/t2&quot;)    public String test2()&#123;        // 重定向，不需要视图解析器，本质就是重新请求一个新地方        return &quot;redirect:/index.jsp&quot;;        // return &quot;redirect:hello.do&quot;; // hello.do为另一个请求    &#125;&#125;
-
-
-转发（forward）是服务器内部跳转，地址栏不变；重定向（redirect）是客户端重新发起请求，地址栏改变。
-
-5. 数据显示到前端第一种：通过ModelAndViewpublic class ControllerTest1 implements Controller &#123;    public ModelAndView handleRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception &#123;        // 返回一个模型视图对象        ModelAndView mv = new ModelAndView();        mv.addObject(&quot;msg&quot;, &quot;ControllerTest1&quot;);        mv.setViewName(&quot;test&quot;);        return mv;    &#125;&#125;
-
-第二种：通过ModelMap@RequestMapping(&quot;/hello&quot;)public String hello(@RequestParam(&quot;username&quot;) String name, ModelMap model)&#123;    // 封装要显示到视图中的数据    // 相当于req.setAttribute(&quot;name&quot;, name);    model.addAttribute(&quot;name&quot;, name);    return &quot;hello&quot;;&#125;
-
-第三种：通过Model@RequestMapping(&quot;/ct2/hello&quot;)public String hello(@RequestParam(&quot;username&quot;) String name, Model model)&#123;    // 封装要显示到视图中的数据    model.addAttribute(&quot;msg&quot;, name);    return &quot;test&quot;;&#125;
-
-三者区别
-
-
-方式
-说明
-
-
-
-Model
-只有寥寥几个方法，适合存储数据
-
-
-ModelMap
-继承了LinkedHashMap，拥有Map的所有方法
-
-
-ModelAndView
-可以存储数据，也可以设置视图名，功能最全
-
-
-6. 拦截器SpringMVC的拦截器（HandlerInterceptor）类似于Servlet中的Filter，用于对处理器进行预处理和后处理。
-public class MyInterceptor implements HandlerInterceptor &#123;    // 在请求处理之前执行（预处理），返回true放行，返回false拦截    @Override    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception &#123;        System.out.println(&quot;预处理...&quot;);        return true;    &#125;    // 在请求处理之后，视图渲染之前执行（后处理）    @Override    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception &#123;        System.out.println(&quot;后处理...&quot;);    &#125;    // 在视图渲染之后执行（清理工作）    @Override    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception &#123;        System.out.println(&quot;清理...&quot;);    &#125;&#125;
-
-拦截器配置：
-@Configurationpublic class WebConfig implements WebMvcConfigurer &#123;    @Override    public void addInterceptors(InterceptorRegistry registry) &#123;        registry.addInterceptor(new MyInterceptor())                .addPathPatterns(&quot;/**&quot;)          // 拦截所有路径                .excludePathPatterns(&quot;/login&quot;);   // 排除login路径    &#125;&#125;
-
-Filter与Interceptor的区别
-
-
-对比项
-Filter
-Interceptor
-
-
-
-规范
-Servlet规范
-SpringMVC规范
-
-
-作用范围
-所有请求
-只拦截Controller请求
-
-
-执行时机
-在DispatcherServlet前后
-在Handler前后
-
-
-获取Bean
-不能直接获取Spring Bean
-可以直接获取Spring Bean
-
-
-7. 全局异常处理@ControllerAdvice + @ExceptionHandler@ControllerAdvicepublic class GlobalExceptionHandler &#123;    @ExceptionHandler(ArithmeticException.class)    public String handleArithmeticException(Exception e, Model model) &#123;        model.addAttribute(&quot;error&quot;, e.getMessage());        return &quot;error&quot;;    &#125;    @ExceptionHandler(Exception.class)    @ResponseBody    public Map&lt;String, Object&gt; handleException(Exception e) &#123;        Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();        map.put(&quot;code&quot;, 500);        map.put(&quot;msg&quot;, e.getMessage());        return map;    &#125;&#125;
-
-8. 常见问题获取项目名$&#123;pageContext.request.contextPath&#125;
-
-DispatcherServlet屏蔽了html页面的访问默认配置下DispatcherServlet会拦截所有请求，包括静态资源。需要在web.xml中添加：
-&lt;servlet-mapping&gt;    &lt;servlet-name&gt;default&lt;/servlet-name&gt;    &lt;url-pattern&gt;*.html&lt;/url-pattern&gt;&lt;/servlet-mapping&gt;
-
-或在SpringMVC配置中添加：
-&lt;mvc:default-servlet-handler/&gt;
-
-中文乱码问题在web.xml中配置字符编码过滤器：
-&lt;filter&gt;    &lt;filter-name&gt;encodingFilter&lt;/filter-name&gt;    &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;/filter-class&gt;    &lt;init-param&gt;        &lt;param-name&gt;encoding&lt;/param-name&gt;        &lt;param-value&gt;UTF-8&lt;/param-value&gt;    &lt;/init-param&gt;&lt;/filter&gt;&lt;filter-mapping&gt;    &lt;filter-name&gt;encodingFilter&lt;/filter-name&gt;    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;&lt;/filter-mapping&gt;
-
-请使用80%的时间打好扎实的基础，剩下18%的时间研究框架，2%的时间去学点英文，框架的官方文档永远是最好的教程。
 ]]></content>
       <categories>
         <category>Java</category>
@@ -4446,35 +4310,64 @@ DispatcherServlet屏蔽了html页面的访问默认配置下DispatcherServlet会
       </tags>
   </entry>
   <entry>
-    <title>StableDeffution</title>
-    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/StableDeiffusion/</url>
-    <content><![CDATA[StableDeiffusionModel:Chilloutmix-Ni.safetensors（7.7G）
-Lora:ulzzang、Taiwan Doll Likeness、Korean Doll Likeness
-VAE:
-
-contollnet:动漫人物转真实模型
-tool:
-
-c站：https://civitai.com/
-colab: https://colab.research.google.com/
-prompt：https://aitag.top/
-
-效果1：使用loral
-Prompt ：(8k, best quality, masterpiece:1.2), (realistic, photo-realistic:1.37), ultra-detailed, 1 girl,cute, solo,beautiful detailed sky,detailed cafe,night,sitting,dating,(nose blush),(smile:1.15),(closed mouth) small breasts,beautiful detailed eyes,(collared shirt:1.1), night, wet,business attire, rain,white lace, (short hair:1.2),floating hair NovaFrogStyle
-Negative Prompt ：paintings, sketches, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (outdoor:1.6), manboobs, backlight,(ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.331), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (more than 2 nipples:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), bad hands, missing fingers, extra digit, (futa:1.1), bad body, NG_DeepNegative_V1_75T,pubic hair, glans
+    <title>前端部署.md</title>
+    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/%E5%89%8D%E7%AB%AF%E9%83%A8%E7%BD%B2/</url>
+    <content><![CDATA[部署目录
+前端
+node 版本问题
+启动
 
 
+后端
+启动
+jenkins
+Dockfile
+kubernaet
 
-参考：https://www.youtube.com/watch?v=HaXb3R2VHP8&amp;list=PLA8oR-9gke1--n2RNoWzhwDSgggvxjjOL&amp;index=3
-效果2：使用chillouMix-ni
-prompt： RAW photo, delicate, best quality, (intricate details:1.3), hyper detail, finely detailed, colorful, 1girl, solo, 8k uhd, film grain, (studio lighting:1.2), (Fujifilm XT3), (photorealistic:1.3), (detailed skin:1.2),1 girl,cute, solo,beautiful detailed sky,detailed cafe,dating,(nose blush),(smile:1.15),(closed mouth), middle breasts,beautiful detailed eyes, daylight, wet, rain, (short hair:1.2),floating hair NovaFrogStyle, full body,turtleneck,ribbed sweater,see-through,wet clothes
-ulzzang-6500-v1.1.bin 我有改名成 ulzzang.bin ，如果想啟動那個韓國女孩臉型 ulzzang-6500-v1.1.bin 訓練檔的效果，prompt 要加上(ulzzang:1.2)
-negative Prompt  ：paintings, sketches, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (outdoor:1.6), manboobs, backlight,(ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.331), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (more than 2 nipples:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), bad hands, missing fingers, extra digit, (futa:1.1), bad body, NG_DeepNegative_V1_75T,pubic hair, glans
 
-参考：https://www.youtube.com/watch?v=bOsFgX5XMwU&amp;list=PLA8oR-9gke1--n2RNoWzhwDSgggvxjjOL&amp;index=2
-效果3：幫超擬真cosplay正妹換衣服及換背景
+docsify部署
+Jenkins部署
+clash安装
+Gpt部署
+翻墙
+tip
 
-参考：https://www.youtube.com/watch?v=qodoWBn58-s
+
+
+
+前端node 版本问题
+解决方法：在命令行修改环境变量：$env:NODE_OPTIONS&#x3D;”–openssl-legacy-provider”然后 npm run serve或npm run dev
+启动# 安装依赖npm install# 建议不要直接使用 cnpm 安装依赖，会有各种诡异的 bug。可以通过如下操作解决 npm 下载速度慢的问题npm install --registry=https://registry.npmmirror.com# 启动服务npm run dev# 打包npm run build:prod# 查看nginx路径whereis nginx# 查看nginx进程ps -ef |head -1; ps -ef |grep nginx       # 关闭nginx./nginx -s stop #内存情况free -h#重新加载nginx./nginx -s reload
+
+
+后端启动#后台运行nohup java -jar ruoyi-admin.jar &gt; ruoyi-admin-log.out  2&gt;&amp;1 &amp;#查看日志tail -f ruoyi-admin-log.out#查看进程及杀死进程#某端口占用的线程的pid netstat -nlp | grep 端口号netstat -nlp | grep :9181#看当前运行的jar包程序进程号ps -ef | grep xxx.jar或者ps -aux | grep java #杀死进程kill -s 9 24204
+
+jenkins#jenkins#mavenclean  install -U -DskipTests#shellappname=pfa-ruoyi-demoname=$&#123;appname&#125;:1# 注意这是jenkins容器的路径mv /var/jenkins_home/workspace/pfa-ruoyi-demo/ruoyi-admin/target/ruoyi-admin.jar /var/jenkins_context/pfa-ruoyi-demo/dev/$&#123;appname&#125;.jar#查询得到指定名称的容器ID#容器IDARG1=$(docker ps -aqf &quot;name=$&#123;appname&#125;&quot;)#查询得到指定名称的镜像ID#镜像IDARG2=$(docker images -q --filter reference=$&#123;name&#125;)if [  -n &quot;$ARG1&quot; ]; then docker rm -f $(docker stop $ARG1) echo &quot;$name容器停止删除成功.....！！！&quot;fi#如果查询结果不为空，先删除镜像#删除镜像if [  -n &quot;$ARG2&quot; ]; then docker rmi -f $ARG2 echo &quot;$name镜像删除成功.....！！！&quot;fidocker build -t $&#123;name&#125; /var/jenkins_context/pfa-ruoyi-demo/devdocker run --name $&#123;appname&#125; -d -p 8081:8080 $&#123;name&#125;rm -f /var/jenkins_context/pfa-ruoyi-demo/dev/$&#123;appname&#125;.jar
+
+Dockfile# This is a DockerfileFROM java:openjdk-8ADD ./demo1-0.0.1-SNAPSHOT.jar demo1.jarRUN bash -c &#x27;touch demo1.jar&#x27;ENTRYPOINT [&quot;java&quot;,&quot;-jar&quot;,&quot;demo1.jar&quot;]
+
+kubernaet#初始化主节点kubeadm init \--apiserver-advertise-address=10.0.12.3 \--image-repository registry.aliyuncs.com/google_containers \--service-cidr=10.20.0.0/16 \--pod-network-cidr=10.244.0.0/16 \--ignore-preflight-errors=all \--cri-socket=unix:///var/run/cri-dockerd.sock#解决主节点无法找到的问题 使用kubeadm reset --cri-socket=unix:///var/run/cri-dockerd.sock
+
+tip:k8s集群搭建
+docsify部署#安装nodenpm i docsify-cli -g#初始化项目docsify init ./docs#启动docsify serve ./docs#nginx配置server&#123;    listen 80;    listen 443 ssl http2;    server_name update.ff11sf.com;    location / &#123;		#proxy_pass http://localhost:3000/;  改为本机加端口或域名加端口		alias /home/myoutput/docsify/docs/;    	index index.html;    &#125;&#125;#后台启动不停机利用node启动docsify（不推荐）nohup docsify serve ./ &gt;log.out 2&gt;&amp;1  &amp;#关闭docsifypkill -f &quot;docsify&quot;#node后台启动和关闭node#启动nohup  npm run docs:dev &gt;/dev/null 2&gt;&amp;1 &amp; exit#2&gt;&amp;1 解释：将标准错误 2 重定向到标准输出 &amp;1 ，标准输出 &amp;1 再被重定向输入到 runoob.log 文件中。0 – stdin (standard input，标准输入)1 – stdout (standard output，标准输出)2 – stderr (standard error，标准错误输出)#关闭node进程ps -A ps ef| grep nodeps -aux | grep &quot;runoob.sh&quot; kill -9 pid
+
+cloudfair实现内网穿透
+
+GitHub搭建博客论坛：https://www.bilibili.com/video/BV1GM4m1m7ZD/?spm_id_from=333.1007.top_right_bar_window_history.content.click&amp;vd_source=f573094b123fadd0c16f71405046adfa
+内网穿透：https://www.bilibili.com/video/BV1H4421X7Wg/?vd_source=f573094b123fadd0c16f71405046adfa
+
+Jenkins部署#删除maven仓库中*.lastUpdated的文件find /home/maven/repository -name &quot;*.lastUpdated&quot; -exec grep -q &quot;Could not transfer&quot; &#123;&#125; \; -print -exec rm &#123;&#125; \;#maven打包clean install -U -DskipTests
+
+clash安装
+https://little-star.love/posts/f2114751/（详细）
+https://www.jianshu.com/p/4499d1dd3570（简单）
+
+Gpt部署#gpt-webdocker run --name chatgpt-web -d -p 3002:3002 \-e OPENAI_API_KEY=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 \-e TIMEOUT_MS=0 \-e SOCKS_PROXY_HOST=127.0.0.1 \-e SOCKS_PROXY_PORT=7890 \-e HTTPS_PROXY=http://:7890 chenzhaoyu94/chatgpt-web#gpt-academicdocker build -t gpt-academic .docker run --name gpt-academic -d -p 56530:56530 gpt-academic
+
+翻墙#视频https://www.youtube.com/watch?v=wu3YRcwYWXg&amp;t=641ssudo -i#命令https://github.com/KEJIXIAOLU/XUI#安装证书工具curl https://get.acme.sh | sh; apt install socat -y || yum install socat -y; ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt#申请证书~/.acme.sh/acme.sh  --issue -d 你的域名 --standalone -k ec-256 --force --insecure#安装证书~/.acme.sh/acme.sh --install-cert -d 你的域名 --ecc --key-file /etc/x-ui/server.key --fullchain-file /etc/x-ui/server.crt#放行 443 端口        iptables -I INPUT -p tcp --dport 54321 -j ACCEPT
+
+tip#递归创建文件makedir -p xx/xx/xx/xx#查看网卡 ip -a#查看端口占用netstat -anp | grep 8080  #或者 netstat -tlnlp | grep 8080#或者 lsof -i :8080
+
 ]]></content>
       <categories>
         <category>Java</category>
@@ -4802,44 +4695,180 @@ flatMap：一对多转换，T -&gt; Stream，扁平化处理
       </tags>
   </entry>
   <entry>
-    <title>hexo博客框架</title>
-    <url>/2024/07/23/%E5%90%8E%E7%AB%AF/hexo%E5%85%A5%E9%97%A8/</url>
-    <content><![CDATA[hexo入门目录
-Quick Start
-Create a new post
-Run server
-Generate static files
-Deploy to remote sites
+    <title>SpringMVC</title>
+    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/Springmvc/</url>
+    <content><![CDATA[SpringMVC目录
+1. MVC设计模式
+2. SpringMVC执行流程
+3. 常用注解
+@RequestMapping
+@RequestParam
+@PathVariable
+@RequestBody
+@ResponseBody
+@Controller vs @RestController
+
+
+4. 请求转发与重定向
+通过Servlet API实现
+通过SpringMVC实现（无视图解析器）
+通过SpringMVC实现（有视图解析器）
+
+
+5. 数据显示到前端
+第一种：通过ModelAndView
+第二种：通过ModelMap
+第三种：通过Model
+三者区别
+
+
+6. 拦截器
+Filter与Interceptor的区别
+
+
+7. 全局异常处理
+@ControllerAdvice + @ExceptionHandler
+
+
+8. 常见问题
+获取项目名
+DispatcherServlet屏蔽了html页面的访问
+中文乱码问题
 
 
 
 
-Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick StartCreate a new post$ hexo new &quot;My New Post&quot;
+1. MVC设计模式MVC是一种设计规范，主要作用是降低了视图与业务逻辑间的双向耦合。
 
-More info: Writing
-Run server$ hexo server
+Model（模型）：数据模型，提供要展示的数据，因此包含数据和行为，可以认为是领域模型或JavaBean组件（包含数据和行为），不过现在一般都分离开来：Value Object（数据Dao）和服务层（行为Service）。也就是模型提供了模型数据查询和模型数据的状态更新等功能，包括数据和业务。
+View（视图）：负责进行模型的展示，一般就是我们见到的用户界面，客户想看到的东西。
+Controller（控制器）：接收用户请求，委托给模型进行处理（状态改变），处理完毕后把返回的模型数据返回给视图，由视图负责展示。也就是说控制器做了个调度员的工作。
 
-More info: Server
-Generate static files$ hexo generate
+最典型的MVC就是JSP + Servlet + JavaBean的模式。
+2. SpringMVC执行流程
+用户发送请求到DispatcherServlet（前端控制器）
+DispatcherServlet调用HandlerMapping（处理器映射器）根据URL找到对应的Handler
+HandlerMapping返回HandlerExecutionChain（包含Handler和拦截器链）
+DispatcherServlet调用HandlerAdapter（处理器适配器）执行Handler
+HandlerAdapter执行Controller中的业务方法，返回ModelAndView
+DispatcherServlet将ModelAndView传给ViewResolver（视图解析器）
+ViewResolver解析后返回具体的View（视图）
+DispatcherServlet对View进行渲染（将模型数据填充至视图中）
+DispatcherServlet响应结果给用户
 
-More info: Generating
-Deploy to remote sites$ hexo deploy
 
-More info: Deployment
-]]></content>
-      <categories>
-        <category>后端</category>
-      </categories>
-      <tags>
-        <tag>docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>git使用</title>
-    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/git%E4%BD%BF%E7%94%A8/</url>
-    <content><![CDATA[git使用#git代理配置git config --global http.http://github.com.proxy &#x27;http://127.0.0.1:10809&#x27;git config --global https.https://github.com.proxy &#x27;http://127.0.0.1:10809&#x27;
+核心组件：DispatcherServlet、HandlerMapping、HandlerAdapter、ViewResolver
 
+3. 常用注解@RequestMapping映射访问路径，可指定请求方法：
+@RequestMapping(value = &quot;/hello&quot;, method = &#123;RequestMethod.GET&#125;)public String index2(Model model)&#123;    model.addAttribute(&quot;msg&quot;, &quot;hello!&quot;);    return &quot;test&quot;;&#125;
+
+衍生注解（简化写法）：
+
+@GetMapping：等价于 @RequestMapping(method = RequestMethod.GET)
+@PostMapping：等价于 @RequestMapping(method = RequestMethod.POST)
+@PutMapping、@DeleteMapping、@PatchMapping
+
+@RequestParam绑定请求参数到方法参数：
+@GetMapping(&quot;/user&quot;)public String getUser(@RequestParam(&quot;id&quot;) Long id,                      @RequestParam(value = &quot;name&quot;, required = false) String name) &#123;    // ...&#125;
+
+@PathVariable获取路径中的变量：
+@GetMapping(&quot;/user/&#123;id&#125;&quot;)public String getUser(@PathVariable(&quot;id&quot;) Long id) &#123;    // ...&#125;
+
+@RequestBody获取请求体中的JSON数据，常用于POST请求：
+@PostMapping(&quot;/user&quot;)public String addUser(@RequestBody User user) &#123;    // ...&#125;
+
+@ResponseBody将方法返回值直接作为响应体返回，而不是解析为视图名：
+@GetMapping(&quot;/api/user&quot;)@ResponseBodypublic User getUser() &#123;    return new User(&quot;张三&quot;, 20);&#125;
+
+@RestController &#x3D; @Controller + @ResponseBody
+@Controller vs @RestController
+@Controller：返回视图名，需要配合视图解析器使用
+@RestController：返回JSON&#x2F;XML数据，适用于RESTful API
+
+4. 请求转发与重定向通过Servlet API实现@Controllerpublic class ResultGo &#123;    // 直接输出    @RequestMapping(&quot;/result/t1&quot;)    public void test1(HttpServletRequest req, HttpServletResponse rsp) throws IOException &#123;        rsp.getWriter().println(&quot;Hello,Spring BY servlet API&quot;);    &#125;    // 重定向    @RequestMapping(&quot;/result/t2&quot;)    public void test2(HttpServletRequest req, HttpServletResponse rsp) throws IOException &#123;        rsp.sendRedirect(&quot;/index.jsp&quot;);    &#125;    // 请求转发    @RequestMapping(&quot;/result/t3&quot;)    public void test3(HttpServletRequest req, HttpServletResponse rsp) throws Exception &#123;        req.setAttribute(&quot;msg&quot;, &quot;/result/t3&quot;);        req.getRequestDispatcher(&quot;/WEB-INF/jsp/test.jsp&quot;).forward(req, rsp);    &#125;&#125;
+
+通过SpringMVC实现（无视图解析器）@Controllerpublic class ResultSpringMVC &#123;    @RequestMapping(&quot;/rsm/t1&quot;)    public String test1()&#123;        // 转发        return &quot;/index.jsp&quot;;    &#125;    @RequestMapping(&quot;/rsm/t2&quot;)    public String test2()&#123;        // 转发二        return &quot;forward:/index.jsp&quot;;    &#125;    @RequestMapping(&quot;/rsm/t3&quot;)    public String test3()&#123;        // 重定向        return &quot;redirect:/index.jsp&quot;;    &#125;&#125;
+
+通过SpringMVC实现（有视图解析器）@Controllerpublic class ResultSpringMVC2 &#123;    @RequestMapping(&quot;/rsm2/t1&quot;)    public String test1()&#123;        // 转发（视图解析器会拼接前缀后缀）        return &quot;test&quot;;    &#125;    @RequestMapping(&quot;/rsm2/t2&quot;)    public String test2()&#123;        // 重定向，不需要视图解析器，本质就是重新请求一个新地方        return &quot;redirect:/index.jsp&quot;;        // return &quot;redirect:hello.do&quot;; // hello.do为另一个请求    &#125;&#125;
+
+
+转发（forward）是服务器内部跳转，地址栏不变；重定向（redirect）是客户端重新发起请求，地址栏改变。
+
+5. 数据显示到前端第一种：通过ModelAndViewpublic class ControllerTest1 implements Controller &#123;    public ModelAndView handleRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception &#123;        // 返回一个模型视图对象        ModelAndView mv = new ModelAndView();        mv.addObject(&quot;msg&quot;, &quot;ControllerTest1&quot;);        mv.setViewName(&quot;test&quot;);        return mv;    &#125;&#125;
+
+第二种：通过ModelMap@RequestMapping(&quot;/hello&quot;)public String hello(@RequestParam(&quot;username&quot;) String name, ModelMap model)&#123;    // 封装要显示到视图中的数据    // 相当于req.setAttribute(&quot;name&quot;, name);    model.addAttribute(&quot;name&quot;, name);    return &quot;hello&quot;;&#125;
+
+第三种：通过Model@RequestMapping(&quot;/ct2/hello&quot;)public String hello(@RequestParam(&quot;username&quot;) String name, Model model)&#123;    // 封装要显示到视图中的数据    model.addAttribute(&quot;msg&quot;, name);    return &quot;test&quot;;&#125;
+
+三者区别
+
+
+方式
+说明
+
+
+
+Model
+只有寥寥几个方法，适合存储数据
+
+
+ModelMap
+继承了LinkedHashMap，拥有Map的所有方法
+
+
+ModelAndView
+可以存储数据，也可以设置视图名，功能最全
+
+
+6. 拦截器SpringMVC的拦截器（HandlerInterceptor）类似于Servlet中的Filter，用于对处理器进行预处理和后处理。
+public class MyInterceptor implements HandlerInterceptor &#123;    // 在请求处理之前执行（预处理），返回true放行，返回false拦截    @Override    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception &#123;        System.out.println(&quot;预处理...&quot;);        return true;    &#125;    // 在请求处理之后，视图渲染之前执行（后处理）    @Override    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception &#123;        System.out.println(&quot;后处理...&quot;);    &#125;    // 在视图渲染之后执行（清理工作）    @Override    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception &#123;        System.out.println(&quot;清理...&quot;);    &#125;&#125;
+
+拦截器配置：
+@Configurationpublic class WebConfig implements WebMvcConfigurer &#123;    @Override    public void addInterceptors(InterceptorRegistry registry) &#123;        registry.addInterceptor(new MyInterceptor())                .addPathPatterns(&quot;/**&quot;)          // 拦截所有路径                .excludePathPatterns(&quot;/login&quot;);   // 排除login路径    &#125;&#125;
+
+Filter与Interceptor的区别
+
+
+对比项
+Filter
+Interceptor
+
+
+
+规范
+Servlet规范
+SpringMVC规范
+
+
+作用范围
+所有请求
+只拦截Controller请求
+
+
+执行时机
+在DispatcherServlet前后
+在Handler前后
+
+
+获取Bean
+不能直接获取Spring Bean
+可以直接获取Spring Bean
+
+
+7. 全局异常处理@ControllerAdvice + @ExceptionHandler@ControllerAdvicepublic class GlobalExceptionHandler &#123;    @ExceptionHandler(ArithmeticException.class)    public String handleArithmeticException(Exception e, Model model) &#123;        model.addAttribute(&quot;error&quot;, e.getMessage());        return &quot;error&quot;;    &#125;    @ExceptionHandler(Exception.class)    @ResponseBody    public Map&lt;String, Object&gt; handleException(Exception e) &#123;        Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();        map.put(&quot;code&quot;, 500);        map.put(&quot;msg&quot;, e.getMessage());        return map;    &#125;&#125;
+
+8. 常见问题获取项目名$&#123;pageContext.request.contextPath&#125;
+
+DispatcherServlet屏蔽了html页面的访问默认配置下DispatcherServlet会拦截所有请求，包括静态资源。需要在web.xml中添加：
+&lt;servlet-mapping&gt;    &lt;servlet-name&gt;default&lt;/servlet-name&gt;    &lt;url-pattern&gt;*.html&lt;/url-pattern&gt;&lt;/servlet-mapping&gt;
+
+或在SpringMVC配置中添加：
+&lt;mvc:default-servlet-handler/&gt;
+
+中文乱码问题在web.xml中配置字符编码过滤器：
+&lt;filter&gt;    &lt;filter-name&gt;encodingFilter&lt;/filter-name&gt;    &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;/filter-class&gt;    &lt;init-param&gt;        &lt;param-name&gt;encoding&lt;/param-name&gt;        &lt;param-value&gt;UTF-8&lt;/param-value&gt;    &lt;/init-param&gt;&lt;/filter&gt;&lt;filter-mapping&gt;    &lt;filter-name&gt;encodingFilter&lt;/filter-name&gt;    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;&lt;/filter-mapping&gt;
+
+请使用80%的时间打好扎实的基础，剩下18%的时间研究框架，2%的时间去学点英文，框架的官方文档永远是最好的教程。
 ]]></content>
       <categories>
         <category>Java</category>
@@ -4849,64 +4878,35 @@ More info: Deployment
       </tags>
   </entry>
   <entry>
-    <title>前端部署.md</title>
-    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/%E5%89%8D%E7%AB%AF%E9%83%A8%E7%BD%B2/</url>
-    <content><![CDATA[部署目录
-前端
-node 版本问题
-启动
+    <title>StableDeffution</title>
+    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/StableDeiffusion/</url>
+    <content><![CDATA[StableDeiffusionModel:Chilloutmix-Ni.safetensors（7.7G）
+Lora:ulzzang、Taiwan Doll Likeness、Korean Doll Likeness
+VAE:
 
+contollnet:动漫人物转真实模型
+tool:
 
-后端
-启动
-jenkins
-Dockfile
-kubernaet
+c站：https://civitai.com/
+colab: https://colab.research.google.com/
+prompt：https://aitag.top/
 
-
-docsify部署
-Jenkins部署
-clash安装
-Gpt部署
-翻墙
-tip
+效果1：使用loral
+Prompt ：(8k, best quality, masterpiece:1.2), (realistic, photo-realistic:1.37), ultra-detailed, 1 girl,cute, solo,beautiful detailed sky,detailed cafe,night,sitting,dating,(nose blush),(smile:1.15),(closed mouth) small breasts,beautiful detailed eyes,(collared shirt:1.1), night, wet,business attire, rain,white lace, (short hair:1.2),floating hair NovaFrogStyle
+Negative Prompt ：paintings, sketches, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (outdoor:1.6), manboobs, backlight,(ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.331), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (more than 2 nipples:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), bad hands, missing fingers, extra digit, (futa:1.1), bad body, NG_DeepNegative_V1_75T,pubic hair, glans
 
 
 
+参考：https://www.youtube.com/watch?v=HaXb3R2VHP8&amp;list=PLA8oR-9gke1--n2RNoWzhwDSgggvxjjOL&amp;index=3
+效果2：使用chillouMix-ni
+prompt： RAW photo, delicate, best quality, (intricate details:1.3), hyper detail, finely detailed, colorful, 1girl, solo, 8k uhd, film grain, (studio lighting:1.2), (Fujifilm XT3), (photorealistic:1.3), (detailed skin:1.2),1 girl,cute, solo,beautiful detailed sky,detailed cafe,dating,(nose blush),(smile:1.15),(closed mouth), middle breasts,beautiful detailed eyes, daylight, wet, rain, (short hair:1.2),floating hair NovaFrogStyle, full body,turtleneck,ribbed sweater,see-through,wet clothes
+ulzzang-6500-v1.1.bin 我有改名成 ulzzang.bin ，如果想啟動那個韓國女孩臉型 ulzzang-6500-v1.1.bin 訓練檔的效果，prompt 要加上(ulzzang:1.2)
+negative Prompt  ：paintings, sketches, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (outdoor:1.6), manboobs, backlight,(ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.331), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (more than 2 nipples:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), bad hands, missing fingers, extra digit, (futa:1.1), bad body, NG_DeepNegative_V1_75T,pubic hair, glans
 
-前端node 版本问题
-解决方法：在命令行修改环境变量：$env:NODE_OPTIONS&#x3D;”–openssl-legacy-provider”然后 npm run serve或npm run dev
-启动# 安装依赖npm install# 建议不要直接使用 cnpm 安装依赖，会有各种诡异的 bug。可以通过如下操作解决 npm 下载速度慢的问题npm install --registry=https://registry.npmmirror.com# 启动服务npm run dev# 打包npm run build:prod# 查看nginx路径whereis nginx# 查看nginx进程ps -ef |head -1; ps -ef |grep nginx       # 关闭nginx./nginx -s stop #内存情况free -h#重新加载nginx./nginx -s reload
+参考：https://www.youtube.com/watch?v=bOsFgX5XMwU&amp;list=PLA8oR-9gke1--n2RNoWzhwDSgggvxjjOL&amp;index=2
+效果3：幫超擬真cosplay正妹換衣服及換背景
 
-
-后端启动#后台运行nohup java -jar ruoyi-admin.jar &gt; ruoyi-admin-log.out  2&gt;&amp;1 &amp;#查看日志tail -f ruoyi-admin-log.out#查看进程及杀死进程#某端口占用的线程的pid netstat -nlp | grep 端口号netstat -nlp | grep :9181#看当前运行的jar包程序进程号ps -ef | grep xxx.jar或者ps -aux | grep java #杀死进程kill -s 9 24204
-
-jenkins#jenkins#mavenclean  install -U -DskipTests#shellappname=pfa-ruoyi-demoname=$&#123;appname&#125;:1# 注意这是jenkins容器的路径mv /var/jenkins_home/workspace/pfa-ruoyi-demo/ruoyi-admin/target/ruoyi-admin.jar /var/jenkins_context/pfa-ruoyi-demo/dev/$&#123;appname&#125;.jar#查询得到指定名称的容器ID#容器IDARG1=$(docker ps -aqf &quot;name=$&#123;appname&#125;&quot;)#查询得到指定名称的镜像ID#镜像IDARG2=$(docker images -q --filter reference=$&#123;name&#125;)if [  -n &quot;$ARG1&quot; ]; then docker rm -f $(docker stop $ARG1) echo &quot;$name容器停止删除成功.....！！！&quot;fi#如果查询结果不为空，先删除镜像#删除镜像if [  -n &quot;$ARG2&quot; ]; then docker rmi -f $ARG2 echo &quot;$name镜像删除成功.....！！！&quot;fidocker build -t $&#123;name&#125; /var/jenkins_context/pfa-ruoyi-demo/devdocker run --name $&#123;appname&#125; -d -p 8081:8080 $&#123;name&#125;rm -f /var/jenkins_context/pfa-ruoyi-demo/dev/$&#123;appname&#125;.jar
-
-Dockfile# This is a DockerfileFROM java:openjdk-8ADD ./demo1-0.0.1-SNAPSHOT.jar demo1.jarRUN bash -c &#x27;touch demo1.jar&#x27;ENTRYPOINT [&quot;java&quot;,&quot;-jar&quot;,&quot;demo1.jar&quot;]
-
-kubernaet#初始化主节点kubeadm init \--apiserver-advertise-address=10.0.12.3 \--image-repository registry.aliyuncs.com/google_containers \--service-cidr=10.20.0.0/16 \--pod-network-cidr=10.244.0.0/16 \--ignore-preflight-errors=all \--cri-socket=unix:///var/run/cri-dockerd.sock#解决主节点无法找到的问题 使用kubeadm reset --cri-socket=unix:///var/run/cri-dockerd.sock
-
-tip:k8s集群搭建
-docsify部署#安装nodenpm i docsify-cli -g#初始化项目docsify init ./docs#启动docsify serve ./docs#nginx配置server&#123;    listen 80;    listen 443 ssl http2;    server_name update.ff11sf.com;    location / &#123;		#proxy_pass http://localhost:3000/;  改为本机加端口或域名加端口		alias /home/myoutput/docsify/docs/;    	index index.html;    &#125;&#125;#后台启动不停机利用node启动docsify（不推荐）nohup docsify serve ./ &gt;log.out 2&gt;&amp;1  &amp;#关闭docsifypkill -f &quot;docsify&quot;#node后台启动和关闭node#启动nohup  npm run docs:dev &gt;/dev/null 2&gt;&amp;1 &amp; exit#2&gt;&amp;1 解释：将标准错误 2 重定向到标准输出 &amp;1 ，标准输出 &amp;1 再被重定向输入到 runoob.log 文件中。0 – stdin (standard input，标准输入)1 – stdout (standard output，标准输出)2 – stderr (standard error，标准错误输出)#关闭node进程ps -A ps ef| grep nodeps -aux | grep &quot;runoob.sh&quot; kill -9 pid
-
-cloudfair实现内网穿透
-
-GitHub搭建博客论坛：https://www.bilibili.com/video/BV1GM4m1m7ZD/?spm_id_from=333.1007.top_right_bar_window_history.content.click&amp;vd_source=f573094b123fadd0c16f71405046adfa
-内网穿透：https://www.bilibili.com/video/BV1H4421X7Wg/?vd_source=f573094b123fadd0c16f71405046adfa
-
-Jenkins部署#删除maven仓库中*.lastUpdated的文件find /home/maven/repository -name &quot;*.lastUpdated&quot; -exec grep -q &quot;Could not transfer&quot; &#123;&#125; \; -print -exec rm &#123;&#125; \;#maven打包clean install -U -DskipTests
-
-clash安装
-https://little-star.love/posts/f2114751/（详细）
-https://www.jianshu.com/p/4499d1dd3570（简单）
-
-Gpt部署#gpt-webdocker run --name chatgpt-web -d -p 3002:3002 \-e OPENAI_API_KEY=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 \-e TIMEOUT_MS=0 \-e SOCKS_PROXY_HOST=127.0.0.1 \-e SOCKS_PROXY_PORT=7890 \-e HTTPS_PROXY=http://:7890 chenzhaoyu94/chatgpt-web#gpt-academicdocker build -t gpt-academic .docker run --name gpt-academic -d -p 56530:56530 gpt-academic
-
-翻墙#视频https://www.youtube.com/watch?v=wu3YRcwYWXg&amp;t=641ssudo -i#命令https://github.com/KEJIXIAOLU/XUI#安装证书工具curl https://get.acme.sh | sh; apt install socat -y || yum install socat -y; ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt#申请证书~/.acme.sh/acme.sh  --issue -d 你的域名 --standalone -k ec-256 --force --insecure#安装证书~/.acme.sh/acme.sh --install-cert -d 你的域名 --ecc --key-file /etc/x-ui/server.key --fullchain-file /etc/x-ui/server.crt#放行 443 端口        iptables -I INPUT -p tcp --dport 54321 -j ACCEPT
-
-tip#递归创建文件makedir -p xx/xx/xx/xx#查看网卡 ip -a#查看端口占用netstat -anp | grep 8080  #或者 netstat -tlnlp | grep 8080#或者 lsof -i :8080
-
+参考：https://www.youtube.com/watch?v=qodoWBn58-s
 ]]></content>
       <categories>
         <category>Java</category>
@@ -7235,6 +7235,185 @@ size++ 不是原子操作
       </tags>
   </entry>
   <entry>
+    <title>Spring Bean循环依赖</title>
+    <url>/2026/05/25/%E9%9D%A2%E8%AF%95/Spring%20Bean%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/</url>
+    <content><![CDATA[目录
+一、什么是循环依赖
+二、Spring 三级缓存机制
+三、核心流程详解（A → B → A）
+关键代码（DefaultSingletonBeanRegistry）：
+
+
+四、为什么需要三级缓存而不是两级
+五、Spring 无法解决的情况
+构造器注入失败示例：
+
+
+六、解决方案
+方案 1：构造器注入 + @Lazy（最常用）
+方案 2：改用 setter 注入
+方案 3：抽取公共逻辑到第三个 Bean（架构层面解耦）
+方案 4：实现 ApplicationContextAware 延迟获取
+
+
+七、面试高频追问
+Q1：Spring Boot 2.6 默认禁止了循环依赖，怎么开启？
+Q2：为什么 Spring 不推荐循环依赖？
+Q3：构造器注入 + @Lazy 的原理？
+Q4：二级缓存够不够？
+Q5：SpringBoot 2.6 为什么要默认禁止？
+
+
+八、一句话总结
+引用
+
+
+Spring Bean 循环依赖
+关联阅读：Spring Bean生命周期
+
+
+一、什么是循环依赖两个或多个 Bean 之间相互持有对方的引用，形成闭环：
+A → B → A            （两个 Bean 互相依赖）A → B → C → A        （三个 Bean 循环依赖）
+
+二、Spring 三级缓存机制Spring 通过三级缓存解决单例 setter 注入的循环依赖：
+
+
+
+缓存层级
+名称
+存放内容
+
+
+
+一级缓存
+singletonObjects
+完整初始化后的 Bean
+
+
+二级缓存
+earlySingletonObjects
+提前暴露的早期 Bean 引用（可能被代理）
+
+
+三级缓存
+singletonFactories
+Bean 的 ObjectFactory（lambda），用于生成早期引用
+
+
+三、核心流程详解（A → B → A）
+创建 A
+实例化 A（调用构造器，A 还是半成品）
+将 A 的 ObjectFactory 放入【三级缓存】
+
+
+A 填充属性 B
+发现需要 B，去创建 B
+
+
+创建 B
+实例化 B
+将 B 的 ObjectFactory 放入【三级缓存】
+
+
+B 填充属性 A
+一级缓存没有 A
+二级缓存没有 A
+三级缓存有 A 的 ObjectFactory
+调用 ObjectFactory.getObject() → 拿到 A 的早期引用
+将 A 放入【二级缓存】，从【三级缓存】移除
+B 持有 A 的早期引用，B 初始化完成
+
+
+B 放入【一级缓存】
+A 拿到完整的 B，A 初始化完成
+A 放入【一级缓存】，从【二级缓存】移除
+
+关键代码（DefaultSingletonBeanRegistry）：// 一级缓存private final Map&lt;String, Object&gt; singletonObjects = new ConcurrentHashMap&lt;&gt;();// 二级缓存private final Map&lt;String, Object&gt; earlySingletonObjects = new ConcurrentHashMap&lt;&gt;();// 三级缓存private final Map&lt;String, ObjectFactory&lt;?&gt;&gt; singletonFactories = new HashMap&lt;&gt;();
+
+四、为什么需要三级缓存而不是两级核心原因：AOP 代理的创建时机
+
+
+
+方案
+问题
+
+
+
+只用两级缓存
+必须在实例化后立即决定是否创建代理，导致所有 Bean 都提前创建代理，违背 Spring 的设计（代理应在初始化后置阶段创建）
+
+
+三级缓存
+存的是 ObjectFactory，调用时才决定返回原始对象还是代理对象，只在检测到循环依赖时才触发
+
+
+// 三级缓存存放的是 lambda，按需生成addSingletonFactory(beanName, () -&gt; getEarlyBeanReference(beanName, mbd, bean));
+
+无循环依赖：ObjectFactory 不会被调用，代理在 postProcessAfterInitialization 正常创建
+有循环依赖：ObjectFactory 被调用，提前创建代理放入二级缓存，保证注入的是代理对象
+
+五、Spring 无法解决的情况
+
+
+场景
+能否解决
+原因
+
+
+
+单例 + setter 注入
+✅ 能
+三级缓存提前暴露
+
+
+单例 + 构造器注入
+❌ 不能
+构造器未执行完，实例都不存在，无法提前暴露
+
+
+原型（prototype）Bean
+❌ 不能
+原型不缓存，无法提前暴露引用
+
+
+@Async 标注的 Bean 循环依赖
+❌ 不能
+@Async 代理创建时机晚于属性注入，与三级缓存不兼容
+
+
+构造器注入失败示例：@Servicepublic class A &#123;    private final B b;    @Autowired    public A(B b) &#123; this.b = b; &#125;  // 构造器执行时 B 还没创建&#125;@Servicepublic class B &#123;    private final A a;    @Autowired    public B(A a) &#123; this.a = a; &#125;  // 构造器执行时 A 还没创建&#125;// 报错: Requested bean is currently in creation: Is there an unresolvable circular reference?
+
+六、解决方案方案 1：构造器注入 + @Lazy（最常用）@Servicepublic class A &#123;    private final B b;    @Autowired    public A(@Lazy B b) &#123; this.b = b; &#125;&#125;
+原理：@Lazy 让 Spring 注入一个 CGLIB 代理对象，首次调用时才触发真实 Bean 创建。
+方案 2：改用 setter 注入@Servicepublic class A &#123;    private B b;    @Autowired    public void setB(B b) &#123; this.b = b; &#125;&#125;
+
+方案 3：抽取公共逻辑到第三个 Bean（架构层面解耦）Before:  A → B → A    （循环）After:   A → C ← B    （打破环，C 承载公共逻辑）
+
+方案 4：实现 ApplicationContextAware 延迟获取@Servicepublic class A implements ApplicationContextAware &#123;    private ApplicationContext ctx;    public void doSomething() &#123;        B b = ctx.getBean(B.class);  // 用时再取，绕开属性注入阶段的循环    &#125;    @Override    public void setApplicationContext(ApplicationContext ctx) &#123;        this.ctx = ctx;    &#125;&#125;
+
+七、面试高频追问Q1：Spring Boot 2.6 默认禁止了循环依赖，怎么开启？spring:  main:    allow-circular-references: true
+
+Q2：为什么 Spring 不推荐循环依赖？循环依赖意味着设计上存在职责耦合，应从架构层面重构解耦，而非依赖框架的兜底机制。
+Q3：构造器注入 + @Lazy 的原理？@Lazy 让 Spring 注入一个 CGLIB 代理对象而非真实 Bean，代理拦截方法调用，首次调用时才触发真实 Bean 的创建，从而绕开循环依赖。
+Q4：二级缓存够不够？如果没有 AOP，两级缓存就够了。三级缓存是为了在有 AOP + 循环依赖时，保证代理创建时机正确且不重复创建。
+Q5：SpringBoot 2.6 为什么要默认禁止？
+循环依赖是设计缺陷的信号
+三级缓存机制增加了代码复杂度
+鼓励开发者从架构层面解决耦合问题
+
+八、一句话总结三级缓存通过提前暴露半成品 Bean 解决单例 setter 循环依赖；构造器注入和原型 Bean 无法解决，需用 @Lazy、setter 注入或重构解耦。三级缓存的核心价值是延迟代理创建，保证 AOP 场景下代理对象的正确性。
+引用]]></content>
+      <categories>
+        <category>Java</category>
+        <category>面试</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>SpringBoot</tag>
+        <tag>Spring</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>MyBatis原理面试</title>
     <url>/2026/05/25/%E9%9D%A2%E8%AF%95/MyBatis%E5%8E%9F%E7%90%86/</url>
     <content><![CDATA[目录
@@ -7619,598 +7798,6 @@ SQL注入
         <tag>Java</tag>
         <tag>MyBatis</tag>
         <tag>ORM</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Spring Bean循环依赖</title>
-    <url>/2026/05/25/%E9%9D%A2%E8%AF%95/Spring%20Bean%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/</url>
-    <content><![CDATA[目录
-一、什么是循环依赖
-二、Spring 三级缓存机制
-三、核心流程详解（A → B → A）
-关键代码（DefaultSingletonBeanRegistry）：
-
-
-四、为什么需要三级缓存而不是两级
-五、Spring 无法解决的情况
-构造器注入失败示例：
-
-
-六、解决方案
-方案 1：构造器注入 + @Lazy（最常用）
-方案 2：改用 setter 注入
-方案 3：抽取公共逻辑到第三个 Bean（架构层面解耦）
-方案 4：实现 ApplicationContextAware 延迟获取
-
-
-七、面试高频追问
-Q1：Spring Boot 2.6 默认禁止了循环依赖，怎么开启？
-Q2：为什么 Spring 不推荐循环依赖？
-Q3：构造器注入 + @Lazy 的原理？
-Q4：二级缓存够不够？
-Q5：SpringBoot 2.6 为什么要默认禁止？
-
-
-八、一句话总结
-引用
-
-
-Spring Bean 循环依赖
-关联阅读：Spring Bean生命周期
-
-
-一、什么是循环依赖两个或多个 Bean 之间相互持有对方的引用，形成闭环：
-A → B → A            （两个 Bean 互相依赖）A → B → C → A        （三个 Bean 循环依赖）
-
-二、Spring 三级缓存机制Spring 通过三级缓存解决单例 setter 注入的循环依赖：
-
-
-
-缓存层级
-名称
-存放内容
-
-
-
-一级缓存
-singletonObjects
-完整初始化后的 Bean
-
-
-二级缓存
-earlySingletonObjects
-提前暴露的早期 Bean 引用（可能被代理）
-
-
-三级缓存
-singletonFactories
-Bean 的 ObjectFactory（lambda），用于生成早期引用
-
-
-三、核心流程详解（A → B → A）
-创建 A
-实例化 A（调用构造器，A 还是半成品）
-将 A 的 ObjectFactory 放入【三级缓存】
-
-
-A 填充属性 B
-发现需要 B，去创建 B
-
-
-创建 B
-实例化 B
-将 B 的 ObjectFactory 放入【三级缓存】
-
-
-B 填充属性 A
-一级缓存没有 A
-二级缓存没有 A
-三级缓存有 A 的 ObjectFactory
-调用 ObjectFactory.getObject() → 拿到 A 的早期引用
-将 A 放入【二级缓存】，从【三级缓存】移除
-B 持有 A 的早期引用，B 初始化完成
-
-
-B 放入【一级缓存】
-A 拿到完整的 B，A 初始化完成
-A 放入【一级缓存】，从【二级缓存】移除
-
-关键代码（DefaultSingletonBeanRegistry）：// 一级缓存private final Map&lt;String, Object&gt; singletonObjects = new ConcurrentHashMap&lt;&gt;();// 二级缓存private final Map&lt;String, Object&gt; earlySingletonObjects = new ConcurrentHashMap&lt;&gt;();// 三级缓存private final Map&lt;String, ObjectFactory&lt;?&gt;&gt; singletonFactories = new HashMap&lt;&gt;();
-
-四、为什么需要三级缓存而不是两级核心原因：AOP 代理的创建时机
-
-
-
-方案
-问题
-
-
-
-只用两级缓存
-必须在实例化后立即决定是否创建代理，导致所有 Bean 都提前创建代理，违背 Spring 的设计（代理应在初始化后置阶段创建）
-
-
-三级缓存
-存的是 ObjectFactory，调用时才决定返回原始对象还是代理对象，只在检测到循环依赖时才触发
-
-
-// 三级缓存存放的是 lambda，按需生成addSingletonFactory(beanName, () -&gt; getEarlyBeanReference(beanName, mbd, bean));
-
-无循环依赖：ObjectFactory 不会被调用，代理在 postProcessAfterInitialization 正常创建
-有循环依赖：ObjectFactory 被调用，提前创建代理放入二级缓存，保证注入的是代理对象
-
-五、Spring 无法解决的情况
-
-
-场景
-能否解决
-原因
-
-
-
-单例 + setter 注入
-✅ 能
-三级缓存提前暴露
-
-
-单例 + 构造器注入
-❌ 不能
-构造器未执行完，实例都不存在，无法提前暴露
-
-
-原型（prototype）Bean
-❌ 不能
-原型不缓存，无法提前暴露引用
-
-
-@Async 标注的 Bean 循环依赖
-❌ 不能
-@Async 代理创建时机晚于属性注入，与三级缓存不兼容
-
-
-构造器注入失败示例：@Servicepublic class A &#123;    private final B b;    @Autowired    public A(B b) &#123; this.b = b; &#125;  // 构造器执行时 B 还没创建&#125;@Servicepublic class B &#123;    private final A a;    @Autowired    public B(A a) &#123; this.a = a; &#125;  // 构造器执行时 A 还没创建&#125;// 报错: Requested bean is currently in creation: Is there an unresolvable circular reference?
-
-六、解决方案方案 1：构造器注入 + @Lazy（最常用）@Servicepublic class A &#123;    private final B b;    @Autowired    public A(@Lazy B b) &#123; this.b = b; &#125;&#125;
-原理：@Lazy 让 Spring 注入一个 CGLIB 代理对象，首次调用时才触发真实 Bean 创建。
-方案 2：改用 setter 注入@Servicepublic class A &#123;    private B b;    @Autowired    public void setB(B b) &#123; this.b = b; &#125;&#125;
-
-方案 3：抽取公共逻辑到第三个 Bean（架构层面解耦）Before:  A → B → A    （循环）After:   A → C ← B    （打破环，C 承载公共逻辑）
-
-方案 4：实现 ApplicationContextAware 延迟获取@Servicepublic class A implements ApplicationContextAware &#123;    private ApplicationContext ctx;    public void doSomething() &#123;        B b = ctx.getBean(B.class);  // 用时再取，绕开属性注入阶段的循环    &#125;    @Override    public void setApplicationContext(ApplicationContext ctx) &#123;        this.ctx = ctx;    &#125;&#125;
-
-七、面试高频追问Q1：Spring Boot 2.6 默认禁止了循环依赖，怎么开启？spring:  main:    allow-circular-references: true
-
-Q2：为什么 Spring 不推荐循环依赖？循环依赖意味着设计上存在职责耦合，应从架构层面重构解耦，而非依赖框架的兜底机制。
-Q3：构造器注入 + @Lazy 的原理？@Lazy 让 Spring 注入一个 CGLIB 代理对象而非真实 Bean，代理拦截方法调用，首次调用时才触发真实 Bean 的创建，从而绕开循环依赖。
-Q4：二级缓存够不够？如果没有 AOP，两级缓存就够了。三级缓存是为了在有 AOP + 循环依赖时，保证代理创建时机正确且不重复创建。
-Q5：SpringBoot 2.6 为什么要默认禁止？
-循环依赖是设计缺陷的信号
-三级缓存机制增加了代码复杂度
-鼓励开发者从架构层面解决耦合问题
-
-八、一句话总结三级缓存通过提前暴露半成品 Bean 解决单例 setter 循环依赖；构造器注入和原型 Bean 无法解决，需用 @Lazy、setter 注入或重构解耦。三级缓存的核心价值是延迟代理创建，保证 AOP 场景下代理对象的正确性。
-引用]]></content>
-      <categories>
-        <category>Java</category>
-        <category>面试</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>SpringBoot</tag>
-        <tag>Spring</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Spring与SpringBoot</title>
-    <url>/2026/05/25/%E9%9D%A2%E8%AF%95/Spring%E4%B8%8ESpringBoot/</url>
-    <content><![CDATA[目录
-一、Spring 和 Spring Boot 有什么区别
-一句话
-核心区别
-
-
-自动配置原理（必问）
-关键条件注解
-面试回答
-二、Spring Boot 配置文件优先级
-优先级从高到低（完整版）
-高频考点：jar 包外 &gt; jar 包内
-完整的外部配置覆盖顺序（jar 外）
-高频考点：properties vs yml 优先级
-高频考点：多配置文件激活
-高频考点：配置文件 vs 代码默认值 —— 谁覆盖谁？
-第一种：@ConfigurationProperties 字段初始值 &#x2F; @Value 冒号默认值
-验证：
-第二种：SpringApplication.setDefaultProperties() 设置的默认值
-完整优先级图示（关键！）
-
-
-三、Spring Boot 怎么接入一个外部组件
-第二步：配置连接
-第三步：直接使用
-
-
-Starter 自动配置原理（面试核心）
-自定义 Starter 的标准套路（进阶考点）
-1. 项目结构
-2. 配置属性类
-3. 核心服务
-4. 自动配置类
-5. 注册自动配置
-6. 使用方引入
-
-
-接入外部组件的三种模式总结
-四、面试高频追问
-4.1 @Conditional 系列注解有哪些？
-4.2 Spring Boot 2.x 和 3.x 自动配置注册的区别？
-4.3 application.yml 和 bootstrap.yml 的区别？
-4.4 怎么禁用某个自动配置？
-4.5 SpringFactoriesLoader 机制？
-4.6 Spring Boot 启动流程？
-4.7 你项目里怎么接入 SOFA 中间件的？
-
-
-引用
-
-
-Spring 与 Spring Boot这篇主要整理 Spring 与 Spring Boot 面试中最常见的几个问题：二者区别、自动配置原理、配置文件优先级、外部组件接入方式，以及面试官常追问的细节。回答时可以先讲结论，再补自动配置和 Starter 机制，这样逻辑会更完整。
-一、Spring 和 Spring Boot 有什么区别一句话
-Spring 是框架，Spring Boot 是 Spring 的自动装配层 + 运维工具层，本质是“用约定消灭配置”。
-
-核心区别
-
-
-维度
-Spring
-Spring Boot
-
-
-
-启动方式
-手动配置 ApplicationContext
-@SpringBootApplication 一键启动
-
-
-依赖管理
-手动选版本，版本冲突频发
-Starter BOM 统一版本，引入即用
-
-
-配置方式
-大量 XML &#x2F; Java Config
-约定大于配置，application.yml 零配置开箱
-
-
-内嵌容器
-需要打 WAR 包部署到 Tomcat
-内嵌 Tomcat&#x2F;Jetty，java -jar 直接跑
-
-
-自动配置
-无，每个 Bean 手动声明
-@EnableAutoConfiguration 按条件自动装配
-
-
-运维能力
-无内置
-Actuator 健康检查、指标、环境信息
-
-
-生产就绪
-需要大量额外配置
-开箱即用（日志、监控、外部化配置）
-
-
-Spring Boot 并不是替代 Spring，而是在 Spring 之上补齐了工程化能力。它把依赖版本管理、自动配置、内嵌容器、外部化配置和生产监控统一起来，让开发者少写大量重复配置。
-自动配置原理（必问）@SpringBootApplication├── @SpringBootConfiguration → 本质就是 @Configuration├── @EnableAutoConfiguration → 核心！自动配置入口└── @ComponentScan           → 扫描当前包及子包的 @Component
-
-@EnableAutoConfiguration 做了什么：
-
-加载 META-INF/spring.factories（Spring Boot 2.x）或 META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports（3.x）
-读取所有 AutoConfiguration 类
-每个 AutoConfiguration 类上有 @Conditional 系列注解
-条件满足 → 装配 Bean；条件不满足 → 跳过
-
-可以把自动配置理解成“候选配置列表 + 条件判断”。Spring Boot 先把可能用到的自动配置类加载进来，再根据 classpath、已有 Bean、配置项、Web 环境等条件决定哪些真正生效。
-关键条件注解
-
-
-注解
-作用
-
-
-
-@ConditionalOnClass
-classpath 存在某个类时生效
-
-
-@ConditionalOnMissingBean
-容器中没有该 Bean 时生效
-
-
-@ConditionalOnProperty
-配置项满足条件时生效
-
-
-@ConditionalOnWebApplication
-Web 应用时生效
-
-
-
-举例：引入 spring-boot-starter-data-redis 后，classpath 有 RedisTemplate.class，RedisAutoConfiguration 的 @ConditionalOnClass 成立，自动创建 RedisTemplate Bean。没引入则不生效，零成本。
-
-面试回答
-Spring 是 IoC + AOP 的框架基础，Spring Boot 在 Spring 之上做了三件事：一是通过 Starter + 自动配置消灭了样板配置，引入 starter-web 就有 Tomcat 和 MVC，引入 starter-redis 就有 RedisTemplate；二是内嵌容器让应用从 WAR 部署变成 java -jar 独立运行；三是 Actuator 提供了生产级运维能力。本质区别不是技术栈不同，而是 Spring Boot 用“约定大于配置”把 Spring 的使用成本降了一个量级。
-
-
-二、Spring Boot 配置文件优先级自动配置解决的是“Bean 怎么自动装配”，配置优先级解决的是“同一个属性到底听谁的”。Spring Boot 的外部化配置非常灵活，面试时最容易考 jar 包内外、profile、默认值之间的覆盖关系。
-优先级从高到低（完整版）
-命令行参数
-JNDI 属性
-Java 系统属性
-操作系统环境变量
-random.* 属性
-jar 包外 application-&#123;profile&#125;.yml ← 最常用
-jar 包内 application-&#123;profile&#125;.yml
-jar 包外 application.yml ← 最常用
-jar 包内 application.yml
-@PropertySource 注解指定的配置
-SpringApplication.setDefaultProperties() 的默认值
-
-高频考点：jar 包外 &gt; jar 包内myapp/├── config/│   └── application.yml ← 优先级最高（jar 外 config 目录）├── application.yml     ← 次之（jar 外根目录）├── myapp.jar│   └── BOOT-INF/classes/│       └── application.yml ← 最低（jar 内）
-
-完整的外部配置覆盖顺序（jar 外）config/application-&#123;profile&#125;.yml ← 最高
-同一层级内，profile 配置永远覆盖默认配置。
-高频考点：properties vs yml 优先级同一位置同时存在 application.properties 和 application.yml：
-
-properties 优先级高于 yml
-但实际项目不应同时存在，容易混乱
-
-高频考点：多配置文件激活spring:  profiles:    active: dev         # 激活 dev    include:            # 额外包含（补充配置）      - redis      - mq    group:              # Spring Boot 2.4+ 配置组      production:        - prod        - redis        - mq
-
-
-
-
-属性
-作用
-版本
-
-
-
-spring.profiles.active
-激活某个 profile
-全版本
-
-
-spring.profiles.include
-在当前 profile 基础上追加 profile
-全版本
-
-
-spring.profiles.group
-定义 profile 组，激活组名等于激活组内所有
-2.4+
-
-
-配置优先级的核心规律可以先记三句话：命令行参数优先级最高，外部配置覆盖内部配置，profile 配置覆盖默认配置。再进一步区分代码里的默认值，就能回答大多数追问。
-高频考点：配置文件 vs 代码默认值 —— 谁覆盖谁？结论：配置文件 &gt; 代码默认值，但有两种“代码默认值”，优先级完全不同。
-第一种：@ConfigurationProperties 字段初始值 &#x2F; @Value 冒号默认值// 写法1：字段初始值@ConfigurationProperties(prefix = &quot;my.service&quot;)public class MyProperties &#123;    private int timeout = 3000; // ← 代码默认值&#125;// 写法2：@Value 冒号默认值@Value(&quot;$&#123;my.service.timeout:3000&#125;&quot;) // ← 冒号后面是代码默认值private int timeout;
-
-这两种默认值的优先级低于所有配置源——只要任何一层配置文件里写了 my.service.timeout=5000，就会覆盖代码默认值。
-
-优先级（高→低）：命令行参数 &gt; 系统属性 &gt; 环境变量 &gt; jar外配置 &gt; jar内配置 &gt; 代码默认值↑ 最底层
-
-验证：# application.yml 不配置 my.service.timeout# → timeout = 3000（代码默认值生效）# application.yml 配置 my.service.timeout=5000# → timeout = 5000（配置文件覆盖代码默认值）
-
-第二种：SpringApplication.setDefaultProperties() 设置的默认值SpringApplication app = new SpringApplication(App.class);Properties defaults = new Properties();defaults.setProperty(&quot;server.port&quot;, &quot;8080&quot;);app.setDefaultProperties(defaults); // ← 这种默认值app.run(args);
-
-这个默认值的优先级比所有配置文件都低，甚至低于 @PropertySource。它在优先级列表的最末尾（第 11 位）。
-完整优先级图示（关键！）高┌─────────────────────────────────────────────────────────────────┐│ 1. 命令行参数                   --server.port=8081                ││ 2. JNDI 属性                                                      ││ 3. Java 系统属性                -Dserver.port=8081                ││ 4. 操作系统环境变量              SERVER_PORT=8081                  ││ 5. random.*                                                       ││ 6. jar外 application-&#123;profile&#125;.yml                                ││ 7. jar内 application-&#123;profile&#125;.yml                                ││ 8. jar外 application.yml                                          ││ 9. jar内 application.yml                                          ││ 10. @PropertySource 指定的配置                                     ││ 11. setDefaultProperties() 的默认值                                │├─────────────────────────────────────────────────────────────────┤│ ↓ 更低 ↓                                                          ││ @ConfigurationProperties 字段初始值 / @Value(:默认)                ││ ← 最底层，任何配置源都能覆盖它                                     │└─────────────────────────────────────────────────────────────────┘低
-
-
-面试易错点：setDefaultProperties() 和 @ConfigurationProperties 字段默认值是两回事。前者是 Environment 里的一个配置源，后者只是属性绑定阶段的兜底值。
-
-// 我们项目里 DRM 动态配置的写法@ConfigurationProperties(prefix = &quot;sofa.ai.antllm.chat&quot;)public class AntLlmChatProperties &#123;    private String baseUrl = &quot;https://antchat.alipay.com&quot;; // 代码默认值    private String appToken;                                // 无默认值，必须配置&#125;
-
-
-优先级：DRM 运行时推送的值 &gt; application.properties 中的值 &gt; 代码默认值 &quot;https://antchat.alipay.com&quot;
-
-DRM 推送 &gt; 配置文件 &gt; 代码默认值，三层覆盖，运行时可热更新。
-
-Spring Boot 配置优先级的核心规则是“外部覆盖内部、profile 覆盖默认、命令行覆盖一切”。具体来说：命令行参数优先级最高，然后是系统属性和环境变量；文件配置中，jar 包外覆盖 jar 包内，config 目录覆盖根目录，application-&#123;profile&#125;.yml 覆盖 application.yml。
-关于配置文件和代码默认值的关系——配置文件一定大于代码默认值。但要区分两种“代码默认值”：@ConfigurationProperties 的字段初始值和 @Value(&quot;$&#123;key:default&#125;&quot;) 的冒号默认值，它们是属性绑定的兜底值，优先级低于所有配置源，任何一层配置文件写了就覆盖；而 setDefaultProperties() 是 Environment 的一个配置源，优先级排在第 11 位，高于前者但低于所有配置文件。我们项目里用这个机制做环境隔离——代码里写默认值兜底，jar 内配置文件放开发环境值，jar 外 config 目录放生产环境值，DRM 运行时推送覆盖一切。
-
-
-三、Spring Boot 怎么接入一个外部组件以接入 Redis 为例，完整链路通常是：引入 Starter、编写连接配置、直接注入使用。这里体现的还是 Spring Boot 的核心思想：依赖存在时自动装配，用户有自定义 Bean 时优先生效。
-引入 Starter 做了什么？
-
-自动引入 spring-data-redis、lettuce-core（或 jedis）等依赖
-BOM 管理版本，不需要手动指定
-
-第二步：配置连接spring:  data:    redis:      host: 127.0.0.1      port: 6379      password: xxx      lettuce:        pool:          max-active: 20          max-idle: 10
-
-第三步：直接使用@Autowiredprivate RedisTemplate&lt;String, Object&gt; redisTemplate;public void set(String key, Object value) &#123;    redisTemplate.opsForValue().set(key, value, 30, TimeUnit.MINUTES);&#125;
-
-不需要手动创建 RedisTemplate Bean——RedisAutoConfiguration 已经自动配好了。
-Starter 自动配置原理（面试核心）引入 spring-boot-starter-data-redis→ classpath 出现 RedisTemplate.class→ spring.factories 声明了 RedisAutoConfiguration→ @ConditionalOnClass(RedisTemplate.class) 成立→ @ConditionalOnMissingBean(RedisTemplate.class) 成立（用户没自定义）→ 自动创建 RedisTemplate Bean
-如果用户自己定义了 RedisTemplate Bean 呢？
-
-@ConditionalOnMissingBean 不成立 → 自动配置跳过 → 用户自定义的生效。这就是 Spring Boot 的“用户优先”原则。
-
-如果面试官继续追问“公司内部组件怎么接入”，就可以从使用 Starter 过渡到自定义 Starter。标准答案不是把所有 Bean 都手写在业务项目里，而是把可复用的装配逻辑沉淀成自动配置。
-自定义 Starter 的标准套路（进阶考点）面试官问“你自己写过 Starter 吗”，用这个结构回答：
-1. 项目结构my-spring-boot-starter/├── my-starter-autoconfigure/│   ├── MyProperties.java              ← 配置属性类│   ├── MyService.java                 ← 核心服务│   ├── MyAutoConfiguration.java       ← 自动配置类│   └── META-INF/spring/│       └── org.springframework.boot.autoconfigure.AutoConfiguration.imports└── my-starter/                         ← 依赖聚合模块（空壳）    └── pom.xml                         ← 只引入 autoconfigure + 核心依赖
-
-2. 配置属性类@ConfigurationProperties(prefix = &quot;my.service&quot;)public class MyProperties &#123;    private String endpoint = &quot;http://localhost:8080&quot;;    private int timeout = 3000;    private boolean enabled = true;    // getter/setter&#125;
-
-3. 核心服务public class MyService &#123;    private final MyProperties properties;    public MyService(MyProperties properties) &#123;        this.properties = properties;    &#125;    public String call(String request) &#123;        // 使用 properties.getEndpoint()、properties.getTimeout()    &#125;&#125;
-
-4. 自动配置类@AutoConfiguration@ConditionalOnClass(MyService.class)@EnableConfigurationProperties(MyProperties.class)public class MyAutoConfiguration &#123;    @Bean    @ConditionalOnMissingBean    @ConditionalOnProperty(prefix = &quot;my.service&quot;, name = &quot;enabled&quot;, havingValue = &quot;true&quot;, matchIfMissing = true)    public MyService myService(MyProperties properties) &#123;        return new MyService(properties);    &#125;&#125;
-
-5. 注册自动配置Spring Boot 3.x:
-# META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.importscom.example.MyAutoConfiguration
-
-Spring Boot 2.x:
-# META-INF/spring.factoriesorg.springframework.boot.autoconfigure.EnableAutoConfiguration=\com.example.MyAutoConfiguration
-
-6. 使用方引入&lt;dependency&gt;    &lt;groupId&gt;com.example&lt;/groupId&gt;    &lt;artifactId&gt;my-starter&lt;/artifactId&gt;&lt;/dependency&gt;
-
-my:  service:    endpoint: http://prod-server:8080    timeout: 5000
-
-接入外部组件的三种模式总结
-
-
-模式
-做法
-适用场景
-举例
-
-
-
-Starter 自动配置
-引入 Starter + 配置文件
-社区有现成 Starter
-Redis、MyBatis、Kafka
-
-
-自定义 Starter
-写 AutoConfiguration + 注册
-内部中间件、公司组件
-SOFA Boot Starter、内部 SDK
-
-
-手动集成
-@Configuration + @Bean
-无 Starter、需要精细控制
-自研组件、老系统对接
-
-
-
-接入外部组件分三种情况。如果社区有 Starter，引入依赖加配置就行，Spring Boot 的自动配置会通过 @ConditionalOnClass 检测 classpath，条件满足就自动创建 Bean。如果是我们内部的中间件，我会按 Starter 规范自己写一个——定义 @ConfigurationProperties 绑定配置，写 @AutoConfiguration 类用 @ConditionalOnMissingBean 保证用户可覆盖，注册到 AutoConfiguration.imports。如果组件没有 Starter 也不值得封装，就手动写 @Configuration + @Bean。核心原则是“约定大于配置，用户定义优先于自动配置”。
-
-
-四、面试高频追问前面几个问题覆盖了主线，下面这些是面试里常见的追问点。准备时重点记住每个问题的“一句话结论”，再补一两个关键细节即可。
-4.1 @Conditional 系列注解有哪些？
-
-
-注解
-条件
-
-
-
-@ConditionalOnClass
-classpath 存在指定类
-
-
-@ConditionalOnMissingClass
-classpath 不存在指定类
-
-
-@ConditionalOnBean
-容器中存在指定 Bean
-
-
-@ConditionalOnMissingBean
-容器中不存在指定 Bean
-
-
-@ConditionalOnProperty
-配置属性满足条件
-
-
-@ConditionalOnWebApplication
-是 Web 应用
-
-
-@ConditionalOnNotWebApplication
-不是 Web 应用
-
-
-@ConditionalOnExpression
-SpEL 表达式为 true
-
-
-最常用的是 @ConditionalOnClass（检测依赖是否存在）和 @ConditionalOnMissingBean（用户可覆盖）。
-4.2 Spring Boot 2.x 和 3.x 自动配置注册的区别？
-
-
-
-Spring Boot 2.x
-Spring Boot 3.x
-
-
-
-注册文件
-META-INF/spring.factories
-META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
-
-
-注解
-@Configuration
-@AutoConfiguration（新注解，支持 after &#x2F; before 排序）
-
-
-条件注解
-同 3.x
-同 2.x，但部分移到 spring-boot-autoconfigure 新包路径
-
-
-迁移：2.x 的 spring.factories 在 3.x 仍然兼容但已 deprecated，建议迁移到新文件。
-4.3 application.yml 和 bootstrap.yml 的区别？
-
-
-
-application.yml
-bootstrap.yml
-
-
-
-加载时机
-应用上下文创建时
-引导上下文（Bootstrap Context）创建时，更早
-
-
-用途
-应用自身配置
-配置中心地址、加解密配置
-
-
-Spring Cloud
-后加载
-先加载，用于拉取远程配置
-
-
-Spring Boot 单体
-唯一配置文件
-不需要
-
-
-Spring Cloud 2020+ 默认禁用了 bootstrap 上下文，改用 spring.config.import 导入配置中心。
-4.4 怎么禁用某个自动配置？// 方式1：排除指定自动配置类@SpringBootApplication(exclude = &#123;RedisAutoConfiguration.class&#125;)
-
-# 方式2：配置文件spring:  autoconfigure:    exclude: org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
-
-# 方式3：@ConditionalOnProperty 控制开关my:  feature:    enabled: false
-
-4.5 SpringFactoriesLoader 机制？SpringFactoriesLoader.loadFactoryNames(type, classLoader)→ 扫描所有 jar 包的 META-INF/spring.factories→ 读取 key=type 对应的 value（全限定类名列表）→ 返回类名列表
-
-这是 Spring Boot 自动配置的底层机制——@EnableAutoConfiguration 通过 SpringFactoriesLoader 扫描所有 jar 包的 spring.factories，找到 EnableAutoConfiguration key 对应的所有自动配置类。
-Spring Boot 3.x 改用 AutoConfiguration.imports 文件，但底层思想一致：约定文件路径 + 全限定类名列表 &#x3D; SPI 机制。
-4.6 Spring Boot 启动流程？main()→ new SpringApplication()   → 推断应用类型（Servlet / Reactive / None）   → 加载 ApplicationContextInitializer   → 加载 ApplicationListener   → 推断主配置类→ SpringApplication.run()   → 创建 Bootstrap Context（Spring Cloud）   → 创建 ApplicationContext   → 准备环境（Environment）← 配置文件在这里加载   → 执行 ApplicationContextInitializer   → 刷新上下文（refresh）      → 执行 @Bean 注册      → 执行 AutoConfiguration      → 完成依赖注入   → 执行 CommandLineRunner / ApplicationRunner→ 应用就绪
-
-启动流程可以和前面的自动配置、配置优先级串起来理解：配置文件在准备 Environment 阶段加载，自动配置在刷新上下文阶段参与 Bean 注册，最终完成依赖注入和应用启动。
-4.7 你项目里怎么接入 SOFA 中间件的？通过 SOFABoot Starter。比如接入 AntLLM，引入 sofa-ai-antllm-sofa-boot-starter，在 application.properties 配置 sofa.ai.antllm.chat.base-url 和 sofa.ai.antllm.chat.app-token，Starter 自动创建 AntLlmChatClient Bean，直接 @Autowired 注入使用。
-接入 DRM 动态配置，引入 drm-client，用 @DrmResource 注解标记配置类，运行时通过 DRM 控制台热更新，不需要重启。本质和 Spring Boot 官方 Starter 一样，只是蚂蚁内部的中间件封装。
-引用]]></content>
-      <categories>
-        <category>Java</category>
-        <category>面试</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>SpringBoot</tag>
-        <tag>Spring</tag>
       </tags>
   </entry>
   <entry>
@@ -8998,6 +8585,419 @@ Q6: ReentrantLock 忘记 unlock？
         <tag>Java</tag>
         <tag>并发</tag>
         <tag>JUC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Spring与SpringBoot</title>
+    <url>/2026/05/25/%E9%9D%A2%E8%AF%95/Spring%E4%B8%8ESpringBoot/</url>
+    <content><![CDATA[目录
+一、Spring 和 Spring Boot 有什么区别
+一句话
+核心区别
+
+
+自动配置原理（必问）
+关键条件注解
+面试回答
+二、Spring Boot 配置文件优先级
+优先级从高到低（完整版）
+高频考点：jar 包外 &gt; jar 包内
+完整的外部配置覆盖顺序（jar 外）
+高频考点：properties vs yml 优先级
+高频考点：多配置文件激活
+高频考点：配置文件 vs 代码默认值 —— 谁覆盖谁？
+第一种：@ConfigurationProperties 字段初始值 &#x2F; @Value 冒号默认值
+验证：
+第二种：SpringApplication.setDefaultProperties() 设置的默认值
+完整优先级图示（关键！）
+
+
+三、Spring Boot 怎么接入一个外部组件
+第二步：配置连接
+第三步：直接使用
+
+
+Starter 自动配置原理（面试核心）
+自定义 Starter 的标准套路（进阶考点）
+1. 项目结构
+2. 配置属性类
+3. 核心服务
+4. 自动配置类
+5. 注册自动配置
+6. 使用方引入
+
+
+接入外部组件的三种模式总结
+四、面试高频追问
+4.1 @Conditional 系列注解有哪些？
+4.2 Spring Boot 2.x 和 3.x 自动配置注册的区别？
+4.3 application.yml 和 bootstrap.yml 的区别？
+4.4 怎么禁用某个自动配置？
+4.5 SpringFactoriesLoader 机制？
+4.6 Spring Boot 启动流程？
+4.7 你项目里怎么接入 SOFA 中间件的？
+
+
+引用
+
+
+Spring 与 Spring Boot这篇主要整理 Spring 与 Spring Boot 面试中最常见的几个问题：二者区别、自动配置原理、配置文件优先级、外部组件接入方式，以及面试官常追问的细节。回答时可以先讲结论，再补自动配置和 Starter 机制，这样逻辑会更完整。
+一、Spring 和 Spring Boot 有什么区别一句话
+Spring 是框架，Spring Boot 是 Spring 的自动装配层 + 运维工具层，本质是“用约定消灭配置”。
+
+核心区别
+
+
+维度
+Spring
+Spring Boot
+
+
+
+启动方式
+手动配置 ApplicationContext
+@SpringBootApplication 一键启动
+
+
+依赖管理
+手动选版本，版本冲突频发
+Starter BOM 统一版本，引入即用
+
+
+配置方式
+大量 XML &#x2F; Java Config
+约定大于配置，application.yml 零配置开箱
+
+
+内嵌容器
+需要打 WAR 包部署到 Tomcat
+内嵌 Tomcat&#x2F;Jetty，java -jar 直接跑
+
+
+自动配置
+无，每个 Bean 手动声明
+@EnableAutoConfiguration 按条件自动装配
+
+
+运维能力
+无内置
+Actuator 健康检查、指标、环境信息
+
+
+生产就绪
+需要大量额外配置
+开箱即用（日志、监控、外部化配置）
+
+
+Spring Boot 并不是替代 Spring，而是在 Spring 之上补齐了工程化能力。它把依赖版本管理、自动配置、内嵌容器、外部化配置和生产监控统一起来，让开发者少写大量重复配置。
+自动配置原理（必问）@SpringBootApplication├── @SpringBootConfiguration → 本质就是 @Configuration├── @EnableAutoConfiguration → 核心！自动配置入口└── @ComponentScan           → 扫描当前包及子包的 @Component
+
+@EnableAutoConfiguration 做了什么：
+
+加载 META-INF/spring.factories（Spring Boot 2.x）或 META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports（3.x）
+读取所有 AutoConfiguration 类
+每个 AutoConfiguration 类上有 @Conditional 系列注解
+条件满足 → 装配 Bean；条件不满足 → 跳过
+
+可以把自动配置理解成“候选配置列表 + 条件判断”。Spring Boot 先把可能用到的自动配置类加载进来，再根据 classpath、已有 Bean、配置项、Web 环境等条件决定哪些真正生效。
+关键条件注解
+
+
+注解
+作用
+
+
+
+@ConditionalOnClass
+classpath 存在某个类时生效
+
+
+@ConditionalOnMissingBean
+容器中没有该 Bean 时生效
+
+
+@ConditionalOnProperty
+配置项满足条件时生效
+
+
+@ConditionalOnWebApplication
+Web 应用时生效
+
+
+
+举例：引入 spring-boot-starter-data-redis 后，classpath 有 RedisTemplate.class，RedisAutoConfiguration 的 @ConditionalOnClass 成立，自动创建 RedisTemplate Bean。没引入则不生效，零成本。
+
+面试回答
+Spring 是 IoC + AOP 的框架基础，Spring Boot 在 Spring 之上做了三件事：一是通过 Starter + 自动配置消灭了样板配置，引入 starter-web 就有 Tomcat 和 MVC，引入 starter-redis 就有 RedisTemplate；二是内嵌容器让应用从 WAR 部署变成 java -jar 独立运行；三是 Actuator 提供了生产级运维能力。本质区别不是技术栈不同，而是 Spring Boot 用“约定大于配置”把 Spring 的使用成本降了一个量级。
+
+
+二、Spring Boot 配置文件优先级自动配置解决的是“Bean 怎么自动装配”，配置优先级解决的是“同一个属性到底听谁的”。Spring Boot 的外部化配置非常灵活，面试时最容易考 jar 包内外、profile、默认值之间的覆盖关系。
+优先级从高到低（完整版）
+命令行参数
+JNDI 属性
+Java 系统属性
+操作系统环境变量
+random.* 属性
+jar 包外 application-&#123;profile&#125;.yml ← 最常用
+jar 包内 application-&#123;profile&#125;.yml
+jar 包外 application.yml ← 最常用
+jar 包内 application.yml
+@PropertySource 注解指定的配置
+SpringApplication.setDefaultProperties() 的默认值
+
+高频考点：jar 包外 &gt; jar 包内myapp/├── config/│   └── application.yml ← 优先级最高（jar 外 config 目录）├── application.yml     ← 次之（jar 外根目录）├── myapp.jar│   └── BOOT-INF/classes/│       └── application.yml ← 最低（jar 内）
+
+完整的外部配置覆盖顺序（jar 外）config/application-&#123;profile&#125;.yml ← 最高
+同一层级内，profile 配置永远覆盖默认配置。
+高频考点：properties vs yml 优先级同一位置同时存在 application.properties 和 application.yml：
+
+properties 优先级高于 yml
+但实际项目不应同时存在，容易混乱
+
+高频考点：多配置文件激活spring:  profiles:    active: dev         # 激活 dev    include:            # 额外包含（补充配置）      - redis      - mq    group:              # Spring Boot 2.4+ 配置组      production:        - prod        - redis        - mq
+
+
+
+
+属性
+作用
+版本
+
+
+
+spring.profiles.active
+激活某个 profile
+全版本
+
+
+spring.profiles.include
+在当前 profile 基础上追加 profile
+全版本
+
+
+spring.profiles.group
+定义 profile 组，激活组名等于激活组内所有
+2.4+
+
+
+配置优先级的核心规律可以先记三句话：命令行参数优先级最高，外部配置覆盖内部配置，profile 配置覆盖默认配置。再进一步区分代码里的默认值，就能回答大多数追问。
+高频考点：配置文件 vs 代码默认值 —— 谁覆盖谁？结论：配置文件 &gt; 代码默认值，但有两种“代码默认值”，优先级完全不同。
+第一种：@ConfigurationProperties 字段初始值 &#x2F; @Value 冒号默认值// 写法1：字段初始值@ConfigurationProperties(prefix = &quot;my.service&quot;)public class MyProperties &#123;    private int timeout = 3000; // ← 代码默认值&#125;// 写法2：@Value 冒号默认值@Value(&quot;$&#123;my.service.timeout:3000&#125;&quot;) // ← 冒号后面是代码默认值private int timeout;
+
+这两种默认值的优先级低于所有配置源——只要任何一层配置文件里写了 my.service.timeout=5000，就会覆盖代码默认值。
+
+优先级（高→低）：命令行参数 &gt; 系统属性 &gt; 环境变量 &gt; jar外配置 &gt; jar内配置 &gt; 代码默认值↑ 最底层
+
+验证：# application.yml 不配置 my.service.timeout# → timeout = 3000（代码默认值生效）# application.yml 配置 my.service.timeout=5000# → timeout = 5000（配置文件覆盖代码默认值）
+
+第二种：SpringApplication.setDefaultProperties() 设置的默认值SpringApplication app = new SpringApplication(App.class);Properties defaults = new Properties();defaults.setProperty(&quot;server.port&quot;, &quot;8080&quot;);app.setDefaultProperties(defaults); // ← 这种默认值app.run(args);
+
+这个默认值的优先级比所有配置文件都低，甚至低于 @PropertySource。它在优先级列表的最末尾（第 11 位）。
+完整优先级图示（关键！）高┌─────────────────────────────────────────────────────────────────┐│ 1. 命令行参数                   --server.port=8081                ││ 2. JNDI 属性                                                      ││ 3. Java 系统属性                -Dserver.port=8081                ││ 4. 操作系统环境变量              SERVER_PORT=8081                  ││ 5. random.*                                                       ││ 6. jar外 application-&#123;profile&#125;.yml                                ││ 7. jar内 application-&#123;profile&#125;.yml                                ││ 8. jar外 application.yml                                          ││ 9. jar内 application.yml                                          ││ 10. @PropertySource 指定的配置                                     ││ 11. setDefaultProperties() 的默认值                                │├─────────────────────────────────────────────────────────────────┤│ ↓ 更低 ↓                                                          ││ @ConfigurationProperties 字段初始值 / @Value(:默认)                ││ ← 最底层，任何配置源都能覆盖它                                     │└─────────────────────────────────────────────────────────────────┘低
+
+
+面试易错点：setDefaultProperties() 和 @ConfigurationProperties 字段默认值是两回事。前者是 Environment 里的一个配置源，后者只是属性绑定阶段的兜底值。
+
+// 我们项目里 DRM 动态配置的写法@ConfigurationProperties(prefix = &quot;sofa.ai.antllm.chat&quot;)public class AntLlmChatProperties &#123;    private String baseUrl = &quot;https://antchat.alipay.com&quot;; // 代码默认值    private String appToken;                                // 无默认值，必须配置&#125;
+
+
+优先级：DRM 运行时推送的值 &gt; application.properties 中的值 &gt; 代码默认值 &quot;https://antchat.alipay.com&quot;
+
+DRM 推送 &gt; 配置文件 &gt; 代码默认值，三层覆盖，运行时可热更新。
+
+Spring Boot 配置优先级的核心规则是“外部覆盖内部、profile 覆盖默认、命令行覆盖一切”。具体来说：命令行参数优先级最高，然后是系统属性和环境变量；文件配置中，jar 包外覆盖 jar 包内，config 目录覆盖根目录，application-&#123;profile&#125;.yml 覆盖 application.yml。
+关于配置文件和代码默认值的关系——配置文件一定大于代码默认值。但要区分两种“代码默认值”：@ConfigurationProperties 的字段初始值和 @Value(&quot;$&#123;key:default&#125;&quot;) 的冒号默认值，它们是属性绑定的兜底值，优先级低于所有配置源，任何一层配置文件写了就覆盖；而 setDefaultProperties() 是 Environment 的一个配置源，优先级排在第 11 位，高于前者但低于所有配置文件。我们项目里用这个机制做环境隔离——代码里写默认值兜底，jar 内配置文件放开发环境值，jar 外 config 目录放生产环境值，DRM 运行时推送覆盖一切。
+
+
+三、Spring Boot 怎么接入一个外部组件以接入 Redis 为例，完整链路通常是：引入 Starter、编写连接配置、直接注入使用。这里体现的还是 Spring Boot 的核心思想：依赖存在时自动装配，用户有自定义 Bean 时优先生效。
+引入 Starter 做了什么？
+
+自动引入 spring-data-redis、lettuce-core（或 jedis）等依赖
+BOM 管理版本，不需要手动指定
+
+第二步：配置连接spring:  data:    redis:      host: 127.0.0.1      port: 6379      password: xxx      lettuce:        pool:          max-active: 20          max-idle: 10
+
+第三步：直接使用@Autowiredprivate RedisTemplate&lt;String, Object&gt; redisTemplate;public void set(String key, Object value) &#123;    redisTemplate.opsForValue().set(key, value, 30, TimeUnit.MINUTES);&#125;
+
+不需要手动创建 RedisTemplate Bean——RedisAutoConfiguration 已经自动配好了。
+Starter 自动配置原理（面试核心）引入 spring-boot-starter-data-redis→ classpath 出现 RedisTemplate.class→ spring.factories 声明了 RedisAutoConfiguration→ @ConditionalOnClass(RedisTemplate.class) 成立→ @ConditionalOnMissingBean(RedisTemplate.class) 成立（用户没自定义）→ 自动创建 RedisTemplate Bean
+如果用户自己定义了 RedisTemplate Bean 呢？
+
+@ConditionalOnMissingBean 不成立 → 自动配置跳过 → 用户自定义的生效。这就是 Spring Boot 的“用户优先”原则。
+
+如果面试官继续追问“公司内部组件怎么接入”，就可以从使用 Starter 过渡到自定义 Starter。标准答案不是把所有 Bean 都手写在业务项目里，而是把可复用的装配逻辑沉淀成自动配置。
+自定义 Starter 的标准套路（进阶考点）面试官问“你自己写过 Starter 吗”，用这个结构回答：
+1. 项目结构my-spring-boot-starter/├── my-starter-autoconfigure/│   ├── MyProperties.java              ← 配置属性类│   ├── MyService.java                 ← 核心服务│   ├── MyAutoConfiguration.java       ← 自动配置类│   └── META-INF/spring/│       └── org.springframework.boot.autoconfigure.AutoConfiguration.imports└── my-starter/                         ← 依赖聚合模块（空壳）    └── pom.xml                         ← 只引入 autoconfigure + 核心依赖
+
+2. 配置属性类@ConfigurationProperties(prefix = &quot;my.service&quot;)public class MyProperties &#123;    private String endpoint = &quot;http://localhost:8080&quot;;    private int timeout = 3000;    private boolean enabled = true;    // getter/setter&#125;
+
+3. 核心服务public class MyService &#123;    private final MyProperties properties;    public MyService(MyProperties properties) &#123;        this.properties = properties;    &#125;    public String call(String request) &#123;        // 使用 properties.getEndpoint()、properties.getTimeout()    &#125;&#125;
+
+4. 自动配置类@AutoConfiguration@ConditionalOnClass(MyService.class)@EnableConfigurationProperties(MyProperties.class)public class MyAutoConfiguration &#123;    @Bean    @ConditionalOnMissingBean    @ConditionalOnProperty(prefix = &quot;my.service&quot;, name = &quot;enabled&quot;, havingValue = &quot;true&quot;, matchIfMissing = true)    public MyService myService(MyProperties properties) &#123;        return new MyService(properties);    &#125;&#125;
+
+5. 注册自动配置Spring Boot 3.x:
+# META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.importscom.example.MyAutoConfiguration
+
+Spring Boot 2.x:
+# META-INF/spring.factoriesorg.springframework.boot.autoconfigure.EnableAutoConfiguration=\com.example.MyAutoConfiguration
+
+6. 使用方引入&lt;dependency&gt;    &lt;groupId&gt;com.example&lt;/groupId&gt;    &lt;artifactId&gt;my-starter&lt;/artifactId&gt;&lt;/dependency&gt;
+
+my:  service:    endpoint: http://prod-server:8080    timeout: 5000
+
+接入外部组件的三种模式总结
+
+
+模式
+做法
+适用场景
+举例
+
+
+
+Starter 自动配置
+引入 Starter + 配置文件
+社区有现成 Starter
+Redis、MyBatis、Kafka
+
+
+自定义 Starter
+写 AutoConfiguration + 注册
+内部中间件、公司组件
+SOFA Boot Starter、内部 SDK
+
+
+手动集成
+@Configuration + @Bean
+无 Starter、需要精细控制
+自研组件、老系统对接
+
+
+
+接入外部组件分三种情况。如果社区有 Starter，引入依赖加配置就行，Spring Boot 的自动配置会通过 @ConditionalOnClass 检测 classpath，条件满足就自动创建 Bean。如果是我们内部的中间件，我会按 Starter 规范自己写一个——定义 @ConfigurationProperties 绑定配置，写 @AutoConfiguration 类用 @ConditionalOnMissingBean 保证用户可覆盖，注册到 AutoConfiguration.imports。如果组件没有 Starter 也不值得封装，就手动写 @Configuration + @Bean。核心原则是“约定大于配置，用户定义优先于自动配置”。
+
+
+四、面试高频追问前面几个问题覆盖了主线，下面这些是面试里常见的追问点。准备时重点记住每个问题的“一句话结论”，再补一两个关键细节即可。
+4.1 @Conditional 系列注解有哪些？
+
+
+注解
+条件
+
+
+
+@ConditionalOnClass
+classpath 存在指定类
+
+
+@ConditionalOnMissingClass
+classpath 不存在指定类
+
+
+@ConditionalOnBean
+容器中存在指定 Bean
+
+
+@ConditionalOnMissingBean
+容器中不存在指定 Bean
+
+
+@ConditionalOnProperty
+配置属性满足条件
+
+
+@ConditionalOnWebApplication
+是 Web 应用
+
+
+@ConditionalOnNotWebApplication
+不是 Web 应用
+
+
+@ConditionalOnExpression
+SpEL 表达式为 true
+
+
+最常用的是 @ConditionalOnClass（检测依赖是否存在）和 @ConditionalOnMissingBean（用户可覆盖）。
+4.2 Spring Boot 2.x 和 3.x 自动配置注册的区别？
+
+
+
+Spring Boot 2.x
+Spring Boot 3.x
+
+
+
+注册文件
+META-INF/spring.factories
+META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
+
+
+注解
+@Configuration
+@AutoConfiguration（新注解，支持 after &#x2F; before 排序）
+
+
+条件注解
+同 3.x
+同 2.x，但部分移到 spring-boot-autoconfigure 新包路径
+
+
+迁移：2.x 的 spring.factories 在 3.x 仍然兼容但已 deprecated，建议迁移到新文件。
+4.3 application.yml 和 bootstrap.yml 的区别？
+
+
+
+application.yml
+bootstrap.yml
+
+
+
+加载时机
+应用上下文创建时
+引导上下文（Bootstrap Context）创建时，更早
+
+
+用途
+应用自身配置
+配置中心地址、加解密配置
+
+
+Spring Cloud
+后加载
+先加载，用于拉取远程配置
+
+
+Spring Boot 单体
+唯一配置文件
+不需要
+
+
+Spring Cloud 2020+ 默认禁用了 bootstrap 上下文，改用 spring.config.import 导入配置中心。
+4.4 怎么禁用某个自动配置？// 方式1：排除指定自动配置类@SpringBootApplication(exclude = &#123;RedisAutoConfiguration.class&#125;)
+
+# 方式2：配置文件spring:  autoconfigure:    exclude: org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+
+# 方式3：@ConditionalOnProperty 控制开关my:  feature:    enabled: false
+
+4.5 SpringFactoriesLoader 机制？SpringFactoriesLoader.loadFactoryNames(type, classLoader)→ 扫描所有 jar 包的 META-INF/spring.factories→ 读取 key=type 对应的 value（全限定类名列表）→ 返回类名列表
+
+这是 Spring Boot 自动配置的底层机制——@EnableAutoConfiguration 通过 SpringFactoriesLoader 扫描所有 jar 包的 spring.factories，找到 EnableAutoConfiguration key 对应的所有自动配置类。
+Spring Boot 3.x 改用 AutoConfiguration.imports 文件，但底层思想一致：约定文件路径 + 全限定类名列表 &#x3D; SPI 机制。
+4.6 Spring Boot 启动流程？main()→ new SpringApplication()   → 推断应用类型（Servlet / Reactive / None）   → 加载 ApplicationContextInitializer   → 加载 ApplicationListener   → 推断主配置类→ SpringApplication.run()   → 创建 Bootstrap Context（Spring Cloud）   → 创建 ApplicationContext   → 准备环境（Environment）← 配置文件在这里加载   → 执行 ApplicationContextInitializer   → 刷新上下文（refresh）      → 执行 @Bean 注册      → 执行 AutoConfiguration      → 完成依赖注入   → 执行 CommandLineRunner / ApplicationRunner→ 应用就绪
+
+启动流程可以和前面的自动配置、配置优先级串起来理解：配置文件在准备 Environment 阶段加载，自动配置在刷新上下文阶段参与 Bean 注册，最终完成依赖注入和应用启动。
+4.7 你项目里怎么接入 SOFA 中间件的？通过 SOFABoot Starter。比如接入 AntLLM，引入 sofa-ai-antllm-sofa-boot-starter，在 application.properties 配置 sofa.ai.antllm.chat.base-url 和 sofa.ai.antllm.chat.app-token，Starter 自动创建 AntLlmChatClient Bean，直接 @Autowired 注入使用。
+接入 DRM 动态配置，引入 drm-client，用 @DrmResource 注解标记配置类，运行时通过 DRM 控制台热更新，不需要重启。本质和 Spring Boot 官方 Starter 一样，只是蚂蚁内部的中间件封装。
+引用]]></content>
+      <categories>
+        <category>Java</category>
+        <category>面试</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>SpringBoot</tag>
+        <tag>Spring</tag>
       </tags>
   </entry>
 </search>

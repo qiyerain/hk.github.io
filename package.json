@@ -28,7 +28,7 @@
   "dependencies": {
     "get-intrinsic": "^1.2.4",
     "gopd": "^1.0.1",
-    "hexo": "^7.0.0",
+    "hexo": "^8.1.2",
     "hexo-algoliasearch": "^2.0.1",
     "hexo-deployer-git": "^4.0.0",
     "hexo-feed": "^1.1.2",

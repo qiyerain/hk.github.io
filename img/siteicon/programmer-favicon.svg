@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Programmer favicon">
+  <defs>
+    <linearGradient id="bg" x1="90" y1="52" x2="422" y2="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#15213b"/>
+      <stop offset="0.56" stop-color="#0b1020"/>
+      <stop offset="1" stop-color="#07130f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="126" y1="154" x2="386" y2="362" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8bffd2"/>
+      <stop offset="1" stop-color="#36f0a2"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path d="M96 142h320M96 256h320M96 370h320M142 96v320M256 96v320M370 96v320" stroke="#24324f" stroke-width="10" opacity=".34"/>
+  <rect x="78" y="82" width="356" height="348" rx="58" fill="none" stroke="#2c3b5f" stroke-width="18"/>
+  <path d="M204 178l-68 78 68 78" fill="none" stroke="url(#accent)" stroke-linecap="round" stroke-linejoin="round" stroke-width="46"/>
+  <path d="M308 178l68 78-68 78" fill="none" stroke="url(#accent)" stroke-linecap="round" stroke-linejoin="round" stroke-width="46"/>
+  <path d="M246 330h88" stroke="#f8fafc" stroke-linecap="round" stroke-width="38"/>
+  <circle cx="126" cy="126" r="15" fill="#ff6b6b"/>
+  <circle cx="174" cy="126" r="15" fill="#ffd166"/>
+  <circle cx="222" cy="126" r="15" fill="#36f0a2"/>
+</svg>

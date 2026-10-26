@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <rect width="1400" height="900" fill="#f8fafc"/>
+  <text x="80" y="100" font-family="Arial Unicode MS, PingFang SC, sans-serif" font-size="54" font-weight="700" fill="#0f172a">今日 AI 项目热度雷达</text>
+  <text x="82" y="150" font-family="Arial Unicode MS, PingFang SC, sans-serif" font-size="26" fill="#475569">GitHub Trending daily / Python daily · 2026-06-17</text>
+  <g font-family="Arial Unicode MS, PingFang SC, sans-serif">
+    <g transform="translate(90 230)"><rect width="1180" height="82" rx="20" fill="#dbeafe"/><rect width="1060" height="82" rx="20" fill="#2563eb"/><text x="30" y="52" font-size="30" fill="white">Agent-Reach · 2,025 stars today · 让 Agent 读取全网内容</text></g>
+    <g transform="translate(90 340)"><rect width="1180" height="82" rx="20" fill="#dcfce7"/><rect width="392" height="82" rx="20" fill="#16a34a"/><text x="30" y="52" font-size="30" fill="white">VoxCPM · 408 · Tokenizer-Free 多语 TTS</text></g>
+    <g transform="translate(90 450)"><rect width="1180" height="82" rx="20" fill="#ede9fe"/><rect width="720" height="82" rx="20" fill="#7c3aed"/><text x="30" y="52" font-size="30" fill="white">AI Engineering from Scratch · 749 · 从工程实战学习 AI</text></g>
+    <g transform="translate(90 560)"><rect width="1180" height="82" rx="20" fill="#cffafe"/><rect width="190" height="82" rx="20" fill="#0891b2"/><text x="30" y="52" font-size="30" fill="white">vLLM · 124 · 高吞吐 LLM 推理服务</text></g>
+    <g transform="translate(90 670)"><rect width="1180" height="82" rx="20" fill="#ffedd5"/><rect width="150" height="82" rx="20" fill="#ea580c"/><text x="30" y="52" font-size="30" fill="white">Fara-7B · 97 · 计算机使用 Agent 模型</text></g>
+  </g>
+</svg>

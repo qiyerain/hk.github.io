@@ -1,0 +1,1657 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>小遨的个人博客 · 原创文章</title>
+    <link>https://blog.pengfanao.top</link>
+    <description>技术、工具与成长主题的原创文章更新。</description>
+    <language>zh-CN</language>
+    <lastBuildDate>Sat, 24 Oct 2026 06:10:00 GMT</lastBuildDate>
+    
+    <item>
+      <guid isPermalink="true">https://blog.pengfanao.top/2026/10/24/agent/Archify-%E6%8A%8A%E9%A1%B9%E7%9B%AE%E7%94%BB%E6%88%90%E8%83%BD%E4%BA%A4%E4%BB%98%E7%9A%84%E5%9B%BE/</guid>
+      <title>用 Archify 把项目画成能交付的图：安装、用法与一次真实产出</title>
+      <link>https://blog.pengfanao.top/2026/10/24/agent/Archify-%E6%8A%8A%E9%A1%B9%E7%9B%AE%E7%94%BB%E6%88%90%E8%83%BD%E4%BA%A4%E4%BB%98%E7%9A%84%E5%9B%BE/</link>
+      <pubDate>Sat, 24 Oct 2026 06:10:00 GMT</pubDate>
+      <category>Archify</category><category>Skill</category><category>架构图</category><category>可视化</category><category>开源</category>
+      <description><![CDATA[<blockquote>
+<p><strong>画图最难的不是画，是画完之前发现自己画错了。</strong></p>
+</blockquote>
+<p>我这周要给 DeepSeek Harness 画一张架构图。试过手写 SVG，也试过 Mermaid，前者改一次要重排一次坐标，后者能出图但读起来像流程清单，不像系统。</p>
+<p>后来用了 Archify。它做的事有点不一样：图不是画出来的，是<strong>生成、检查、再交付</strong>的。源文件是一份带类型的 JSON，交付前要过四道门，最后的产物是一个能点、能筛、能导出的单文件 HTML。</p>
+<p>这篇文章讲清三件事：它是什么、怎么装怎么用、以及我用它给 dsh 做的那张图。</p>
+<blockquote>
+<p><strong>一句话看懂：Archify 把图当成有源文件和验收标准的交付物，而不是一次性的截图。</strong></p>
+</blockquote>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
+<li><a href="#%E4%B8%80%E3%80%81%E8%BF%99%E4%B8%AA%E9%A1%B9%E7%9B%AE%E6%98%AF%E4%BB%80%E4%B9%88">一、这个项目是什么</a></li>
+<li><a href="#%E4%BA%8C%E3%80%81%E5%AE%83%E5%92%8C-Mermaid%E3%80%81%E7%94%BB%E5%9B%BE%E5%B7%A5%E5%85%B7%E7%9A%84%E5%8C%BA%E5%88%AB">二、它和 Mermaid、画图工具的区别</a></li>
+<li><a href="#%E4%B8%89%E3%80%81%E5%AE%89%E8%A3%85">三、安装</a></li>
+<li><a href="#%E5%9B%9B%E3%80%81%E5%85%88%E9%80%89%E5%AF%B9%E5%9B%BE%E7%B1%BB%E5%9E%8B">四、先选对图类型</a></li>
+<li><a href="#%E4%BA%94%E3%80%81%E4%B8%80%E6%9D%A1%E6%B5%81%E6%B0%B4%E7%BA%BF%E8%B5%B0%E5%AE%8C%E4%BA%A4%E4%BB%98">五、一条流水线走完交付</a></li>
+<li><a href="#%E5%85%AD%E3%80%81%E7%9C%9F%E5%AE%9E%E4%BA%A7%E5%87%BA%EF%BC%9ADeepSeek-Harness-%E6%9E%B6%E6%9E%84%E5%9B%BE">六、真实产出：DeepSeek Harness 架构图</a></li>
+<li><a href="#%E4%B8%83%E3%80%81%E5%9B%BE%E4%B8%8A%E8%BF%98%E8%83%BD%E5%81%9A%E4%BB%80%E4%B9%88">七、图上还能做什么</a></li>
+<li><a href="#%E5%85%AB%E3%80%81%E6%88%91%E8%B8%A9%E7%9A%84%E5%9D%91">八、我踩的坑</a></li>
+<li><a href="#%E6%B8%85%E5%8D%95">清单</a></li>
+</ul>
+<hr>
+<h2 id="一、这个项目是什么"><a href="#一、这个项目是什么" class="headerlink" title="一、这个项目是什么"></a>一、这个项目是什么</h2><p>Archify 是 <a href="https://github.com/tt-a1i">tt-a1i</a> 做的一个 Agent Skill，仓库在 <a href="https://github.com/tt-a1i/archify">github.com&#x2F;tt-a1i&#x2F;archify</a>，MIT 许可，当前稳定版 3.2.0（2026-10-18 发布）。</p>
+<p>它的定位一句话就能说完：<strong>把你想说清楚的东西，变成一张可以探索的图。</strong></p>
+<p>具体支持十种原生图类型：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>回答什么问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>architecture</code></td>
+<td>系统由什么组成，边界在哪</td>
+</tr>
+<tr>
+<td><code>workflow</code></td>
+<td>几步做完，哪一步要人批</td>
+</tr>
+<tr>
+<td><code>sequence</code></td>
+<td>一次请求经过了谁</td>
+</tr>
+<tr>
+<td><code>dataflow</code></td>
+<td>数据从哪来，到哪去</td>
+</tr>
+<tr>
+<td><code>lifecycle</code></td>
+<td>现在处于什么状态</td>
+</tr>
+<tr>
+<td><code>erd</code></td>
+<td>表和表之间怎么关联</td>
+</tr>
+<tr>
+<td><code>class</code></td>
+<td>类型与继承怎么组织</td>
+</tr>
+<tr>
+<td><code>tree</code></td>
+<td>层级与从属</td>
+</tr>
+<tr>
+<td><code>timeline</code></td>
+<td>什么时候发生了什么</td>
+</tr>
+<tr>
+<td><code>waterfall</code></td>
+<td>时间花在哪一段</td>
+</tr>
+</tbody></table>
+<p>另外还有一个 <code>explainer</code> 模式：不是画图，是把一个问题的答案做成一页，结论在前，每块配图。</p>
+<p>项目的热度不低：GitHub 上 8.8 万星，skills.sh 上 13 万+ 安装，作者说它上过 GitHub Trending 的周榜第一。这些数字我只是转述，没去核验。</p>
+<p>对我来说更有说服力的是它解决了一个真实痛点：<strong>图和事实会脱节。</strong></p>
+<p>Mermaid 里的方框是纯文本，没人知道它对应哪个文件。Archify 的 architecture 类型可以给每个节点挂 <code>sources</code>，写清楚文件名和行号，还要锁定一个 40 位的提交哈希。图上的每个断言都能点回源码。</p>
+<h2 id="二、它和-Mermaid、画图工具的区别"><a href="#二、它和-Mermaid、画图工具的区别" class="headerlink" title="二、它和 Mermaid、画图工具的区别"></a>二、它和 Mermaid、画图工具的区别</h2><p>三个区别，决定了它适合什么场景。</p>
+<p><strong>第一，源文件是带类型的 JSON，不是文本 DSL。</strong></p>
+<p>每种图类型都有自己的 schema，字段有约束。这意味着写错了会在校验阶段报错，而不是渲染出一张看着还行、实际有歧义的图。</p>
+<p><strong>第二，布局是”作者判断 + 机器校验”，不是全自动。</strong></p>
+<p>坐标由写源文件的人（或者你的 agent）按真实连线来排。工具会检查：标签有没有压到线、框有没有越界、两条关系有没有交叉。Archify 自己在文档里写得很清楚：它不是通用自动布局工具，也不是 Mermaid 主题。</p>
+<p><strong>第三，交付前要过门。</strong></p>
+<p>最后一步不是”渲染出一个 HTML”，而是”通过 schema、布局、HTML&#x2F;SVG、路由和标签避让检查之后，原子替换目标文件”。失败会返回稳定的规则码和可修复项，而不是一段 Node 报错栈。</p>
+<p>第三条是它跟”画图工具”最大的分界：<strong>它认失败。</strong></p>
+<h2 id="三、安装"><a href="#三、安装" class="headerlink" title="三、安装"></a>三、安装</h2><p>一条命令，装在全局：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx skills add tt-a1i/archify -g</span><br></pre></td></tr></table></figure>
+
+<p><code>skills</code> 是一个跨宿主的 skill 安装器。装完之后，Claude Code、Codex CLI、OpenCode、Cursor 都能用，区别只是目录：</p>
+<table>
+<thead>
+<tr>
+<th>宿主</th>
+<th>安装位置</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Claude Code</td>
+<td><code>~/.claude/skills/</code> 或 <code>.claude/skills/</code></td>
+</tr>
+<tr>
+<td>Codex CLI</td>
+<td><code>~/.agents/skills/</code> 或 <code>.agents/skills/</code></td>
+</tr>
+<tr>
+<td>OpenCode</td>
+<td><code>~/.config/opencode/skills/</code>、<code>.opencode/skills/</code> 或 <code>.agents/skills/</code></td>
+</tr>
+</tbody></table>
+<p>我的机器上它落在 <code>~/.agents/skills/archify/</code>，Codex 和 OpenCode 共用这一份。</p>
+<p>不想装也可以先试：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx skills use tt-a1i/archify@archify --agent codex</span><br></pre></td></tr></table></figure>
+
+<p>如果你在用 DeepSeek Harness，作者还提供了一个社区集成（不是官方插件）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dsh plugin --profile web add @tt-a1i/archify-dsh@1.0.0</span><br></pre></td></tr></table></figure>
+
+<p>装完先跑一次自检，确认 Node 环境和渲染依赖都在：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">node ~/.agents/skills/archify/bin/archify.mjs doctor</span><br></pre></td></tr></table></figure>
+
+<p><code>doctor</code> 会告诉你 Chrome 在不在、模板齐不齐。Chrome 是后面 <code>browser-check</code> 和 <code>visual-check</code> 用的——它们不是模拟渲染，是真的开一次浏览器截图。</p>
+<h2 id="四、先选对图类型"><a href="#四、先选对图类型" class="headerlink" title="四、先选对图类型"></a>四、先选对图类型</h2><p>选错类型，画得再漂亮也没人看得懂。这张表是我动手前的第一道判断。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/archify-type-router-1200x675.png" alt="先问要回答什么，再挑图类型"></p>
+<p>拿不准的时候别猜，直接问 CLI：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">node ~/.agents/skills/archify/bin/archify.mjs guide <span class="string">&quot;API 请求经过 Redis 缓存，miss 之后查 PostgreSQL&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>它会给出建议的类型和理由，<code>--json</code> 还能拿到结构化结果。</p>
+<p>有个经验：<strong>“谁调用谁”用 architecture，”先做什么后做什么”用 workflow，”一次请求的时间顺序”用 sequence。</strong> 这三个最容易混，也最容易选错。</p>
+<h2 id="五、一条流水线走完交付"><a href="#五、一条流水线走完交付" class="headerlink" title="五、一条流水线走完交付"></a>五、一条流水线走完交付</h2><p>Archify 的目录约定很省心：每个新需求一个文件夹。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.archify/architecture-dsh-20261024-113112/</span><br><span class="line">├── candidate.json      # 源文件，事实源</span><br><span class="line">├── dsh-architecture.html  # 交付物</span><br><span class="line">└── review-5/           # 每轮检查的证据</span><br></pre></td></tr></table></figure>
+
+<p>改图只改 <code>candidate.json</code>，不碰 HTML。这一点很重要，后面会讲为什么。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/archify-pipeline-v2-1200x675.png" alt="六步走完，图才叫交付"></p>
+<p>命令不多，常用的就这几个：</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>干什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>validate</code></td>
+<td>只校验源文件，最快的一步</td>
+</tr>
+<tr>
+<td><code>preview</code></td>
+<td>起一个本地预览，只在通过校验时刷新</td>
+</tr>
+<tr>
+<td><code>finalize</code></td>
+<td>校验 + 渲染 + 浏览器检查，一条龙</td>
+</tr>
+<tr>
+<td><code>browser-check</code></td>
+<td>单独开浏览器验证渲染</td>
+</tr>
+<tr>
+<td><code>visual-check</code></td>
+<td>检查遮挡、越界、可读性，出截图</td>
+</tr>
+<tr>
+<td><code>deliver</code></td>
+<td>交付并可选打开</td>
+</tr>
+<tr>
+<td><code>check</code></td>
+<td>检查一个已有 HTML 是否可溯源</td>
+</tr>
+<tr>
+<td><code>compare</code></td>
+<td>两个 architecture 源做差异对比</td>
+</tr>
+</tbody></table>
+<p>最小的一条命令长这样：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node ~/.agents/skills/archify/bin/archify.mjs finalize architecture \</span><br><span class="line">  .archify/architecture-dsh-20261024-113112/candidate.json \</span><br><span class="line">  .archify/architecture-dsh-20261024-113112/dsh-architecture.html \</span><br><span class="line">  --repo-root . --browser-check --json</span><br></pre></td></tr></table></figure>
+
+<p>注意 <code>--repo-root</code>：源码引用的行号要相对仓库根目录去校验，不给这个参数，<code>sources</code> 就只是装饰。</p>
+<p>还有一条纪律：<strong>非零退出码永远不算成功。</strong> 失败了就读 <code>diagnostics</code>，按它给的修复项改，然后重跑整条命令。不要手改 HTML——那会让回执失效。</p>
+<h2 id="六、真实产出：DeepSeek-Harness-架构图"><a href="#六、真实产出：DeepSeek-Harness-架构图" class="headerlink" title="六、真实产出：DeepSeek Harness 架构图"></a>六、真实产出：DeepSeek Harness 架构图</h2><p>这是我这次生成的图。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/archify-dsh-result-1600x922.png" alt="DeepSeek Harness 架构总览：从用户到 Web 客户端、Host、Agent Loop、模型 API，以及工具与会话分支"></p>
+<p>图里能看出来的信息：左边是用户与 Web 客户端，中间是 Host 服务，右侧是 Agent Loop 调 LLM 运行时再打模型 API；Agent Loop 往下分出 System Prompt、工具管线、会话日志三条支路；工具管线再落到能力接缝，最后 spawn 到本机或远程执行环境。橙色的框是 <code>dsh 进程 · Cordis 插件树</code> 这个边界，外部系统和执行环境被明确地放在框外。</p>
+<p>截图看不到的部分才是有用的部分——这张图能点、能搜、能导出。我把它一起放进了博客，点开就是完整版本：</p>
+<div class="btns wide">
+<a class="button no-text-decoration" href="/demos/dsh-architecture/" target="_blank" rel="noopener"><i class="anzhiyufont anzhiyu-icon-arrow-circle-right"></i>打开这张架构图（可交互）</a>
+</div>
+
+<p>这份源文件里的数字：</p>
+<ul>
+<li>12 个组件，12 条关系，4 张说明卡片，1 个边界</li>
+<li>26 处源码引用，每条都带文件路径和行号</li>
+<li>锁定提交 <code>22ddee3</code>，产物 838,423 字节</li>
+<li>12 条关系每一条都有语义（<code>RPC</code>、<code>SSE</code>、<code>append</code>、<code>provider</code>、<code>spawn</code>），没有一条是随手连的</li>
+</ul>
+<p>过程比结果值得说。第一次 <code>finalize</code> 就失败了，规则码是 <code>composition/desktop-readability</code>——桌面可读性不过。简单说就是图太挤，1440 宽的视口里读不清。</p>
+<p>我改了两处：把 <code>Profiles / Bundles</code> 移到 Agent Loop 正上方，让”装配插件树”这条线变成一条直线；把边界框收紧，让它只包住真正的进程内组件。重跑之后 <code>finalize</code> 通过，<code>browser-check</code> 和 <code>visual-check</code> 分别在 1440×900 和 2048×1320 两个视口、深色和浅色两个主题下都过了。</p>
+<p>前前后后留下 5 份检查记录（<code>review-1</code> 到 <code>review-5</code>）。失败的那份没有删，留在目录里——下次改图时，它就是”哪里容易出错”的说明书。</p>
+<p>这也是我觉得它比截图可靠的地方：<strong>图的状态是可验证的。</strong> 回执绑定了产物的 sha256，改一个字节就对不上。</p>
+<p>如果要做图给不看代码的人，这张图可以直接发；如果要给同事讲某条链路，它能按路径高亮。</p>
+<p>图里这些组件对应的事实，我整理在<a href="/2026/10/24/agent/DeepSeek-Harness-%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/">DeepSeek Harness 学习手册</a>那篇里。</p>
+<h2 id="七、图上还能做什么"><a href="#七、图上还能做什么" class="headerlink" title="七、图上还能做什么"></a>七、图上还能做什么</h2><p>产物是单文件 HTML，双击就能开，不依赖 Archify。</p>
+<p>几个我常用的操作：</p>
+<ul>
+<li><code>?</code> 打开图例与说明</li>
+<li><code>/</code> 搜节点，回车聚焦</li>
+<li><code>R</code> 追一条有向路径，能看完整旅程</li>
+<li><code>L</code> 对比两类角色</li>
+<li><code>M</code> 打开总览雷达</li>
+<li><code>F</code> 进演示模式，适合投屏</li>
+<li><code>S</code> 换视觉风格，<code>T</code> 切深浅色，<code>E</code> 打开导出</li>
+</ul>
+<p>导出支持 PNG、WebP、JPG 长图，也能打印成 PDF。动效可以导出成 WebM，但默认不会进静态导出——这点做得克制。</p>
+<p>还有一个我没想到的用法：路线分享卡。选中一条路径导出 1200×630 的 PNG，整张图保留作上下文，只高亮那一条链路。发群里比截全图清楚。</p>
+<h2 id="八、我踩的坑"><a href="#八、我踩的坑" class="headerlink" title="八、我踩的坑"></a>八、我踩的坑</h2><p><strong>坑一：以为说一句话就能出终稿。</strong></p>
+<p>能出，但要改。第一版通常语义没错、布局不行。真正的活儿在”看检查结果 → 改源文件 → 重跑”这个循环里。</p>
+<p><strong>坑二：手改 HTML。</strong></p>
+<p>改完很好看，但回执失效，<code>check --require-provenance</code> 直接报错。而且下次重跑就覆盖了。所有修改都要落到 <code>candidate.json</code>。</p>
+<p><strong>坑三：把失败当警告。</strong></p>
+<p><code>finalize</code> 返回非零退出码时，产物不会替换目标文件。这时候磁盘上那个 HTML 还是上一个通过检查的版本——看着”没变化”，其实是没交付。</p>
+<p><strong>坑四：源码引用乱挂。</strong></p>
+<p><code>source</code> 要指向真正支撑这条断言的位置。挂一个文件开头当”出处”，校验能过，但图就失去了可追溯的意义。Archify 的文档里写得很直白：每个引用只证明那个位置上可见的事实。</p>
+<p><strong>坑五：想拿它当画图软件。</strong></p>
+<p>它不是 WYSIWYG 编辑器，也不做通用自动布局。想随手拖一个框，用别的工具更快。它的价值在”可验证的系统图”。</p>
+<h2 id="清单"><a href="#清单" class="headerlink" title="清单"></a>清单</h2><ul>
+<li><input disabled="" type="checkbox"> 装完先跑 <code>doctor</code>，确认 Chrome 可用</li>
+<li><input disabled="" type="checkbox"> 用 <code>guide</code> 确认图类型，别凭感觉选</li>
+<li><input disabled="" type="checkbox"> 每个需求一个 <code>.archify/</code> 子目录，源文件叫 <code>candidate.json</code></li>
+<li><input disabled="" type="checkbox"> 真实仓库的图，每个关键节点挂 <code>sources</code>（文件 + 行号）</li>
+<li><input disabled="" type="checkbox"> 锁定提交哈希，别用 <code>main</code></li>
+<li><input disabled="" type="checkbox"> 改图只改源文件，不碰 HTML</li>
+<li><input disabled="" type="checkbox"> 非零退出码当失败处理，读 <code>diagnostics</code> 再改</li>
+<li><input disabled="" type="checkbox"> 交付前确认 1440 宽视口能读清</li>
+<li><input disabled="" type="checkbox"> 保留失败记录，它是下次的避坑指南</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li>项目主页：<code>https://github.com/tt-a1i/archify</code>（MIT，v3.2.0）</li>
+<li>在线示例：<code>https://archify.si/gallery.html</code></li>
+<li>技能说明：<code>~/.agents/skills/archify/SKILL.md</code></li>
+<li>交付契约：<code>~/.agents/skills/archify/references/delivery-contract.md</code></li>
+<li>本次产物：<code>.archify/architecture-dsh-20261024-113112/dsh-architecture.html</code></li>
+<li>在线交互版：<a href="/demos/dsh-architecture/">blog.pengfanao.top&#x2F;demos&#x2F;dsh-architecture&#x2F;</a></li>
+</ul>
+]]></description>
+    </item>
+    
+    <item>
+      <guid isPermalink="true">https://blog.pengfanao.top/2026/10/24/%E5%B7%A5%E5%85%B7/OpenRouter-%E5%85%8D%E8%B4%B9%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E7%94%A8/</guid>
+      <title>OpenRouter 的免费模型怎么用：18 个能聊天，17 个能进 agent</title>
+      <link>https://blog.pengfanao.top/2026/10/24/%E5%B7%A5%E5%85%B7/OpenRouter-%E5%85%8D%E8%B4%B9%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E7%94%A8/</link>
+      <pubDate>Sat, 24 Oct 2026 05:40:00 GMT</pubDate>
+      <category>Agent</category><category>LLM</category><category>OpenRouter</category><category>免费模型</category><category>API</category>
+      <description><![CDATA[<blockquote>
+<p><strong>免费模型省下的不是钱，是试错成本。</strong></p>
+</blockquote>
+<p>我把 OpenRouter 的模型目录拉下来数了一遍：469 个模型，prompt 和 completion 价格都是 0 的有 20 个。其中两个是音乐生成，真正能对话的是 18 个。</p>
+<p>这 18 个里有 17 个支持工具调用。也就是说，它们不只是”能聊”，而是能进 agent 循环，跑多步任务。</p>
+<p>但免费是有代价的，而且代价不在账单上。这篇文章按”挑、接、验、防”四步走一遍，把能用和不能用的边界说清楚。</p>
+<blockquote>
+<p><strong>一句话看懂：<code>:free</code> 是独立端点，有独立限额；先按任务挑模型，再按客户端接端点，最后用证据验收，而不是靠感觉。</strong></p>
+</blockquote>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
+<li><a href="#%E4%B8%80%E3%80%81%E5%85%88%E6%8A%8A%E8%B4%A6%E7%AE%97%E6%B8%85%E6%A5%9A">一、先把账算清楚</a></li>
+<li><a href="#%E4%BA%8C%E3%80%81%E6%8C%89%E4%BB%BB%E5%8A%A1%E6%8C%91%E6%A8%A1%E5%9E%8B">二、按任务挑模型</a></li>
+<li><a href="#%E4%B8%89%E3%80%81%E4%B8%89%E6%9D%A1%E6%8E%A5%E5%85%A5%E8%B7%AF%E5%BE%84">三、三条接入路径</a></li>
+<li><a href="#%E5%9B%9B%E3%80%81%E6%8E%A5%E4%B8%8A%E4%B9%8B%E5%90%8E%E6%80%8E%E4%B9%88%E9%AA%8C%E6%94%B6">四、接上之后怎么验收</a></li>
+<li><a href="#%E4%BA%94%E3%80%81%E5%85%8D%E8%B4%B9%E7%9A%84%E5%9B%9B%E4%B8%AA%E7%BA%A6%E6%9D%9F">五、免费的四个约束</a></li>
+<li><a href="#%E5%85%AD%E3%80%81%E6%88%91%E7%9A%84%E4%BD%BF%E7%94%A8%E7%AD%96%E7%95%A5">六、我的使用策略</a></li>
+<li><a href="#%E6%B8%85%E5%8D%95">清单</a></li>
+</ul>
+<hr>
+<h2 id="一、先把账算清楚"><a href="#一、先把账算清楚" class="headerlink" title="一、先把账算清楚"></a>一、先把账算清楚</h2><p>统计口径很简单：<code>pricing.prompt == 0</code> 且 <code>pricing.completion == 0</code>。</p>
+<p>按这个口径，20 个条目里：</p>
+<ul>
+<li><strong>18 个是聊天模型</strong>，能正常发消息、接工具。</li>
+<li><strong>2 个是 Google Lyria 音乐生成</strong>，token 价是 0，但实际按首收费：完整歌曲 $0.08&#x2F;首，30 秒片段 $0.04&#x2F;段。</li>
+</ul>
+<p>第二条最容易被误读。看到 <code>pricing</code> 全是 0 就以为免费，结果月末发现有消费——因为它的计费单位不是 token。</p>
+<p>这也是我写这篇的第一个动机：<strong>免费和”计价器显示为零”是两件事。</strong></p>
+<h2 id="二、按任务挑模型"><a href="#二、按任务挑模型" class="headerlink" title="二、按任务挑模型"></a>二、按任务挑模型</h2><p>18 个模型的能力差距很大：上下文从 65k 到 1M，参数从 2.6B 到 975B。硬用一个”最强”去跑所有任务，通常是最慢的方案。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/openrouter-free-matrix-v2-1200x675.png" alt="按任务挑：四类免费模型，各有各的强项"></p>
+<p>我的分法是四类。</p>
+<p><strong>要通读整仓库、对比长文档</strong>，用 1M 上下文里推理最强的三个：<code>thinkingmachines/inkling:free</code>（975B MoE，41B 激活）、<code>nvidia/nemotron-3-ultra-550b-a55b:free</code>（550B MoE，55B 激活）、<code>thinkingmachines/inkling-small:free</code>（276B MoE）。</p>
+<p>这类模型的体验是”想得深但等得久”。我一般只在需要它一次看完几十个文件时才用。</p>
+<p><strong>要改代码、跑测试、读报错再改</strong>，用 Poolside 的两个编码模型：<code>laguna-s-2.1:free</code>（118B，8B 激活，Terminal-Bench 2.1 得分 70.2%）和 <code>laguna-xs-2.1:free</code>。它们是为 agent 场景训练的，工具调用的形状比通用模型稳。</p>
+<p><strong>要看截图、票据、视频片段</strong>，用 <code>nvidia/nemotron-3.5-super-vl:free</code>（支持文本、图像、视频输入）、<code>google/gemma-4-31b-it:free</code>、<code>dots-studio/dots-3-note-preview:free</code>（512k 上下文）。</p>
+<p><strong>要跑批量抽取、分类、子代理</strong>，用小的：<code>nvidia/nemotron-3.5-lightning:free</code>（30B MoE，3B 激活）、<code>liquid/lfm-2.5-2.6b:free</code>（65k 上下文，适合短文本任务）。</p>
+<p>完整的 18 个在这张表里，按上下文从大到小排：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>上下文</th>
+<th>工具</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>thinkingmachines/inkling:free</code></td>
+<td>1M</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>thinkingmachines/inkling-small:free</code></td>
+<td>1M</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>nvidia/nemotron-3-ultra-550b-a55b:free</code></td>
+<td>1M</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>nvidia/nemotron-3.5-lightning:free</code></td>
+<td>1M</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>nvidia/nemotron-3.5-super-vl:free</code></td>
+<td>1M</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>dots-studio/dots-3-note-preview:free</code></td>
+<td>512k</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>nvidia/nemotron-3-super-120b-a12b:free</code></td>
+<td>262k</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>google/gemma-4-26b-a4b-it:free</code></td>
+<td>262k</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>google/gemma-4-31b-it:free</code></td>
+<td>262k</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>poolside/laguna-s-2.1:free</code></td>
+<td>262k</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>poolside/laguna-xs-2.1:free</code></td>
+<td>262k</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>recursive/flint-v1.0:free</code></td>
+<td>262k</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>xingchen-agi/xing4.0-29b-a4b:free</code></td>
+<td>262k</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>cohere/north-mini-code:free</code></td>
+<td>256k</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free</code></td>
+<td>256k</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>openrouter/free</code></td>
+<td>200k</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>nvidia/nemotron-3.5-content-safety:free</code></td>
+<td>128k</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>liquid/lfm-2.5-2.6b:free</code></td>
+<td>65k</td>
+<td>✅</td>
+</tr>
+</tbody></table>
+<p>最后一行值得单独说：<code>content-safety</code> 是 4B 的内容审核模型，唯一不支持 tools 的聊天条目。它适合做护栏，不适合当主模型。</p>
+<p>还有一个 <code>openrouter/free</code> 是路由器：随机从可用免费模型里挑一个，还会过滤掉不适合当前请求的。它适合”我就想跑通一下”，不适合做评测——每次跑到的模型可能不一样。</p>
+<h2 id="三、三条接入路径"><a href="#三、三条接入路径" class="headerlink" title="三、三条接入路径"></a>三、三条接入路径</h2><p>OpenRouter 只暴露一个 OpenAI 兼容端点：<code>https://openrouter.ai/api/v1</code>。所以能不能接，取决于你的客户端支不支持自定义 <code>base_url</code>。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/openrouter-endpoint-paths-1200x675.png" alt="三条接入路径，一个 OpenAI 兼容端点"></p>
+<p><strong>路径一：OpenCode。</strong></p>
+<p>OpenCode 的模型名带 provider 前缀，OpenRouter 的模型长这样：<code>openrouter/thinkingmachines/inkling:free</code>。配置好 key 之后，选全名就行。</p>
+<p>这条路径最省事，因为工具调用、流式、图片输入都是它自己处理的。</p>
+<p><strong>路径二：Codex + CC Switch。</strong></p>
+<p>如果你习惯用 Codex，可以在 CC Switch 里加一个自定义供应商：</p>
+<ul>
+<li><code>base_url</code>：<code>https://openrouter.ai/api/v1</code></li>
+<li><code>wire_api</code>：<code>chat</code></li>
+<li><code>apiKey</code>：<code>sk-or-</code> 开头的那串</li>
+</ul>
+<p><code>wire_api</code> 选 <code>chat</code>，对应的是 <code>/chat/completions</code>，不是 <code>/responses</code>。</p>
+<p><strong>路径三：curl 或 OpenAI SDK。</strong></p>
+<p>脚本、批处理、评测用这条最直接：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">curl -s https://openrouter.ai/api/v1/chat/completions \</span><br><span class="line">  -H <span class="string">&quot;Authorization: Bearer <span class="variable">$OPENROUTER_KEY</span>&quot;</span> \</span><br><span class="line">  -H <span class="string">&quot;Content-Type: application/json&quot;</span> \</span><br><span class="line">  -d <span class="string">&#x27;&#123;</span></span><br><span class="line"><span class="string">    &quot;model&quot;: &quot;thinkingmachines/inkling:free&quot;,</span></span><br><span class="line"><span class="string">    &quot;messages&quot;: [&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;用三句话解释什么是会话日志&quot;&#125;]</span></span><br><span class="line"><span class="string">  &#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>模型名一定要写全 id，<code>:free</code> 后缀不能省。省了就是另一个（付费的）端点，或者直接 404。</p>
+<h2 id="四、接上之后怎么验收"><a href="#四、接上之后怎么验收" class="headerlink" title="四、接上之后怎么验收"></a>四、接上之后怎么验收</h2><p>这一步最多人跳过。免费模型的失败往往是静默的：请求成功、返回正常、账单为零，但结果不能用。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/openrouter-checks-1200x675.png" alt="接上之后：三步确认，再谈能不能用"></p>
+<p>我的三步：</p>
+<p><strong>第一步，查这把 key 的额度和用量。</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -s -H <span class="string">&quot;Authorization: Bearer <span class="variable">$OPENROUTER_KEY</span>&quot;</span> \</span><br><span class="line">  https://openrouter.ai/api/v1/key</span><br></pre></td></tr></table></figure>
+
+<p>返回值里有限额和使用量。先看这个，比等 429 再猜要快。</p>
+<p><strong>第二步，发一个最小请求，看响应里的 <code>model</code> 字段。</strong></p>
+<p>这是唯一能证明”我确实用到了想用的模型”的证据。如果用 <code>openrouter/free</code>，响应里的 <code>model</code> 很可能不是你预期的那个。</p>
+<p><strong>第三步，打开 tools 跑一轮真实小任务。</strong></p>
+<p>支持 tools 不等于工具调用可用。参数拼错、模型不支持某种 JSON schema、上游版本差异，都会让它退化成纯文本回答。跑一个”列目录再读文件”的小任务，比看文档可靠。</p>
+<p>常见红灯我对了个表：</p>
+<ul>
+<li><code>429</code>：免费额度或并发打满，等一会儿或换模型。</li>
+<li><code>404</code>：模型 id 少了 <code>:free</code> 后缀。</li>
+<li><code>403</code>：key 没开通，或者来源受限。</li>
+<li><code>5xx</code>：上游在切换，重试一次，还不行就换。</li>
+</ul>
+<p>判定标准只有一条：<strong>能在你的真实任务里稳定产出可验证结果，才算能用。</strong> 能返回，只说明网络通。</p>
+<h2 id="五、免费的四个约束"><a href="#五、免费的四个约束" class="headerlink" title="五、免费的四个约束"></a>五、免费的四个约束</h2><p><strong>约束一：额度按账号算，不按模型算。</strong></p>
+<p><code>:free</code> 端点是独立端点，有自己的每日请求上限。具体数字跟账号状态有关，所以别抄别人的数字，去 <code>/api/v1/key</code> 看自己的。</p>
+<p><strong>约束二：高峰会排队。</strong></p>
+<p>免费流量优先级低于付费。我遇到过同一个请求白天超时、凌晨秒回。跑长任务尽量避开高峰。</p>
+<p><strong>约束三：上游会换，而且免费端点有到期日。</strong></p>
+<p>同一个模型 id 背后可能挂多个 provider。我这次快照里就有三个免费条目带到期时间：<code>laguna-s-2.1:free</code> 和 <code>laguna-xs-2.1:free</code> 到 2026-10-31，<code>dots-3-note-preview:free</code> 到 2026-12-31。</p>
+<p>这意味着<strong>不能把免费端点写死进生产流程</strong>。今天能跑的方案，下周可能就不存在了。</p>
+<p><strong>约束四：日志与数据策略更宽松。</strong></p>
+<p>免费通道通常伴随更宽松的保留策略。内部代码、客户数据、未公开的方案，不要走免费通道。这不是阴谋论，是成本结构的必然结果——免费额度由谁承担，数据就要相应地被处理。</p>
+<h2 id="六、我的使用策略"><a href="#六、我的使用策略" class="headerlink" title="六、我的使用策略"></a>六、我的使用策略</h2><p>跑了一段时间之后，我固定成四条：</p>
+<ol>
+<li><strong>主任务用付费模型，副任务用免费。</strong> 写代码、改线上配置这类事，稳定性比省钱重要。</li>
+<li><strong>免费模型只做”能验证”的活。</strong> 摘要、抽取、分类、批量改写——结果对不对一眼能看出来。</li>
+<li><strong>模型 id 写全，不用路由器。</strong> 评测和回归需要确定性，<code>openrouter/free</code> 每次可能不同。</li>
+<li><strong>把到期日记进提醒。</strong> 免费端点有生命周期，方案里留一条”换模型”的退路。</li>
+</ol>
+<p>还有一个反直觉的结论：免费模型最适合的场景，不是”省钱”，而是**”降低尝试门槛”**。想试一个新模型值不值得用，先跑免费版，跑通了再换付费版，这个流程比看榜单有用。</p>
+<h2 id="清单"><a href="#清单" class="headerlink" title="清单"></a>清单</h2><ul>
+<li><input disabled="" type="checkbox"> 用 <code>/api/v1/models</code> 确认当前哪些条目价格为零（别用旧文章里的名单）</li>
+<li><input disabled="" type="checkbox"> 按任务类型挑模型，不要一个模型打天下</li>
+<li><input disabled="" type="checkbox"> 模型名写全 id，带 <code>:free</code></li>
+<li><input disabled="" type="checkbox"> 用 <code>/api/v1/key</code> 查自己的额度，不抄别人的数字</li>
+<li><input disabled="" type="checkbox"> 发一个最小请求，确认响应里的 <code>model</code> 字段</li>
+<li><input disabled="" type="checkbox"> 跑一轮真实 tools 任务，确认工具调用没退化</li>
+<li><input disabled="" type="checkbox"> 检查免费端点的到期时间</li>
+<li><input disabled="" type="checkbox"> 内部代码和客户数据不走免费通道</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li>模型目录：<code>https://openrouter.ai/api/v1/models</code>（本文数据为 2026-10-24 快照，共 469 个模型）</li>
+<li>额度查询：<code>https://openrouter.ai/api/v1/key</code></li>
+<li>限流说明：<code>https://openrouter.ai/docs/api-reference/limits</code></li>
+<li>免费变体说明：<code>https://openrouter.ai/docs/faq</code>（<code>:free</code> 是独立变体，有自己的限流）</li>
+</ul>
+]]></description>
+    </item>
+    
+    <item>
+      <guid isPermalink="true">https://blog.pengfanao.top/2026/10/24/agent/DeepSeek-Harness-%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/</guid>
+      <title>DeepSeek Harness 学习手册：从 363 个包里找到一条主线</title>
+      <link>https://blog.pengfanao.top/2026/10/24/agent/DeepSeek-Harness-%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/</link>
+      <pubDate>Sat, 24 Oct 2026 05:10:00 GMT</pubDate>
+      <category>DeepSeek Harness</category><category>Cordis</category><category>源码阅读</category><category>Agent</category><category>架构</category>
+      <description><![CDATA[<blockquote>
+<p><strong>读 dsh 源码最难的，不是看不懂某个文件，而是不知道下一个该打开哪个文件。</strong></p>
+</blockquote>
+<p>我第一次打开 <code>packages/</code> 时，看到 52 个分组、363 个工作区包。每个包都有自己的 README，每份 README 都写得挺清楚，但我读完第三章就忘了第一章。</p>
+<p>问题不在于文档少，而在于它们平铺。我需要的是一条主路径：先看什么、后看什么、什么时候可以跳过。</p>
+<p>于是我给自己写了一份交互式手册（<code>learn-harness/index.html</code>，13 章正文加 2 篇附录）。它不是 API 文档的复述，而是一张阅读地图。这篇文章记录手册里的主线，以及我按这条线读完之后的几个判断。</p>
+<blockquote>
+<p><strong>一句话看懂：dsh 的一切都是插件；一次对话是 turn 里的若干 step；模型看到的上下文，永远是会话日志投影出来的。</strong></p>
+</blockquote>
+<p>手册本身是个单页应用，能搜包名、能点开每个包的说明、能按主路径高亮，读起来比 Markdown 顺手。我把它和这篇文章放在同一个域名下，点开就能用：</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/dsh-handbook-live-1600x900.png" alt="交互版手册的实际界面：左边 15 节目录，右边是正文与包地图"></p>
+<div class="btns wide">
+<a class="button no-text-decoration" href="/demos/learn-harness/" target="_blank" rel="noopener"><i class="anzhiyufont anzhiyu-icon-arrow-circle-right"></i>打开交互版手册</a>
+</div>
+
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
+<li><a href="#%E4%B8%80%E3%80%81363-%E4%B8%AA%E5%8C%85%EF%BC%8C%E4%B8%8D%E6%98%AF%E7%94%A8%E6%9D%A5%E9%80%9A%E8%AF%BB%E7%9A%84">一、363 个包，不是用来通读的</a></li>
+<li><a href="#%E4%BA%8C%E3%80%81%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BF%83%E6%99%BA%E6%A8%A1%E5%9E%8B%EF%BC%9A%E4%B8%80%E5%88%87%E7%9A%86%E6%8F%92%E4%BB%B6">二、第一个心智模型：一切皆插件</a></li>
+<li><a href="#%E4%B8%89%E3%80%81%E8%A3%85%E9%85%8D%EF%BC%9A%E4%BB%8E%E7%A9%BA%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%B0-web-%E5%BA%94%E7%94%A8">三、装配：从空上下文到 web 应用</a></li>
+<li><a href="#%E5%9B%9B%E3%80%81%E6%A0%B8%E5%BF%83%E8%84%8A%E6%9F%B1%EF%BC%9A%E5%85%AD%E4%B8%AA%E5%8C%85">四、核心脊柱：六个包</a></li>
+<li><a href="#%E4%BA%94%E3%80%81%E4%B8%80%E8%BD%AE%E5%AF%B9%E8%AF%9D%EF%BC%9A%E4%B8%A4%E6%AC%A1%E6%8F%90%E4%BA%A4">五、一轮对话：两次提交</a></li>
+<li><a href="#%E5%85%AD%E3%80%81%E5%B7%A5%E5%85%B7%E6%98%AF%E4%B8%80%E6%9D%A1%E5%8F%97%E6%8E%A7%E7%AE%A1%E7%BA%BF">六、工具是一条受控管线</a></li>
+<li><a href="#%E4%B8%83%E3%80%81%E4%BC%9A%E8%AF%9D%E6%97%A5%E5%BF%97%E6%89%8D%E6%98%AF%E4%BA%8B%E5%AE%9E%E6%BA%90">七、会话日志才是事实源</a></li>
+<li><a href="#%E5%85%AB%E3%80%81%E8%83%BD%E5%8A%9B%E6%8E%A5%E7%BC%9D%EF%BC%9A%E4%B8%89%E4%B8%AA%E8%A7%92%E8%89%B2%E6%89%8D%E7%AE%97%E5%AE%8C%E6%95%B4">八、能力接缝：三个角色才算完整</a></li>
+<li><a href="#%E4%B9%9D%E3%80%81%E6%89%A9%E5%B1%95%E6%97%B6%E6%8A%8A%E6%96%B0%E8%A1%8C%E4%B8%BA%E6%94%BE%E5%AF%B9%E4%BD%8D%E7%BD%AE">九、扩展时把新行为放对位置</a></li>
+<li><a href="#%E5%8D%81%E3%80%81%E5%9B%9B%E5%91%A8%E8%B7%AF%E7%BA%BF%E6%80%8E%E4%B9%88%E8%B5%B0">十、四周路线怎么走</a></li>
+<li><a href="#%E5%8D%81%E4%B8%80%E3%80%81%E6%88%91%E8%B8%A9%E8%BF%87%E7%9A%84%E5%9B%9B%E4%B8%AA%E5%9D%91">十一、我踩过的四个坑</a></li>
+<li><a href="#%E8%87%AA%E6%B5%8B%E6%B8%85%E5%8D%95">自测清单</a></li>
+</ul>
+<hr>
+<h2 id="一、363-个包，不是用来通读的"><a href="#一、363-个包，不是用来通读的" class="headerlink" title="一、363 个包，不是用来通读的"></a>一、363 个包，不是用来通读的</h2><p>先把数字摆清楚，因为它决定了读法。</p>
+<p>dsh 仓库里 <code>packages/</code> 下有 52 个分组、363 个工作区包。出厂 profile 有 5 个：<code>web</code>、<code>headless</code>、<code>sdk</code>、<code>sdk-minimal</code>、<code>acp</code>。会话格式版本是 <code>SESSION_FORMAT_VERSION = 4</code>。</p>
+<p>这些数字放在一起说明一件事：包的数量不是知识量，而是组装方式的数量。</p>
+<p>同一个能力可以出现在多个 profile 里，以不同配置、不同宿主、不同沙箱策略出现。你要理解的不是 363 份代码，而是<strong>它们怎么被拼起来</strong>，以及<strong>主路径上谁先谁后</strong>。</p>
+<p>所以手册的第一条规则是：先读装配，再读主干，最后才按需展开分支。</p>
+<h2 id="二、第一个心智模型：一切皆插件"><a href="#二、第一个心智模型：一切皆插件" class="headerlink" title="二、第一个心智模型：一切皆插件"></a>二、第一个心智模型：一切皆插件</h2><p>dsh 跑在 Cordis 上。Cordis 的世界观很简单：插件往共享的 <code>ctx</code> 上贡献服务、类型化事件和可逆的副作用。</p>
+<p>这里有两个词值得停一下。</p>
+<p><strong>可逆</strong>：注册即副作用。插件卸载时，它注册的东西会跟着回滚，不需要谁去手动清理。这解释了一个常见困惑——为什么改配置就能换掉模型适配器，而不是去改某个 <code>if</code>。</p>
+<p><strong>没有特权内核</strong>：模型适配器、工具注册表、会话日志、agent loop，全都是插件。没有一处”必须改这里”的补丁点。想加行为，就在旁边挂一个插件。</p>
+<p>我一开始把这理解成”架构优雅”，后来发现它更实际的作用是：<strong>它规定了新代码该写在哪</strong>。凡是能写成插件的行为，就不该动 loop。</p>
+<h2 id="三、装配：从空上下文到-web-应用"><a href="#三、装配：从空上下文到-web-应用" class="headerlink" title="三、装配：从空上下文到 web 应用"></a>三、装配：从空上下文到 web 应用</h2><p>一个正在运行的 dsh，是启动时按顺序叠出来的插件树。</p>
+<p>叠的顺序是：profile 列出它要用的 bundle 顺序，bundle 带着自己的配置行和代码，最后由用户的 <code>cordis.patch.yml</code> 按行 id 覆盖 config，或者插入新行。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/dsh-assembly-layers-1200x675.png" alt="启动装配：四层按序覆盖，得到一棵插件树"></p>
+<p>我建议第一次读的时候，只盯住两件事：</p>
+<ol>
+<li>第 4 层的 patch 是按 <strong>id</strong> 覆盖的，不是按位置。所以你能改一行而不影响其它行。</li>
+<li>层是叠加的，不是替换的。上层没提到的行，仍然保留下层的配置。</li>
+</ol>
+<p>理解这两点之后，”为什么我改了配置没生效”这类问题就有了解法：先确认你改的是不是同一行 id，再确认有没有更上层把它盖回去。</p>
+<h2 id="四、核心脊柱：六个包"><a href="#四、核心脊柱：六个包" class="headerlink" title="四、核心脊柱：六个包"></a>四、核心脊柱：六个包</h2><p>抛开宿主和外围，真正要读的是六个包，各自挂一个 <code>ctx</code> key：</p>
+<table>
+<thead>
+<tr>
+<th>包</th>
+<th>负责什么</th>
+<th><code>ctx</code> key</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>core/session</code></td>
+<td>追加式的会话事件日志与内存存储</td>
+<td><code>ctx.sessions</code></td>
+</tr>
+<tr>
+<td><code>core/system-prompt</code></td>
+<td>prompt 分段与工具 schema 组装</td>
+<td><code>ctx.systemPrompt</code></td>
+</tr>
+<tr>
+<td><code>core/tools</code></td>
+<td>作用域内的工具注册表与受控执行管线</td>
+<td><code>ctx.tools</code></td>
+</tr>
+<tr>
+<td><code>core/agent</code></td>
+<td><code>Agent</code> 接口、活动注册表、<code>agent/*</code> 事件</td>
+<td><code>ctx.agents</code></td>
+</tr>
+<tr>
+<td><code>core/agent-loop</code></td>
+<td>实现该接口的默认驱动器</td>
+<td><code>ctx.agentLoop</code></td>
+</tr>
+<tr>
+<td><code>llm/llm</code></td>
+<td>消息与流式词汇，以及适配器接缝</td>
+<td><code>ctx.llm</code></td>
+</tr>
+</tbody></table>
+<p><code>core/scope</code> 也在脊柱上，但它提供的是库，不挂 key。</p>
+<p>这六个包之所以叫脊柱，是因为它们串起了所有其它能力：工具要经过 <code>ctx.tools</code>，模型要经过 <code>ctx.llm</code>，历史要从 <code>ctx.sessions</code> 投影，prompt 要由 <code>ctx.systemPrompt</code> 组装。</p>
+<p>剩下的三百多个包，绝大多数是在这条脊柱上挂东西。</p>
+<h2 id="五、一轮对话：两次提交"><a href="#五、一轮对话：两次提交" class="headerlink" title="五、一轮对话：两次提交"></a>五、一轮对话：两次提交</h2><p>这是手册里我改得最多的一章，也是最值得慢慢读的一章。</p>
+<p>先对齐定义：<strong>step 是一次模型请求加上它调用的工具；turn 是零个或多个 step</strong>。turn 在认领第一个输入之前打开，在没有欠账时关闭。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/dsh-turn-lifecycle-1200x675.png" alt="一次 turn：输入先提交，结果后提交"></p>
+<p>完整走一遍：</p>
+<ol>
+<li><code>turn/start</code>：认领下一步输入，顺带一条排队消息。</li>
+<li>快照会话的模型选择，组装 prompt 分段和被允许的工具 schema。</li>
+<li><code>agent/pre-step</code>：监听者可以接受、改写或拒绝。拒绝，或者第一条就被改写成空，这个 turn 直接关闭，一步都不走。</li>
+<li><code>step/start</code>，然后 <code>agent/request</code> 进入 <code>prepareCall()</code>。</li>
+<li><code>prepareCall()</code> <strong>绑定适配器之后</strong>，才提交 system prompt 和被接受的用户消息。</li>
+<li>从日志里推导并冻结模型历史，开始流式请求。</li>
+<li><code>assistant/message</code> 落盘，接着 <code>tool/call*</code> 走工具管线。</li>
+<li><code>step/end</code>。如果工具还欠一次请求，或者又来了新输入，就再走一步。</li>
+<li>欠账清零，<code>turn/end</code>。</li>
+</ol>
+<p>我最初以为”提交”是循环结束时的统一动作。实际上是<strong>两次提交</strong>：输入在绑定适配器后立刻提交，结果在流式结束后提交。</p>
+<p>这个顺序不是洁癖。它保证了一个很难得的行为：<strong>取消时，system prompt 和用户消息一个都不提交</strong>。半截状态不会进入日志，下次恢复不用猜。</p>
+<h2 id="六、工具是一条受控管线"><a href="#六、工具是一条受控管线" class="headerlink" title="六、工具是一条受控管线"></a>六、工具是一条受控管线</h2><p>工具调用看起来像”模型说一句话，函数跑一遍”。在 dsh 里它是一条有四个位置的管线：</p>
+<p><code>tools/pre-execute</code> → <code>tools/execute</code> → <code>tools/post-execute</code> → <code>tool/result</code></p>
+<p><code>pre</code> 管准入和改写，<code>execute</code> 是真正的执行，<code>post</code> 处理结果，最后 <code>tool/result</code> 落进日志。中间几个是 waterfall，监听者必须调用 <code>next()</code> 才会继续往下走——不调用就是短路。</p>
+<p>还有一个细节容易被忽略：失败的 step 会把缺失的工具结果记下来。这样日志里不会出现”发起过但没结果”的空洞。</p>
+<p>我读完这一章的实际收获，是明白了权限、沙箱、超时这些策略该挂在哪：不是塞进工具实现里，而是挂在 <code>pre</code> 上。</p>
+<h2 id="七、会话日志才是事实源"><a href="#七、会话日志才是事实源" class="headerlink" title="七、会话日志才是事实源"></a>七、会话日志才是事实源</h2><p>dsh 里有一句话：<strong>模型可见，就意味着已记录</strong>。</p>
+<p>模型的上下文不是内存里攒出来的数组，而是 <code>deriveMessages()</code> 从会话日志投影出来的。每个 <code>assistant/message</code> 内嵌产生它的完整流式记录；<code>assistant/attempt</code> 保留失败、重试、取消和流错误的尝试，但不进入模型历史。</p>
+<p>这条规则带来两个后果。</p>
+<p>第一，你不能”只在内存里加一点上下文”。任何进入模型请求的东西，都得先在日志里有一个事件。</p>
+<p>第二，格式变更很贵。<code>SESSION_FORMAT_VERSION</code> 现在是 4，提交过的代际不会被移动、覆盖或删除。要做变更只能新增一个带版本名的后继格式，走一次相邻迁移。</p>
+<p>我原先以为这是保守，后来懂了：会话是用户资产的载体，删掉一代就等于删掉别人的历史。</p>
+<h2 id="八、能力接缝：三个角色才算完整"><a href="#八、能力接缝：三个角色才算完整" class="headerlink" title="八、能力接缝：三个角色才算完整"></a>八、能力接缝：三个角色才算完整</h2><p>原文对”接缝”（seam）的定义是三段式：<strong>Service Definition</strong> 声明接口，<strong>Service Provider</strong> 实现它，<strong>Consumer</strong> 使用它。一个包可以同时扮演多个角色，但只有一个角色不算接缝。</p>
+<p>这是我在手册里最有获得感的一节，因为它能直接判断”这个改动是不是做全了”。</p>
+<p>举个真实的例子：文件系统和子进程的提供者共享同一个执行世界。所以当你把它们一起指向远程沙箱时，Bash、PTY、LSP 会跟着一起搬过去，不需要为每个工具写一份远程分支。</p>
+<p>也就是说，换一个提供者，改变的是整个产品，而不是某个函数。</p>
+<p>判断新能力时，我会问三句：接口在哪、谁实现、谁用。三句都有答案，才算设计完。</p>
+<h2 id="九、扩展时把新行为放对位置"><a href="#九、扩展时把新行为放对位置" class="headerlink" title="九、扩展时把新行为放对位置"></a>九、扩展时把新行为放对位置</h2><p>事件是扩展点，第一件事是选对事件域。手册里把域分成三类：</p>
+<ul>
+<li><strong>会话事件</strong>：追加进日志的持久事实。需要跨重载活下来，就用它。</li>
+<li><strong>agent 事件</strong>（<code>agent/*</code>）：携带活动中的 <code>Agent</code>，用来观察或拦截飞行中的工作。</li>
+<li><strong>能力事件</strong>：把策略和适配器挂到接缝上，不用 import loop。</li>
+</ul>
+<p>选错域的症状很典型：你写了一个只在当前进程有效的拦截，重启之后行为就变了。那不是 bug，是放错了地方。</p>
+<p>至于”要不要改 agent-loop”，我的经验是先默认不改。dsh 的约定是：新行为走已文档化的扩展点；真要改 loop，就得同步更新架构文档——这条约束本身就说明它不是常规操作。</p>
+<h2 id="十、四周路线怎么走"><a href="#十、四周路线怎么走" class="headerlink" title="十、四周路线怎么走"></a>十、四周路线怎么走</h2><p>手册最后给了一条四周路线，我按它走了一遍，觉得节奏合理：</p>
+<ul>
+<li><strong>第 1 周</strong>：装配与脊柱。把 profile &#x2F; bundle &#x2F; patch 走通，认全六个 <code>ctx</code> key。</li>
+<li><strong>第 2 周</strong>：turn 生命周期。反复读那一张流程图，直到能凭记忆说出每一步提交了什么。</li>
+<li><strong>第 3 周</strong>：工具与会话。重点看 <code>pre</code> 与 <code>post</code>，以及 <code>deriveMessages()</code> 的输入。</li>
+<li><strong>第 4 周</strong>：接缝与宿主。挑一个接缝（比如 <code>ctx.fs</code>），把三个角色都找出来。</li>
+</ul>
+<p>每周的验收方式不是”读完”，而是”能指出来”。比如第 2 周的验收是：给我一段日志，我能说出它属于哪一步、为什么在这。</p>
+<h2 id="十一、我踩过的四个坑"><a href="#十一、我踩过的四个坑" class="headerlink" title="十一、我踩过的四个坑"></a>十一、我踩过的四个坑</h2><p><strong>坑一：以为要改 agent-loop。</strong> 实际上九成需求用事件或工具就够了。先翻扩展点，再考虑动主干。</p>
+<p><strong>坑二：把会话当成数据库。</strong> 它是追加式日志，查询能力来自投影，不是来自索引。想按业务字段查，应该写投影，不是加表。</p>
+<p><strong>坑三：想着通读 363 个包。</strong> 读完也记不住。正确的做法是顺着主路径读，用到哪个分支再展开哪个分支。</p>
+<p><strong>坑四：把 service 当成 seam。</strong> 只有一个服务、没有消费者，不叫接缝。写新能力前先想清楚谁会用。</p>
+<h2 id="自测清单"><a href="#自测清单" class="headerlink" title="自测清单"></a>自测清单</h2><p>读完这份手册，我用下面六个问题自检。能全答上来，基本就能改代码了：</p>
+<ul>
+<li>profile、bundle、patch 三层的覆盖关系是什么？为什么改配置有时不生效？</li>
+<li>六个核心 <code>ctx</code> key 分别负责什么？</li>
+<li>一个 turn 里，system prompt 与用户消息在哪一步提交？取消时会发生什么？</li>
+<li>工具管线的四个位置分别适合挂什么策略？</li>
+<li>为什么说”模型可见就意味着已记录”？这条规则限制了什么写法？</li>
+<li>能力接缝的三个角色分别是什么？缺一个会怎样？</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li>手册本体：<code>learn-harness/index.html</code>（13 章正文 + 2 篇附录，含包地图与四周路线）</li>
+<li>在线交互版：<a href="/demos/learn-harness/">blog.pengfanao.top&#x2F;demos&#x2F;learn-harness&#x2F;</a></li>
+<li>配套：把这几个层的关系画成图，见<a href="/2026/10/24/agent/Archify-%E6%8A%8A%E9%A1%B9%E7%9B%AE%E7%94%BB%E6%88%90%E8%83%BD%E4%BA%A4%E4%BB%98%E7%9A%84%E5%9B%BE/">用 Archify 把项目画成能交付的图</a></li>
+<li>架构文档：<code>docs/architecture.md</code>（装配、turn flow、会话日志、能力接缝）</li>
+<li>仓库根目录：<code>AGENTS.md</code>（约定与命令）</li>
+<li>Cordis 入门：<code>docs/cordis-primer.md</code></li>
+</ul>
+]]></description>
+    </item>
+    
+    <item>
+      <guid isPermalink="true">https://blog.pengfanao.top/2026/10/18/%E5%90%8E%E7%AB%AF/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%98/</guid>
+      <title>Java 缓存怎么选：从为什么缓存到 Caffeine、Redis 与一致性</title>
+      <link>https://blog.pengfanao.top/2026/10/18/%E5%90%8E%E7%AB%AF/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1%E5%AE%9E%E6%88%98/</link>
+      <pubDate>Sun, 18 Oct 2026 16:00:00 GMT</pubDate>
+      <category>缓存</category><category>Caffeine</category><category>Redis</category><category>Spring Cache</category>
+      <description><![CDATA[<p>一个商品详情页每秒收到几千次请求，但商品名称和图片一天只改几次。如果每次请求都查数据库，大部分查询是在重复做同一件事。缓存把近期用过的数据放在读取更快的位置，让重复请求少走一段路。</p>
+<p>这篇文章先回答<strong>为什么缓存、缓存在哪里</strong>，再认识 Java 常见的缓存方案，最后用一个两级缓存案例说明：数据更新后，为什么用户仍可能读到旧值，以及该怎么处理。</p>
+<h2 id="一、为什么需要缓存"><a href="#一、为什么需要缓存" class="headerlink" title="一、为什么需要缓存"></a>一、为什么需要缓存</h2><p>假设一次数据库查询需要 20 ms，而一次本地内存读取只需很短的时间。把热点商品放进缓存后，大量重复读取可以直接返回，数据库也能腾出连接和算力处理真正需要查询的请求。具体收益要用自己的数据和压测验证，不能把某个延迟数字当成所有系统的承诺。</p>
+<table>
+<thead>
+<tr>
+<th>原来的问题</th>
+<th>例子</th>
+<th>缓存的作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>重复计算</td>
+<td>同一段脚本反复编译</td>
+<td>复用编译结果</td>
+</tr>
+<tr>
+<td>重复读取</td>
+<td>热门商品每次都查数据库</td>
+<td>减少查询量和响应时间</td>
+</tr>
+<tr>
+<td>外部调用成本高</td>
+<td>反复请求远程配置</td>
+<td>降低网络延迟与调用次数</td>
+</tr>
+</tbody></table>
+<p>代价同样明确：<strong>缓存里可能是旧数据</strong>，还会占内存、增加失效和排障工作。余额、库存扣减这类正确性要求高的操作，不能因为有缓存就跳过数据库中的并发控制。先判断数据是否“读多写少、允许短时间陈旧、加载成本较高”，再考虑缓存。</p>
+<h3 id="一次读取是怎样命中的"><a href="#一次读取是怎样命中的" class="headerlink" title="一次读取是怎样命中的"></a>一次读取是怎样命中的</h3><p>最常见的做法叫 <em>Cache Aside</em>（旁路缓存）：业务代码先读缓存；没找到就查数据库，并把结果放进缓存。写入时通常先更新数据库，再删除相关缓存项；下次读取重新加载。下面的图展示一个项目里不同用途的缓存，后文再拆解其中的两级模型。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/cache-design-overview-20261019.jpeg" alt="原始项目中的缓存体系总览，区分业务缓存、实例缓存与注解缓存"></p>
+<p>命中率高不等于设计正确。数据库更新后若旧值仍留在缓存里，用户读到的依然是错的。</p>
+<h2 id="二、缓存可以放在哪里"><a href="#二、缓存可以放在哪里" class="headerlink" title="二、缓存可以放在哪里"></a>二、缓存可以放在哪里</h2><p>先看位置，再挑框架。位置决定了速度、共享范围和一致性成本。</p>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>常见实现</th>
+<th>优点</th>
+<th>要注意</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JVM 本地内存</td>
+<td>Caffeine、Guava、Ehcache</td>
+<td>读取快，不经过网络</td>
+<td>每个应用实例各有一份，重启后消失</td>
+</tr>
+<tr>
+<td>独立缓存服务</td>
+<td>Redis</td>
+<td>多个应用实例可共享</td>
+<td>有网络开销，要管理服务可用性和内存</td>
+</tr>
+<tr>
+<td>两级缓存</td>
+<td>本地 Caffeine + Redis</td>
+<td>热点读本地，其余读共享缓存</td>
+<td>两层都要处理更新和失效</td>
+</tr>
+</tbody></table>
+<p><strong>单机、数据量有界、允许各节点短暂不一致</strong>，先考虑本地缓存；<strong>多实例需要共享缓存值</strong>，考虑 Redis；只有性能数据证明单层缓存不够用，才引入两级缓存。数据库始终是本例中的权威数据源。</p>
+<h2 id="三、Java-生态中有哪些选择"><a href="#三、Java-生态中有哪些选择" class="headerlink" title="三、Java 生态中有哪些选择"></a>三、Java 生态中有哪些选择</h2><p>这些名字经常一起出现，但不在同一层：Caffeine、Guava、Ehcache 是本地缓存实现；Redis 是独立缓存服务；Spring Cache 是调用缓存的<strong>抽象接口和注解机制</strong>，并不自行决定数据存在哪里。</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>适合什么</th>
+<th>选用时最重要的判断</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Caffeine</strong></td>
+<td>新项目中的 JVM 本地热点数据</td>
+<td>支持容量限制、过期、加载和统计；通常是本地缓存的优先选择</td>
+</tr>
+<tr>
+<td><strong>Guava Cache</strong></td>
+<td>已经使用 Guava 缓存的项目</td>
+<td>能完成基础加载与过期；新代码可比较 Caffeine</td>
+</tr>
+<tr>
+<td><strong>Ehcache</strong></td>
+<td>需要堆内、堆外或磁盘等存储层的项目</td>
+<td>按实际存储需求选，配置与运维也更复杂</td>
+</tr>
+<tr>
+<td><strong>Redis</strong></td>
+<td>多实例共享的缓存</td>
+<td>有网络和服务故障成本；它不在 Java 进程内</td>
+</tr>
+<tr>
+<td><strong>Spring Cache</strong></td>
+<td>用 <code>@Cacheable</code> 管理方法结果</td>
+<td>还须配置 Caffeine、Redis 等具体 <code>CacheManager</code></td>
+</tr>
+<tr>
+<td><strong>JCache（JSR 107）</strong></td>
+<td>需要标准化缓存 API</td>
+<td>是规范，不是具体缓存产品</td>
+</tr>
+</tbody></table>
+<h3 id="先从-Caffeine-的一条缓存开始"><a href="#先从-Caffeine-的一条缓存开始" class="headerlink" title="先从 Caffeine 的一条缓存开始"></a>先从 Caffeine 的一条缓存开始</h3><p>例如商品详情允许短时间陈旧，可以限制条目数和写入后过期时间：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Cache&lt;Long, Product&gt; products = Caffeine.newBuilder()</span><br><span class="line">    .maximumSize(<span class="number">10_000</span>)</span><br><span class="line">    .expireAfterWrite(Duration.ofMinutes(<span class="number">5</span>))</span><br><span class="line">    .build();</span><br><span class="line"></span><br><span class="line"><span class="type">Product</span> <span class="variable">product</span> <span class="operator">=</span> products.get(productId, id -&gt; productRepository.findById(id));</span><br></pre></td></tr></table></figure>
+
+<p>这里的 5 分钟只是例子，不是所有商品的推荐 TTL。Caffeine 的 <code>get</code> 对同一个 key 的加载有原子计算语义，但数据库失败如何处理、查不到商品时是否缓存空值，仍要由业务定义。<code>maximumSize</code> 限制条目数量，不是 JVM 内存字节数；大对象要估算堆占用。</p>
+<h3 id="Spring-Cache-解决的是接入方式"><a href="#Spring-Cache-解决的是接入方式" class="headerlink" title="Spring Cache 解决的是接入方式"></a>Spring Cache 解决的是接入方式</h3><p>在 Spring 项目中，也可以把缓存声明放到查询方法上：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Cacheable(cacheNames = &quot;products&quot;, key = &quot;#id&quot;)</span></span><br><span class="line"><span class="keyword">public</span> Product <span class="title function_">findProduct</span><span class="params">(Long id)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> productRepository.findById(id);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@CacheEvict(cacheNames = &quot;products&quot;, key = &quot;#id&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">updateProduct</span><span class="params">(Long id, ProductUpdate command)</span> &#123;</span><br><span class="line">    productRepository.update(id, command);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码还需要配置具体的缓存实现。<code>@Cacheable</code> 依赖 Spring 代理，同一个对象内部直接调用自身方法通常不会经过代理；写入失败、事务回滚与缓存删除的先后顺序也必须检查。注解不会自动替你决定 TTL、key 和一致性策略。</p>
+<h3 id="什么时候需要-Redis"><a href="#什么时候需要-Redis" class="headerlink" title="什么时候需要 Redis"></a>什么时候需要 Redis</h3><p>假设服务部署了三台机器，机器 A 修改了商品，机器 B 的本地缓存不会因为 A 的删除操作自动更新。若业务要求各节点读取同一份缓存，Redis 是直接的选择。它也会遇到穿透、热点 key、服务故障等问题，因此仍要保留数据库回源路径、合理的过期时间和监控。</p>
+<p>不要仅仅因为“系统是分布式的”就叠加 Caffeine + Redis。先确认 Redis 是否已满足延迟和吞吐目标；多一层本地缓存，就多一层需要同步失效的旧数据。</p>
+<h2 id="四、从选框架走到设计缓存"><a href="#四、从选框架走到设计缓存" class="headerlink" title="四、从选框架走到设计缓存"></a>四、从选框架走到设计缓存</h2><p>选好了产品，还要回答四个问题：<strong>缓存什么、key 是什么、什么时候过期、数据变化时谁负责删除</strong>。</p>
+<ol>
+<li>**缓存对象。**优先选热点、加载成本高、读多写少的数据。模型实例、编译结果和商品详情的生命周期不同，不应共用一套 TTL。</li>
+<li>**设计 key。**key 必须覆盖所有影响结果的条件，例如商品 ID、租户 ID 和语言。漏掉租户 ID，可能把 A 租户的数据给 B 租户。</li>
+<li>**限制容量和过期。**本地缓存至少考虑容量上限；<code>expireAfterWrite</code> 从写入后计时，<code>expireAfterAccess</code> 从最近访问后计时。TTL 表示愿意接受的陈旧窗口，不代表到期前一定正确。</li>
+<li>**处理变更。**数据库写成功后，失效相关 key；一条数据有多个查询入口时，要逐个处理。跨节点本地缓存还需要消息通知、版本化 key，或者接受 TTL 定义的陈旧窗口。</li>
+</ol>
+<p>还有三个常见故障：不存在的 key 每次都打到数据库，是<strong>穿透</strong>；热点 key 同时过期，大量请求一起回源，是<strong>击穿</strong>；大量 key 同时过期，造成集中回源，是<strong>雪崩</strong>。按场景分别考虑短时空值、单 key 合并加载、过期时间错峰和限流。数据库故障不能被长期缓存成“数据不存在”。</p>
+<h2 id="五、用两级缓存亲手看一次旧数据"><a href="#五、用两级缓存亲手看一次旧数据" class="headerlink" title="五、用两级缓存亲手看一次旧数据"></a>五、用两级缓存亲手看一次旧数据</h2><p>下面保留一个项目的结构作为案例：L1 在 JVM 中保存创建成本较高的模型实例，L2 在 JVM 中保存模型配置，最后才查数据库。**这里的 L1、L2 都是本地缓存，并没有 Redis。**案例中的 L2 最多 1000 项、写入后 10 分钟过期；L1 没有自动过期。这些是项目配置，不是框架默认值。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/cache-design-two-level-20261019.jpeg" alt="原始项目中的 ChatModel 两级缓存结构，展示实例池、配置缓存和数据库"></p>
+<p>模型把 L1 简化成实例持有的配置版本，只演示关键状态变化。实际实例还可能持有连接、线程等资源，替换时需要处理关闭和并发创建。</p>
+<link rel="stylesheet" href="/css/cache-design.css">
+<section id="cache-design-lab" class="cache-lab" aria-labelledby="cache-lab-title">
+  <div class="cache-lab__heading">
+    <div><span class="cache-lab__eyebrow">交互演示 / L2 写入后 10 分钟过期</span><h3 id="cache-lab-title">数据库变了，缓存会跟着变吗？</h3></div>
+    <output class="cache-lab__result" id="cache-lab-result" aria-live="polite">等待读取</output>
+  </div>
+  <div class="cache-lab__flow" aria-label="请求依次访问 L1 实例池、L2 配置缓存和数据库">
+    <div class="cache-lab__node" id="cache-lab-l1"><small>01 · L1 实例池</small><strong id="cache-lab-l1-value">空</strong><span>无自动过期</span></div>
+    <span class="cache-lab__arrow" aria-hidden="true">→</span>
+    <div class="cache-lab__node" id="cache-lab-l2"><small>02 · L2 配置缓存</small><strong id="cache-lab-l2-value">空</strong><span id="cache-lab-l2-age">10 分钟 TTL</span></div>
+    <span class="cache-lab__arrow" aria-hidden="true">→</span>
+    <div class="cache-lab__node cache-lab__node--db" id="cache-lab-db"><small>03 · 数据库</small><strong id="cache-lab-db-value">v1</strong><span>权威数据</span></div>
+  </div>
+  <div class="cache-lab__controls" aria-label="缓存模拟操作">
+    <button type="button" data-action="read">读取请求</button>
+    <button type="button" data-action="update">更新数据库</button>
+    <button type="button" data-action="clear-l1">清除 L1</button>
+    <button type="button" data-action="clear-all">清除两级缓存</button>
+    <button type="button" data-action="advance">时间 +11 分钟</button>
+    <button type="button" data-action="reset" title="重置模拟状态" aria-label="重置模拟状态">↺</button>
+  </div>
+  <p class="cache-lab__hint">试一试：先读取，再更新数据库；只清除 L1 后再次读取，最后清除两级缓存。</p>
+  <div class="cache-lab__footer"><span id="cache-lab-stats">缓存命中 0 次 · 数据库读取 0 次</span><ol id="cache-lab-log" aria-label="操作记录"><li>初始状态：缓存为空，数据库为 v1。</li></ol></div>
+</section>
+<script data-pjax src="/js/cache-design.js"></script>
+
+<p>观察结果：更新数据库之后，L1 还能返回旧实例；只删除 L1，L2 又可能把旧配置装回 L1；删除两级缓存后，下一次读取才会访问数据库。即使 L2 到期，只要 L1 仍命中，请求也不会走到 L2。这解释了为什么“配置缓存 10 分钟过期”不等于“所有用户最多读旧 10 分钟”。</p>
+<p>原项目里还有按 <code>agentCode_version</code>、<code>agentId</code>、<code>agentCode_status</code> 三种 key 缓存同一份 Agent 元数据的例子。它们的 TTL 分别是 5、5、1 分钟。修改一条元数据时，三个查询入口都要失效；否则不同页面可能看到不同版本。项目中的提示词模板、Groovy 编译结果和 Spring Cache 方法结果，也分别采用了不同容量与过期策略。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/cache-design-strategies-20261019.jpeg" alt="原始项目中不同缓存对象的容量和过期策略对照"></p>
+<h2 id="六、最后怎么选"><a href="#六、最后怎么选" class="headerlink" title="六、最后怎么选"></a>六、最后怎么选</h2><p>第一次给 Java 服务加缓存，可以按这个顺序做：</p>
+<ol>
+<li>先量出慢在哪里，确认是重复读取或重复计算，明确可接受的陈旧时间。</li>
+<li>单实例或节点间允许短暂差异时，先评估 Caffeine；需要共享时，评估 Redis。Spring Cache 可用于接入已有实现。</li>
+<li>为每类数据确定 key、容量、TTL、更新后的失效动作和数据库故障时的行为。</li>
+<li>用“更新数据库后立即读取”的测试验证旧值窗口；上线后同时看命中率、回源量、加载耗时、内存占用和错误率。</li>
+</ol>
+<p><strong>缓存是用空间和一致性成本换读取速度。选型只是第一步，真正决定方案是否可靠的是 key、过期、失效与监控。</strong></p>
+<h3 id="延伸阅读"><a href="#延伸阅读" class="headerlink" title="延伸阅读"></a>延伸阅读</h3><ul>
+<li><a href="https://github.com/ben-manes/caffeine/wiki/Eviction">Caffeine Eviction</a></li>
+<li><a href="https://docs.spring.io/spring-framework/reference/integration/cache.html">Spring Framework Cache Abstraction</a></li>
+<li><a href="https://redis.io/docs/latest/develop/use/patterns/">Redis caching patterns</a></li>
+<li><a href="https://www.ehcache.org/documentation/3.10/">Ehcache 3 Documentation</a></li>
+<li><a href="https://github.com/google/guava/wiki/CachesExplained">Guava Caches Explained</a></li>
+</ul>
+]]></description>
+    </item>
+    
+    <item>
+      <guid isPermalink="true">https://blog.pengfanao.top/2026/09/22/%E5%B7%A5%E5%85%B7/Codex%E6%9B%B4%E6%8D%A2%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%BB%E9%A2%98/</guid>
+      <title>Codex更换自定义主题</title>
+      <link>https://blog.pengfanao.top/2026/09/22/%E5%B7%A5%E5%85%B7/Codex%E6%9B%B4%E6%8D%A2%E8%87%AA%E5%AE%9A%E4%B9%89%E4%B8%BB%E9%A2%98/</link>
+      <pubDate>Tue, 22 Sep 2026 19:10:00 GMT</pubDate>
+      <category>Codex</category><category>macOS</category><category>DreamSkin</category><category>FFmpeg</category><category>WebP</category>
+      <description><![CDATA[<p>最近给 Codex 换了一套背景。折腾下来，静态主题其实很简单，真正费时间的是动态背景：原视频很清楚，一转成 WebP，体积和画质就开始打架。</p>
+<p>这篇把完整流程记下来。只想换现成主题的话，前半部分几分钟就能完成；想自己做动态主题，再往后看 FFmpeg 那一段。</p>
+<h2 id="一、安装-DreamSkin"><a href="#一、安装-DreamSkin" class="headerlink" title="一、安装 DreamSkin"></a>一、安装 DreamSkin</h2><p>DreamSkin 是一款第三方 Codex 桌面端主题工具。它通过本地 CDP 注入主题，不需要修改 Codex 官方应用包。</p>
+<p>先打开 <a href="https://dreamskin.cc/">DreamSkin 官网</a>，或者直接进入 <a href="https://dreamskin.cc/download">下载页面</a> 下载安装包。</p>
+<p>在 macOS 上安装时，建议先把 Codex（旧版本界面里可能显示为 ChatGPT）彻底退出。不是只关窗口，而是在菜单栏或程序坞中选择“退出”。否则旧进程还在运行，主题引擎可能无法正确安装或加载。</p>
+<p>安装步骤很普通：</p>
+<ol>
+<li>下载并打开 DMG。</li>
+<li>将 DreamSkin 拖入“应用程序”。</li>
+<li>启动 DreamSkin，按提示授予必要权限。</li>
+</ol>
+<h2 id="二、安装或升级主题引擎"><a href="#二、安装或升级主题引擎" class="headerlink" title="二、安装或升级主题引擎"></a>二、安装或升级主题引擎</h2><p>第一次启动后，打开 Mac 顶部菜单栏里的 DreamSkin 图标，依次选择：</p>
+<blockquote>
+<p>维护 → 修复 &#x2F; 重新安装引擎…</p>
+</blockquote>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/codex-clipboard-a8649369-eecf-46e4-a19d-feb953fbba6a.png" alt="在 DreamSkin 菜单中修复或重新安装主题引擎"></p>
+<p>这一步会把当前版本的主题引擎装好。以后 Codex 更新后，如果主题突然失效，也可以先回到这里重新安装引擎，再重新应用一次皮肤。</p>
+<h2 id="三、一键应用主题"><a href="#三、一键应用主题" class="headerlink" title="三、一键应用主题"></a>三、一键应用主题</h2><p>接着进入 DreamSkin 官方主题库。我做的这款主题已经发布，可以直接打开：</p>
+<p><a href="https://dreamskin.cc/themes/ver_04ccc15583f908ce0673">查看并安装这款 Codex 主题</a></p>
+<p>在主题详情页点击“一键换肤”，然后回到 DreamSkin 应用皮肤即可。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/codex-clipboard-ea70377f-193e-408b-832e-9b16d74131a8.png" alt="主题应用后的 Codex 界面"></p>
+<p>如果页面按钮没有拉起 DreamSkin，先确认应用已经启动，再试一次。主题装好后通常不需要重启 Mac，重新应用皮肤或重开 Codex 就够了。</p>
+<h2 id="四、动态主题为什么要先转成-WebP"><a href="#四、动态主题为什么要先转成-WebP" class="headerlink" title="四、动态主题为什么要先转成 WebP"></a>四、动态主题为什么要先转成 WebP</h2><p>我后来又做了一版动态背景，源文件是一段 MP4。这里不能直接把视频改名成 <code>background.webp</code>，因为两种文件的内容格式完全不同。</p>
+<p>DreamSkin 当前的主题包只识别 <code>background.png</code>、<code>background.jpg</code> 和 <code>background.webp</code>。引擎读取图片后，将它变成 Blob URL，再作为 CSS 背景交给 Codex 界面显示。MP4 是视频容器，现有链路里没有负责创建 <code>&lt;video&gt;</code>、自动播放和循环控制的代码。</p>
+<p>动态 WebP 正好卡在中间：对引擎来说它仍然是一张图片，对用户来说它又能播放多帧动画。因此目前最省事的办法，就是用 FFmpeg 把 MP4 抽帧、缩放，再编码成动态 WebP。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/dreamskin-flow.png" alt="MP4 转成 DreamSkin 动态主题的处理流程"></p>
+<h2 id="五、我实际使用的-FFmpeg-命令"><a href="#五、我实际使用的-FFmpeg-命令" class="headerlink" title="五、我实际使用的 FFmpeg 命令"></a>五、我实际使用的 FFmpeg 命令</h2><p>先安装 FFmpeg：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install ffmpeg</span><br></pre></td></tr></table></figure>
+
+<p>然后执行下面这条命令。把输入和输出路径换成自己的即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -y \</span><br><span class="line">  -i <span class="string">&quot;/path/input.mp4&quot;</span> \</span><br><span class="line">  -an \</span><br><span class="line">  -vf <span class="string">&quot;fps=15,scale=1920:1080:force_original_aspect_ratio=increase:flags=lanczos,crop=1920:1080,setpts=PTS-STARTPTS&quot;</span> \</span><br><span class="line">  -c:v libwebp_anim \</span><br><span class="line">  -lossless 0 \</span><br><span class="line">  -compression_level 4 \</span><br><span class="line">  -q:v 92 \</span><br><span class="line">  -loop 0 \</span><br><span class="line">  <span class="string">&quot;/path/background.webp&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>这组参数的意思并不复杂：</p>
+<ul>
+<li><code>-an</code>：去掉音频，桌面背景用不到声音。</li>
+<li><code>fps=15</code>：每秒保留 15 帧。对壁纸来说通常够用，也能明显减小体积。</li>
+<li><code>scale</code> 加 <code>crop</code>：先等比放大，再裁成 1920×1080，不拉伸画面。</li>
+<li><code>flags=lanczos</code>：缩放时尽量保留细节。</li>
+<li><code>-q:v 92</code>：有损 WebP 的画质参数，数字越高越清楚，文件也越大。</li>
+<li><code>-loop 0</code>：无限循环播放。</li>
+</ul>
+<p>我这次做出来的文件是 1920×1080、15 FPS、76 帧、质量 92，最终 8.66 MB，已经能在 Codex 里正常循环。</p>
+<h2 id="六、为什么必须小于-10-MiB"><a href="#六、为什么必须小于-10-MiB" class="headerlink" title="六、为什么必须小于 10 MiB"></a>六、为什么必须小于 10 MiB</h2><p>这个限制不是经验值，而是 DreamSkin 当前源码里的硬校验：背景图片最大允许 <code>10 × 1024 × 1024</code> 字节，也就是 <strong>10,485,760 字节</strong>。</p>
+<p>超过这个大小，主题在导入或校验时就会被拒绝。所以不要盯着源视频是 40 MB、80 MB 还是 4K。最终文件大小主要由下面几项决定：</p>
+<ul>
+<li>视频时长；</li>
+<li>画面运动和细节多少；</li>
+<li>输出分辨率；</li>
+<li>帧率；</li>
+<li>WebP 质量。</li>
+</ul>
+<p>同样是 4K 视频，5 秒的慢镜头和 30 秒的快速运动，压出来可能差很多。</p>
+<p>如果生成结果超过 10 MiB，我一般按这个顺序调整：先把 <code>q92</code> 降到 <code>q90</code> 或 <code>q88</code>，再把 <code>fps=15</code> 降到 <code>fps=12</code>，最后才把 1920×1080 降到 1600×900。先降分辨率最伤观感，不建议一上来就做。</p>
+<p>可以用下面这张表快速选参数：</p>
+<table>
+<thead>
+<tr>
+<th>视频时长</th>
+<th>建议分辨率</th>
+<th>帧率</th>
+<th>质量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>5 秒以内</td>
+<td>1920×1080</td>
+<td>15 FPS</td>
+<td>92</td>
+</tr>
+<tr>
+<td>5～8 秒</td>
+<td>1920×1080</td>
+<td>15 FPS</td>
+<td>88～90</td>
+</tr>
+<tr>
+<td>8～12 秒</td>
+<td>1920×1080</td>
+<td>12 FPS</td>
+<td>85～88</td>
+</tr>
+<tr>
+<td>12～20 秒</td>
+<td>1600×900</td>
+<td>10 FPS</td>
+<td>82～86</td>
+</tr>
+</tbody></table>
+<p>这只是起点，不是万能公式。画面越复杂，越需要继续降低质量或帧率。</p>
+<h2 id="七、别忘了检查它是不是真的会动"><a href="#七、别忘了检查它是不是真的会动" class="headerlink" title="七、别忘了检查它是不是真的会动"></a>七、别忘了检查它是不是真的会动</h2><p>有些 FFmpeg 构建虽然带有 <code>libwebp_anim</code>，实际输出却可能只有一帧。文件扩展名还是 WebP，但放进主题后只会显示静态画面。</p>
+<p>安装 WebP 工具并检查帧数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brew install webp</span><br><span class="line">webpmux -info <span class="string">&quot;/path/background.webp&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>输出里的 <code>Number of frames</code> 必须大于 1。</p>
+<p>如果只有一帧，可以改用更稳妥的两步法：先用 FFmpeg 导出序列帧，再交给 <code>img2webp</code> 合成。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p /tmp/dreamskin-frames</span><br><span class="line"></span><br><span class="line">ffmpeg -y \</span><br><span class="line">  -i <span class="string">&quot;/path/input.mp4&quot;</span> \</span><br><span class="line">  -an \</span><br><span class="line">  -vf <span class="string">&quot;fps=15,scale=1920:1080:force_original_aspect_ratio=increase:flags=lanczos,crop=1920:1080&quot;</span> \</span><br><span class="line">  <span class="string">&quot;/tmp/dreamskin-frames/frame-%04d.png&quot;</span></span><br><span class="line"></span><br><span class="line">img2webp \</span><br><span class="line">  -lossy -q 92 -d 67 -loop 0 \</span><br><span class="line">  /tmp/dreamskin-frames/frame-*.png \</span><br><span class="line">  -o <span class="string">&quot;/path/background.webp&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>-d 67</code> 表示每帧大约停留 67 毫秒，对应约 15 FPS。生成后再跑一次 <code>webpmux -info</code>，确认帧数和文件大小。</p>
+<p>最后，把生成的文件命名为 <code>background.webp</code>，覆盖主题目录中的同名文件，再从 DreamSkin 菜单选择“重新应用皮肤”。只要主题结构没变，后续换视频都可以沿用这套流程。</p>
+<h2 id="八、后面准备怎么改"><a href="#八、后面准备怎么改" class="headerlink" title="八、后面准备怎么改"></a>八、后面准备怎么改</h2><p>WebP 方案能用，但画质、体积和帧率必须互相让步。尤其是 2K、4K 视频，为了塞进 10 MiB，损失会比较明显。</p>
+<p>后续更合理的方向是直接改 DreamSkin 引擎：</p>
+<ol>
+<li>在主题包校验中允许 MP4、WebM 等视频资源；</li>
+<li>注入一个静音、循环、自动播放的 <code>&lt;video&gt;</code> 背景层；</li>
+<li>处理窗口切换、主题卸载和资源释放；</li>
+<li>再根据实际内存占用，决定是否放宽 10 MiB 限制。</li>
+</ol>
+<p>只把 10 MiB 改大并不能解决 MP4 播放，因为“文件能通过校验”和“渲染器会播放视频”是两件事。原生视频支持的改动会比改一个数字大一些，但能绕开动态 WebP 的体积困境，画质和编码效率也会好得多。</p>
+<p>现阶段如果只是想快速换一段动态背景，还是建议先用 5～8 秒的短视频、1080p、12～15 FPS。这个区间最容易把体积控制住，实际桌面观感也比较稳。</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><ul>
+<li><a href="https://dreamskin.cc/">DreamSkin 官网</a></li>
+<li><a href="https://dreamskin.cc/download">DreamSkin 下载</a></li>
+<li><a href="https://dreamskin.cc/themes/ver_04ccc15583f908ce0673">本文使用的主题</a></li>
+<li><a href="https://github.com/Fei-Away/Codex-Dream-Skin">DreamSkin 开源仓库</a></li>
+</ul>
+]]></description>
+    </item>
+    
+    <item>
+      <guid isPermalink="true">https://blog.pengfanao.top/2026/09/20/%E5%B7%A5%E5%85%B7/%E5%AE%89%E5%8D%93%E6%8A%95%E5%B1%8Fmac/</guid>
+      <title>安卓投屏mac</title>
+      <link>https://blog.pengfanao.top/2026/09/20/%E5%B7%A5%E5%85%B7/%E5%AE%89%E5%8D%93%E6%8A%95%E5%B1%8Fmac/</link>
+      <pubDate>Sun, 20 Sep 2026 08:59:57 GMT</pubDate>
+      
+      <description><![CDATA[<p>可以直接下载，不必依赖 Homebrew。你这台 Mac 是 Apple Silicon（<code>arm64</code>），下载官方的 Apple Silicon 版本：</p>
+<p><a href="https://github.com/Genymobile/scrcpy/releases/download/v4.1/scrcpy-macos-aarch64-v4.1.tar.gz">下载 scrcpy-macos-aarch64-v4.1.tar.gz</a></p>
+<p>它不是 <code>.dmg</code> 安装器，而是官方便携版压缩包。操作方法：</p>
+<ol>
+<li>下载并双击解压。</li>
+<li>打开“终端”，进入解压目录，例如：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/Downloads/scrcpy-macos-aarch64-v4.1</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>连接安卓手机并打开 USB 调试，然后运行：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./scrcpy --video-bit-rate=16M --max-size=1920 --max-fps=60 --stay-awake</span><br></pre></td></tr></table></figure>
+
+<p>如果提示无法执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">chmod</span> +x scrcpy</span><br><span class="line">./scrcpy</span><br></pre></td></tr></table></figure>
+
+<p>如果 macOS 阻止打开，到“系统设置 → 隐私与安全性”里允许，或者在 Finder 中右键 <code>scrcpy</code>，选择“打开”。</p>
+<p>如果提示找不到 <code>adb</code>，再下载官方 Android Platform Tools：</p>
+<p><a href="https://dl.google.com/android/repository/platform-tools-latest-darwin.zip">下载 platform-tools for Mac</a></p>
+<p>解压后执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/Downloads/platform-tools</span><br><span class="line">./adb devices</span><br></pre></td></tr></table></figure>
+
+<p>看到手机后，用下面方式启动 scrcpy：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/Downloads/scrcpy-macos-aarch64-v4.1</span><br><span class="line">PATH=<span class="string">&quot;<span class="variable">$HOME</span>/Downloads/platform-tools:<span class="variable">$PATH</span>&quot;</span> ./scrcpy \</span><br><span class="line">  --video-bit-rate=16M \</span><br><span class="line">  --max-size=1920 \</span><br><span class="line">  --max-fps=60 \</span><br><span class="line">  --stay-awake</span><br></pre></td></tr></table></figure>
+
+<p>如果想去掉上面点白边，ctrl+c结束后在执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">./scrcpy \</span><br><span class="line">  --window-borderless \</span><br><span class="line">  --video-bit-rate=16M \</span><br><span class="line">  --max-size=1920 \</span><br><span class="line">  --max-fps=60 \</span><br><span class="line">  --stay-awake</span><br></pre></td></tr></table></figure>
+
+<p>如果想占满Mac整个屏幕，ctrl+c结束后在执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">./scrcpy \</span><br><span class="line">  --window-borderless \</span><br><span class="line">  --always-on-top \</span><br><span class="line">  --video-bit-rate=16M \</span><br><span class="line">  --max-size=1920 \</span><br><span class="line">  --max-fps=60 \</span><br><span class="line">  --stay-awake</span><br></pre></td></tr></table></figure>
+
+<p>你的直播链路直接这样即可：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">安卓手机 USB → scrcpy → Mac 抖音直播伴侣窗口采集</span><br></pre></td></tr></table></figure>
+
+<p>如果只是 Homebrew 下载超时，直接下载官方压缩包通常更适合你当前情况。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/img.png" alt="img.png"></p>
+]]></description>
+    </item>
+    
+    <item>
+      <guid isPermalink="true">https://blog.pengfanao.top/2026/06/22/agent/%E5%BD%93AI%E5%AD%A6%E4%BC%9A%E6%8E%92%E7%89%88-3%E4%B8%AA%E5%BC%80%E6%BA%90Skill%E7%BC%96%E6%8E%92%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E5%BC%95%E6%93%8E/</guid>
+      <title>写一次，博客和公众号草稿同时就绪：我的内容工作流</title>
+      <link>https://blog.pengfanao.top/2026/06/22/agent/%E5%BD%93AI%E5%AD%A6%E4%BC%9A%E6%8E%92%E7%89%88-3%E4%B8%AA%E5%BC%80%E6%BA%90Skill%E7%BC%96%E6%8E%92%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E5%BC%95%E6%93%8E/</link>
+      <pubDate>Mon, 22 Jun 2026 02:30:00 GMT</pubDate>
+      <category>AI</category><category>技能编排</category><category>md2wechat</category><category>内容工作流</category><category>自动化</category>
+      <description><![CDATA[<blockquote>
+<p><strong>我真正想省掉的，不是写作，而是写完之后那一串重复劳动。</strong> 维护一份 Markdown，就能得到一篇博客和一篇排好版的公众号草稿；某一步失败，也不必从头再来。</p>
+</blockquote>
+<p>每次写完文章，我都要重复同一套动作：找封面、处理正文图、上传图床、检查博客，再去公众号后台重新排一遍。</p>
+<p>写作只做了一次，搬运却像又写了一次。</p>
+<p>于是我把这些步骤串成了一条个人内容工作流。它不替我按下最终发布按钮，但会把成品送到按钮前，并告诉我哪里通过了、哪里应该停。</p>
+<blockquote>
+<p><strong>一句话看懂：一份内容作为事实源，博客和公众号分别输出，失败从断点继续。</strong></p>
+</blockquote>
+<h2 id="先看结果：我最终拿到什么"><a href="#先看结果：我最终拿到什么" class="headerlink" title="先看结果：我最终拿到什么"></a>先看结果：我最终拿到什么</h2><p>不是一堆中间文件，而是三个可以继续使用的结果。</p>
+<p><strong>博客成品</strong>：标题、摘要、封面、正文图片、来源和分类都完整，Hexo 构建通过后才进入发布流程。</p>
+<p><strong>公众号成品</strong>：不是裸 Markdown，而是适合手机阅读的内联样式 HTML；正文图和封面也会进入公众号素材流程。</p>
+<p><strong>恢复记录</strong>：文章、图片和草稿状态被保存下来。网络或接口出错时，下次只重试没完成的部分。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/workflow-dual-output-1200x675.png" alt="一份 Markdown 如何变成博客文章和公众号草稿"></p>
+<p>这张图就是整套流程：<strong>同一份原稿，走向两个发布端；每个关键步骤前都有检查点。</strong></p>
+<h2 id="三个-Skill，不是三个“万能引擎”"><a href="#三个-Skill，不是三个“万能引擎”" class="headerlink" title="三个 Skill，不是三个“万能引擎”"></a>三个 Skill，不是三个“万能引擎”</h2><p>我一开始也把它们讲复杂了。其实三个工具的关系非常简单：一个管全局，一个管排版，一个管送达。</p>
+<blockquote>
+<p><strong>总控｜wechat-article-generator</strong></p>
+<p>它像项目经理加质检员：理解选题、组织文章、规划图片、调用图床、生成 Hexo 文件，并判断下一步该调用谁。它关心的是整件事有没有闭环。</p>
+</blockquote>
+<blockquote>
+<p><strong>排版｜md2wechat</strong></p>
+<p>它把 Markdown 转成公众号兼容的 HTML，并负责主题、预览、封面和信息图等排版能力。文章已经写好、只想解决公众号排版的人，用这一段就够了。</p>
+</blockquote>
+<blockquote>
+<p><strong>送达｜baoyu-post-to-wechat</strong></p>
+<p>它处理正文图片、封面素材、账号配置和草稿创建。它只负责把成品安全送进编辑后台，默认不会替我发布或群发。</p>
+</blockquote>
+<p>所以，真正的关系不是“三个 AI 一起写文章”，而是：</p>
+<p><strong>总控决定顺序，md2wechat 负责变好看，baoyu 负责放进草稿箱。</strong></p>
+<h2 id="稳定，不等于“一键无脑跑完”"><a href="#稳定，不等于“一键无脑跑完”" class="headerlink" title="稳定，不等于“一键无脑跑完”"></a>稳定，不等于“一键无脑跑完”</h2><p>这套工作流真正有用的地方，是把容易忘、容易错的动作变成固定顺序。</p>
+<p><strong>先写清楚。</strong> 总控先确认读者、核心结论和信息来源。涉及新闻、项目数据和产品能力时，必须保留来源，不能猜数字。</p>
+<p><strong>再让图片解释内容。</strong> 封面负责让读者一眼看懂主题，正文图负责解释流程、架构或故障恢复，不拿无关“科技图”凑数。</p>
+<p><strong>图片先进入 OSS。</strong> 博客只引用真实线上地址。上传失败时，流程停止，不偷偷改成本地路径，也不拿默认图顶上去。</p>
+<p><strong>两个渠道分别渲染。</strong> 博客保留 Markdown，交给 Hexo；公众号生成全内联样式 HTML，避免进入编辑器后样式丢失。</p>
+<p><strong>最后才检查交付。</strong> 封面、正文图、移动端字号、HTML 兼容性和博客构建全部通过，才算完成。</p>
+<blockquote>
+<p>自动化不是“什么都继续做”，而是<strong>该继续时继续，该停时明确停下。</strong></p>
+</blockquote>
+<h2 id="图片不是装饰，它要先回答问题"><a href="#图片不是装饰，它要先回答问题" class="headerlink" title="图片不是装饰，它要先回答问题"></a>图片不是装饰，它要先回答问题</h2><p>我对封面的要求只有一个：用户只看这张图，也能知道文章在讲什么。</p>
+<p>因此，系统先从标题、摘要和正文里提炼一个主题与两到四个要点，再决定画面结构。图片模型只负责无文字底图或视觉框架，准确中文最后由可控排版叠加。</p>
+<p>主标题和关键信息保留 6% 到 8% 的安全边距，缩成手机封面后仍要看得清。</p>
+<p>如果生成服务不可用，才会选择同主题、来源明确的真实素材。技术文章只看技术类候选，不会从动漫、风景和人物图里随机抽一张。</p>
+<p>这不是“有图就行”，而是四道检查：<strong>主题相关、文字正确、画幅适配、来源可追溯。</strong></p>
+<h2 id="真正遇到故障时，会发生什么"><a href="#真正遇到故障时，会发生什么" class="headerlink" title="真正遇到故障时，会发生什么"></a>真正遇到故障时，会发生什么</h2><p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/failure-resume-1200x675.png" alt="内容工作流的失败恢复策略"></p>
+<p>我把故障分成三种，不同故障有不同处理方式。</p>
+<p><strong>能替代</strong>：封面生成服务不可用，可以换成同主题的真实素材，但必须重新检查构图和授权。</p>
+<p><strong>能续跑</strong>：出口 IP 不在白名单，博客和微信 HTML 可以保留；网络恢复后，只重试草稿上传。</p>
+<p><strong>必须停</strong>：图片没上传到 OSS、文章检查没通过、草稿条件不满足。此时不能伪造 URL，也不能为了“看起来完成了”而静默降级。</p>
+<p><code>state.json</code> 记录文章哈希、素材和草稿结果。它不会让错误自动消失，但会让下一次清楚知道：<strong>哪些已经完成，哪些还没做。</strong></p>
+<h2 id="9-月-13-日那次失败，反而说明它有用"><a href="#9-月-13-日那次失败，反而说明它有用" class="headerlink" title="9 月 13 日那次失败，反而说明它有用"></a>9 月 13 日那次失败，反而说明它有用</h2><p>那期 GitHub 周报第一次运行时，博客已经构建并推送成功，公众号却没有出现草稿。</p>
+<p>问题不在文章，而在代理改变了出口 IP，公众号令牌接口返回 <code>40164</code>，当前地址不在白名单。</p>
+<p>流程没有假装成功。文章、微信 HTML、封面和已上传图片都被保留下来。</p>
+<p>关闭代理后，我只重试了草稿阶段：重新检查令牌，上传正文图与封面，创建草稿，再核对标题、正文和阅读原文链接。</p>
+<p>没有重新研究，没有重新写稿，也没有再生成一篇博客。</p>
+<blockquote>
+<p>这比“全自动”更重要：<strong>失败时知道停在哪里，恢复时知道从哪里接着走。</strong></p>
+</blockquote>
+<h2 id="你不必复刻整套系统"><a href="#你不必复刻整套系统" class="headerlink" title="你不必复刻整套系统"></a>你不必复刻整套系统</h2><p>只做公众号排版，就拿走 <a href="https://github.com/geekjourneyx/md2wechat-skill">md2wechat</a>：Markdown 写完后，用它生成适合公众号的 HTML 和预览。</p>
+<p>已经有排好版的 Markdown 或 HTML，只差进入草稿箱，就用 <a href="https://github.com/JimLiu/baoyu-skills/tree/main/skills/baoyu-post-to-wechat">baoyu-post-to-wechat</a>。</p>
+<p>同时维护 Hexo、Hugo 等博客和公众号，再借鉴总控思路：保留一份主稿，为两个渠道分别输出，并给图片、排版和构建设置硬检查。</p>
+<p>如果只想改善封面，也只需要拿走一条原则：<strong>先让图片说清文章主题，再谈风格好不好看。</strong></p>
+<h2 id="文末工具箱"><a href="#文末工具箱" class="headerlink" title="文末工具箱"></a>文末工具箱</h2><ul>
+<li><a href="https://github.com/wwrtpfa/wwrtpfa.github.io/tree/master/.codex/skills/wechat-article-generator">wechat-article-generator：我的总控 Skill</a></li>
+<li><a href="https://github.com/geekjourneyx/md2wechat-skill">md2wechat：Markdown 转公众号 HTML、预览与视觉生成</a></li>
+<li><a href="https://github.com/JimLiu/baoyu-skills/tree/main/skills/baoyu-post-to-wechat">baoyu-post-to-wechat：公众号草稿上传与多通道发布</a></li>
+<li><a href="https://github.com/Molunerfinn/PicGo">PicGo：图片上传与图床客户端</a></li>
+<li><a href="https://hexo.io/">Hexo：静态博客生成器</a></li>
+</ul>
+<p>我最后留下的不是一个所有人都要照搬的方案，而是三个可以复用的原则：<strong>一份内容作为事实源，工具各做自己擅长的事，任何发布都要经过可验证的质量门。</strong></p>
+<p>如果你也在做内容，你最想先省掉哪一步：排版、配图，还是草稿上传？</p>
+]]></description>
+    </item>
+    
+    <item>
+      <guid isPermalink="true">https://blog.pengfanao.top/2026/06/22/agent/LangChain-Agent-03-%E5%AE%9E%E6%88%98%E7%AF%87-%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA%E4%BB%A3%E7%A0%81%E5%8A%A9%E6%89%8BAgent/</guid>
+      <title>LangChain Agent 系列(三)：从零搭建代码助手 Agent</title>
+      <link>https://blog.pengfanao.top/2026/06/22/agent/LangChain-Agent-03-%E5%AE%9E%E6%88%98%E7%AF%87-%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA%E4%BB%A3%E7%A0%81%E5%8A%A9%E6%89%8BAgent/</link>
+      <pubDate>Mon, 22 Jun 2026 00:00:00 GMT</pubDate>
+      <category>Agent</category><category>LangChain</category><category>AI教程</category><category>Python</category><category>实战</category>
+      <description><![CDATA[<h2 id="终于到动手环节了。"><a href="#终于到动手环节了。" class="headerlink" title="终于到动手环节了。"></a>终于到动手环节了。</h2><p>前两篇讲了 Agent 的概念和架构，这一篇我们从头写一个能读文件、写代码、执行 Shell 的代码助手 Agent。跟着一步步来，大约 20 分钟能跑通。</p>
+<hr>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>先装依赖。打开终端，一行搞定：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install <span class="string">&quot;langchain&lt;1.0&quot;</span> langchain-openai</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>⚠️ 版本说明：</strong> LangChain 1.0+ 移除了 <code>create_tool_calling_agent</code> 和 <code>AgentExecutor</code>（改用 LangGraph 的 <code>create_agent()</code>）。本文基于 0.3.x 版本，<code>langchain&lt;1.0</code> 确保代码可直接运行。学习完成后建议查阅 <a href="https://langchain-ai.github.io/langgraph/">LangGraph Agent 文档</a> 了解最新用法。</p>
+</blockquote>
+<p>然后创建 <code>agent_demo.py</code>，把 API key 配好：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line">os.environ[<span class="string">&quot;OPENAI_API_KEY&quot;</span>] = <span class="string">&quot;sk-your-key-here&quot;</span>  <span class="comment"># 或从 .env 读取</span></span><br></pre></td></tr></table></figure>
+
+<p>如果你用的是其他模型（比如 DeepSeek、Claude），在创建 LLM 时指定 <code>base_url</code> 即可，后面会讲到。现在先把环境搭好。</p>
+<hr>
+<h2 id="定义三个工具"><a href="#定义三个工具" class="headerlink" title="定义三个工具"></a>定义三个工具</h2><p>第二篇讲过，工具（<code>BaseTool</code>）是 Agent 的”手和眼睛”。LangChain 提供了一种极其简洁的方式来定义工具——<code>@tool</code> 装饰器。你只需要写一个普通函数，加上类型注解和 docstring，装饰器会自动把它包装成 <code>BaseTool</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langchain_core.tools <span class="keyword">import</span> tool</span><br><span class="line"></span><br><span class="line"><span class="meta">@tool</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">read_file</span>(<span class="params">path: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;读取指定路径的文件内容。参数 path: 文件的绝对或相对路径&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(path, <span class="string">&quot;r&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="keyword">return</span> f.read()</span><br><span class="line"></span><br><span class="line"><span class="meta">@tool</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">write_file</span>(<span class="params">path: <span class="built_in">str</span>, content: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;写入内容到指定路径的文件。参数 path: 目标文件路径, content: 要写入的内容&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(path, <span class="string">&quot;w&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(content)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">f&quot;已写入 <span class="subst">&#123;path&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@tool</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_shell</span>(<span class="params">command: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;执行 shell 命令并返回输出。参数 command: 要执行的 shell 命令。⚠️ 仅用于本地开发环境&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">import</span> subprocess</span><br><span class="line">    result = subprocess.run(command, shell=<span class="literal">True</span>, capture_output=<span class="literal">True</span>, text=<span class="literal">True</span>)</span><br><span class="line">    <span class="keyword">return</span> result.stdout <span class="keyword">or</span> result.stderr</span><br><span class="line"></span><br><span class="line">tools = [read_file, write_file, run_shell]</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>⚠️ <strong>安全提醒：</strong> <code>run_shell</code> 中使用了 <code>shell=True</code>，这意味着任何能调用此工具的人都可以在你的机器上执行任意命令。本文的代码仅用于本地开发学习，<strong>绝对不能</strong>部署到生产环境或暴露给不信任的用户。生产环境应使用沙箱（如 Docker 容器）或在 Agent prompt 中限制可执行的命令范围。</p>
+</blockquote>
+<p>就这三段代码，Agent 就有了读文件、写文件、执行命令的能力。来拆一下每行在干什么。</p>
+<h3 id="tool-装饰器做了什么"><a href="#tool-装饰器做了什么" class="headerlink" title="@tool 装饰器做了什么"></a><code>@tool</code> 装饰器做了什么</h3><p>回忆第二篇讲的 <code>BaseTool</code> 四个核心属性：<code>name</code>、<code>description</code>、<code>args_schema</code>、<code>_run()</code>。<code>@tool</code> 装饰器做的事情就是把这四个属性从你的函数里自动提取出来：</p>
+<ul>
+<li><strong><code>name</code></strong>：取函数名。<code>read_file</code> 函数 → 工具名就是 <code>&quot;read_file&quot;</code></li>
+<li><strong><code>description</code></strong>：取 docstring。LLM 读这个描述来决定”什么时候该用这个工具”</li>
+<li><strong><code>args_schema</code></strong>：根据类型注解自动生成 Pydantic model。<code>path: str</code> → 参数定义为一个 <code>str</code> 类型的字段。有了这个 schema，LLM 才知道调用 <code>read_file</code> 需要传一个叫 <code>path</code> 的字符串参数</li>
+<li><strong><code>_run()</code></strong>：就是你的函数体本身</li>
+</ul>
+<p><code>run_shell</code> 的 docstring 里加了一个 <code>⚠️ 仅用于本地开发环境</code> 的安全提示。这不是给开发者看的注释，而是<strong>给 LLM 看的</strong>——Agent 在决策时会读到这段描述，相当于在 prompt 里内置了一条安全提醒。</p>
+<p>最后，<code>tools = [read_file, write_file, run_shell]</code> 把三个工具装进列表。这就是后面要传给 Agent 的工具清单。</p>
+<hr>
+<h2 id="创建-Agent"><a href="#创建-Agent" class="headerlink" title="创建 Agent"></a>创建 Agent</h2><p>有了工具，接下来创建 Agent 本身。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langchain_openai <span class="keyword">import</span> ChatOpenAI</span><br><span class="line"><span class="keyword">from</span> langchain.agents <span class="keyword">import</span> create_tool_calling_agent, AgentExecutor</span><br><span class="line"><span class="keyword">from</span> langchain_core.prompts <span class="keyword">import</span> ChatPromptTemplate, MessagesPlaceholder</span><br><span class="line"></span><br><span class="line">llm = ChatOpenAI(model=<span class="string">&quot;gpt-4o&quot;</span>, temperature=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">system_prompt = (</span><br><span class="line">    <span class="string">&quot;你是一个 Python 代码助手。你可以读取文件、写入文件、执行 Shell 命令。&quot;</span></span><br><span class="line">    <span class="string">&quot;遇到需要操作文件或执行命令的任务时，使用提供的工具。&quot;</span></span><br><span class="line">    <span class="string">&quot;如果执行命令出错，分析错误并尝试修复。&quot;</span></span><br><span class="line">    <span class="string">&quot;完成任务后给出清晰的总结。&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">prompt = ChatPromptTemplate.from_messages([</span><br><span class="line">    (<span class="string">&quot;system&quot;</span>, system_prompt),</span><br><span class="line">    (<span class="string">&quot;human&quot;</span>, <span class="string">&quot;&#123;input&#125;&quot;</span>),</span><br><span class="line">    MessagesPlaceholder(<span class="string">&quot;agent_scratchpad&quot;</span>),</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">agent = create_tool_calling_agent(llm, tools, prompt)</span><br><span class="line">executor = AgentExecutor(agent=agent, tools=tools, verbose=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<p>不到 10 行，Agent 就创建好了。下面逐行解释。</p>
+<h3 id="为什么用-create-tool-calling-agent"><a href="#为什么用-create-tool-calling-agent" class="headerlink" title="为什么用 create_tool_calling_agent"></a>为什么用 <code>create_tool_calling_agent</code></h3><p>第二篇我们对比过 Agent 的几种类型——ReAct、Tool Calling、OpenAI Tools、JSON&#x2F;XML Agent。这里选 <strong>Tool Calling</strong>，因为 <code>gpt-4o</code> 原生支持 function calling，LLM 会直接返回结构化的 <code>tool_calls</code> 对象，不靠文本解析。比 ReAct 更可靠，比 OpenAI Tools 更通用。</p>
+<p><code>create_tool_calling_agent</code> 内部做的事情就是把 Prompt 模板、工具列表、LLM 和 OutputParser 串成一条完整的 Agent 管道——Agent 本身就是一个 Runnable。我们手动构建了 <code>ChatPromptTemplate</code>，其中 <code>MessagesPlaceholder(&quot;agent_scratchpad&quot;)</code> 是 Think→Act→Observe 循环中的”历史记录”插槽，每次迭代自动填充最新步骤。你不需要处理 tool_calls 解析，LangChain 都帮你了。</p>
+<h3 id="system-prompt-的作用"><a href="#system-prompt-的作用" class="headerlink" title="system_prompt 的作用"></a><code>system_prompt</code> 的作用</h3><p>这四句话是 Agent 的”任务说明书”：</p>
+<ol>
+<li><strong>定义角色</strong>：”你是一个 Python 代码助手”——告诉 LLM 它的身份</li>
+<li><strong>告知工具</strong>：”你可以读取文件、写入文件、执行 Shell 命令”——让 LLM 知道它有什么能力</li>
+<li><strong>错误处理指令</strong>：”如果执行命令出错，分析错误并尝试修复”——激活 Agent 的自我纠错机制</li>
+<li><strong>输出要求</strong>：”完成任务后给出清晰的总结”——明确交付标准</li>
+</ol>
+<h3 id="AgentExecutor——Think-→-Act-→-Observe-的引擎"><a href="#AgentExecutor——Think-→-Act-→-Observe-的引擎" class="headerlink" title="AgentExecutor——Think → Act → Observe 的引擎"></a><code>AgentExecutor</code>——Think → Act → Observe 的引擎</h3><p><code>AgentExecutor</code> 不参与推理，不执行工具。它是总调度器，职责就是跑循环：</p>
+<ol>
+<li>把 prompt 发给 LLM（Think）</li>
+<li>拿到输出，如果是 <code>AgentAction</code>，找到对应的工具执行（Act）</li>
+<li>把工具返回的结果作为 Observation 填回历史（Observe）</li>
+<li>判断：继续循环还是停止</li>
+<li>直到 LLM 输出 <code>AgentFinish</code>，返回最终答案</li>
+</ol>
+<p><code>verbose=True</code> 让每一步都打印出来——你会亲眼看到 Think → Act → Observe 的完整过程。这正是第二篇讲的 Callbacks 机制：<code>on_agent_action</code>、<code>on_tool_start</code>、<code>on_tool_end</code> 等钩子在每一步触发，把日志打印到控制台。</p>
+<blockquote>
+<p><strong>一点说明</strong>：<code>AgentExecutor</code> 在 LangChain v1 中已进入维护模式，官方推荐的新方案是基于 LangGraph 的 <code>create_agent()</code>。但 <code>AgentExecutor</code> 仍然是学习 Agent 循环机制的最佳选择——它把这个循环暴露得清清楚楚，每个步骤都能看到。理解了它，切到新 API 只是换个函数名。</p>
+</blockquote>
+<hr>
+<h2 id="跑起来——第一个示例"><a href="#跑起来——第一个示例" class="headerlink" title="跑起来——第一个示例"></a>跑起来——第一个示例</h2><p>把上面的代码全部放到 <code>agent_demo.py</code>，底部加上：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">result = executor.invoke(&#123;</span><br><span class="line">    <span class="string">&quot;input&quot;</span>: <span class="string">&quot;统计当前目录下所有 .py 文件的行数&quot;</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="built_in">print</span>(result[<span class="string">&quot;output&quot;</span>])</span><br></pre></td></tr></table></figure>
+
+<p>然后：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python agent_demo.py</span><br></pre></td></tr></table></figure>
+
+<p>你会看到类似这样的输出（这是我实际运行时 <code>verbose=true</code> 打印的日志，加了注释标注每个阶段）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&gt; Entering new AgentExecutor chain...</span><br><span class="line"></span><br><span class="line">🧠 Think: 我需要先列出目录下的 .py 文件</span><br><span class="line">🔧 Action: run_shell</span><br><span class="line">📋 Action Input: &#123;&quot;command&quot;: &quot;ls /Users/pengfanao/code/wwrtpfa.github.io/*.py&quot;&#125;</span><br><span class="line"></span><br><span class="line">👁️ Observation: scripts/create_post.py scripts/fetch_github.py</span><br><span class="line"></span><br><span class="line">🧠 Think: 有2个文件，现在统计每个文件的行数</span><br><span class="line">🔧 Action: run_shell</span><br><span class="line">📋 Action Input: &#123;&quot;command&quot;: &quot;wc -l scripts/create_post.py scripts/fetch_github.py&quot;&#125;</span><br><span class="line"></span><br><span class="line">👁️ Observation: 45 scripts/create_post.py, 102 scripts/fetch_github.py, 147 total</span><br><span class="line"></span><br><span class="line">🧠 Think: 信息够了</span><br><span class="line">✅ Final Answer: 当前目录下共 2 个 .py 文件，合计 147 行代码。</span><br><span class="line"></span><br><span class="line">&gt; Finished chain.</span><br></pre></td></tr></table></figure>
+
+<p>整个过程经历了 <strong>2 轮 Think → Act → Observe</strong>：</p>
+<ol>
+<li>第一轮：Agent 思考”需要先列出文件” → 执行 <code>ls *.py</code> → 拿到文件名列表</li>
+<li>第二轮：Agent 看到有 2 个文件，决定统计行数 → 执行 <code>wc -l</code> → 拿到统计结果</li>
+<li>信息足够，Agent 输出最终答案</li>
+</ol>
+<p>注意 Agent <strong>不是一次性想好所有步骤</strong>的——它每一步都观察上一步的结果，再决定下一步做什么。这和你在终端里手动操作没有区别：先 <code>ls</code> 看看有什么，再 <code>wc -l</code> 统计，最后汇总。</p>
+<hr>
+<h2 id="观察-Agent-自主纠错"><a href="#观察-Agent-自主纠错" class="headerlink" title="观察 Agent 自主纠错"></a>观察 Agent 自主纠错</h2><p>前面的例子太顺利了。来看看 Agent 遇到错误时怎么办——这是它和普通 LLM 最根本的区别。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">result = executor.invoke(&#123;</span><br><span class="line">    <span class="string">&quot;input&quot;</span>: <span class="string">&quot;写一个 Python 脚本 hello.py，打印&#x27;Hello World from Agent!&#x27;，然后执行它。&quot;</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="built_in">print</span>(result[<span class="string">&quot;output&quot;</span>])</span><br></pre></td></tr></table></figure>
+
+<p>Agent 的执行过程大概是这样的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&gt; Entering new AgentExecutor chain...</span><br><span class="line"></span><br><span class="line">🧠 Think: 用户要创建一个 Python 脚本并执行。我先写文件，再运行。</span><br><span class="line">🔧 Action: write_file</span><br><span class="line">📋 Action Input: &#123;&quot;path&quot;: &quot;hello.py&quot;, &quot;content&quot;: &quot;print(&#x27;Hello World from Agent!&#x27;)&quot;&#125;</span><br><span class="line"></span><br><span class="line">👁️ Observation: 已写入 hello.py</span><br><span class="line"></span><br><span class="line">🧠 Think: 文件已创建。现在用 python 命令执行它。</span><br><span class="line">🔧 Action: run_shell</span><br><span class="line">📋 Action Input: &#123;&quot;command&quot;: &quot;python hello.py&quot;&#125;</span><br><span class="line"></span><br><span class="line">👁️ Observation: Hello World from Agent!</span><br><span class="line"></span><br><span class="line">🧠 Think: 脚本成功创建并执行完毕。</span><br><span class="line">✅ Final Answer: 任务完成。已创建 hello.py，内容为打印 &#x27;Hello World from Agent!&#x27;，并成功执行，输出无误。</span><br><span class="line"></span><br><span class="line">&gt; Finished chain.</span><br></pre></td></tr></table></figure>
+
+<p>三步完成：写文件 → 执行 → 确认结果。如果执行出错（比如脚本里有语法错误），Agent 的行为会是这样的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">👁️ Observation: SyntaxError: invalid syntax at line 3</span><br><span class="line"></span><br><span class="line">🧠 Think: 脚本报语法错误了。让我读一下文件内容，找出问题。</span><br><span class="line">🔧 Action: read_file</span><br><span class="line">📋 Action Input: &#123;&quot;path&quot;: &quot;hello.py&quot;&#125;</span><br><span class="line"></span><br><span class="line">👁️ Observation: print(&#x27;Hello World from Agent!&#x27;</span><br><span class="line"></span><br><span class="line">🧠 Think: 发现少了一个右括号。修正后重新写入。</span><br><span class="line">🔧 Action: write_file</span><br><span class="line">📋 Action Input: &#123;&quot;path&quot;: &quot;hello.py&quot;, &quot;content&quot;: &quot;print(&#x27;Hello World from Agent!&#x27;)&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Agent 自己发现了错误 → 自己排查了原因 → 自己修复了 → 继续执行。整个过程不需要你插手。</p>
+<p>这就是第二篇讲的<strong>反馈环</strong>的力量。普通 LLM 遇到同样的情况，只能输出一段代码然后说”你试试看能不能跑”——至于跑不跑得通，它不知道，也不关心。</p>
+<blockquote>
+<p><strong>普通 LLM 只是告诉你”怎么做”，Agent 是帮你”做出来并验证它真的能跑”。</strong></p>
+</blockquote>
+<hr>
+<h2 id="总结：代码与架构的对应关系"><a href="#总结：代码与架构的对应关系" class="headerlink" title="总结：代码与架构的对应关系"></a>总结：代码与架构的对应关系</h2><p>写了这么多代码，现在我们把它映射回第二篇的架构概念。每一行代码，背后都有一个 LangChain 抽象在支撑：</p>
+<table>
+<thead>
+<tr>
+<th>代码</th>
+<th>架构概念</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>@tool</code> 装饰器</td>
+<td><code>BaseTool</code></td>
+<td>自动生成 name、description、args_schema、_run()</td>
+</tr>
+<tr>
+<td><code>create_tool_calling_agent()</code></td>
+<td><code>Runnable</code></td>
+<td>Agent 本身是一个 Runnable，对外暴露 <code>invoke()</code></td>
+</tr>
+<tr>
+<td><code>executor.invoke()</code></td>
+<td>触发 Think→Act→Observe 循环</td>
+<td>AgentExecutor 是整条链路的总调度</td>
+</tr>
+<tr>
+<td>每行 verbose 日志</td>
+<td><code>AgentAction</code> &#x2F; <code>AgentFinish</code></td>
+<td>Think 阶段输出决策，Act 阶段执行工具</td>
+</tr>
+<tr>
+<td><code>verbose=True</code></td>
+<td><code>Callbacks</code></td>
+<td>在关键节点触发钩子，打印日志</td>
+</tr>
+<tr>
+<td><code>tools</code> 列表</td>
+<td>工具清单</td>
+<td>LLM 根据 tools 的描述决定调用哪个</td>
+</tr>
+<tr>
+<td><code>system_prompt</code></td>
+<td>Prompt 模板</td>
+<td>定义角色 + 告知工具 + 行为指令</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="三篇回顾"><a href="#三篇回顾" class="headerlink" title="三篇回顾"></a>三篇回顾</h2><p>到这个系列结束的时刻了。回顾一下我们走过的路：</p>
+<p><strong>第一篇——概念篇</strong>：Agent 是什么。LLM 有大脑没身体，Agent &#x3D; LLM + 工具 + 决策循环，核心是 Think → Act → Observe 的 ReAct 循环。</p>
+<p><strong>第二篇——架构篇</strong>：LangChain 内部怎么转。三层包结构（core &#x2F; classic &#x2F; v1），五大核心组件（Runnable、BaseTool、Prompt 模板、AgentAction&#x2F;AgentFinish、Callbacks），Agent 类型怎么选。</p>
+<p><strong>第三篇——实战篇</strong>：从零搭建代码助手 Agent。三个 <code>@tool</code> 装饰器定义工具，<code>create_tool_calling_agent</code> 创建 Agent，<code>AgentExecutor</code> 驱动循环——不到 50 行代码，Agent 真的跑起来了，能读写文件、执行命令、自主纠错。</p>
+<p>从概念到代码，从理解到上手——希望你读完这个系列后，不会再觉得 Agent 是什么神秘的黑魔法。它就是一套设计精巧的循环机制，而你现在已经知道怎么造一个出来了。</p>
+<hr>
+<p><em>LangChain Agent 系列文章：</em></p>
+<ul>
+<li>(一) <a href="/2026/06/17/agent/LangChain-Agent-01-%E6%A6%82%E5%BF%B5%E7%AF%87-Agent%E6%98%AF%E4%BB%80%E4%B9%88/">Agent 是什么？</a></li>
+<li>(二) <a href="/2026/06/19/agent/LangChain-Agent-02-%E6%9E%B6%E6%9E%84%E7%AF%87-LangChain%E5%86%85%E9%83%A8%E6%80%8E%E4%B9%88%E8%BD%AC%E7%9A%84/">LangChain Agent 内部怎么转的？</a></li>
+<li>(三) 从零搭建代码助手 Agent（本文）</li>
+</ul>
+]]></description>
+    </item>
+    
+    <item>
+      <guid isPermalink="true">https://blog.pengfanao.top/2026/06/21/agent/Claude-Code-Codex-agent-browser-%E6%AE%8B%E7%95%99%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/</guid>
+      <title>Mac 发热？AI 可能忘了关浏览器</title>
+      <link>https://blog.pengfanao.top/2026/06/21/agent/Claude-Code-Codex-agent-browser-%E6%AE%8B%E7%95%99%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/</link>
+      <pubDate>Sun, 21 Jun 2026 17:30:00 GMT</pubDate>
+      <category>Claude Code</category><category>Codex</category><category>agent-browser</category><category>Chrome</category><category>CDP</category><category>macOS</category>
+      <description><![CDATA[<blockquote>
+<p>Claude Code、Codex 明明已经停下来了，Mac 风扇却还在转，内存也迟迟不降。问题可能不在当前会话，而在一批没有正常收尾的 <code>agent-browser</code> daemon 与自动化 Chrome。</p>
+</blockquote>
+<p>这次我在本机清理了 <strong>8 组遗留的 agent-browser &#x2F; Chrome 后台实例及其子进程</strong>。普通 Chrome 标签页没有动，机器热量很快就降了下来。</p>
+<p>这不是一个玄学问题，也不能简单归咎于“Chrome 太吃内存”。真正要理解的是：AI 编程工具、浏览器自动化工具、CDP、daemon 和 session 之间，到底是谁启动了谁，又该由谁负责关掉。</p>
+<span id="more"></span>
+
+<h2 id="30-秒结论"><a href="#30-秒结论" class="headerlink" title="30 秒结论"></a>30 秒结论</h2><p>先给赶时间的人答案：</p>
+<ul>
+<li><code>agent-browser</code> 采用 <strong>CLI + 后台 daemon + Chrome</strong> 的架构，daemon 会故意跨命令常驻，以便下一条指令不用重新启动浏览器。</li>
+<li>每个独立 session 都可能拥有自己的浏览器实例。Claude Code、Codex 并发执行多个 agent 或工具任务时，session 数量很容易叠加。</li>
+<li>如果任务异常中断、会话被强制停止，或者调用方忘了执行 <code>agent-browser close</code>，后台进程就可能继续存在。</li>
+<li>CDP 只是控制通道，不是泄漏的根因。根因是 <strong>浏览器生命周期没有闭环</strong>。</li>
+<li>最优先执行官方收尾命令：<code>agent-browser close --all</code>。只有正常关闭失败，才按特征匹配并发送 <code>TERM</code>，最后才考虑 <code>KILL</code>。</li>
+<li>长期方案是设置空闲超时、复用 session，并要求每个自动化任务在 <code>finally</code> 或 shell <code>trap</code> 中关闭自己的 session。</li>
+</ul>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ul>
+<li><a href="#%E4%B8%80%E7%8E%B0%E8%B1%A1ai-%E5%81%9C%E4%BA%86%E6%B5%8F%E8%A7%88%E5%99%A8%E5%8D%B4%E6%B2%A1%E5%81%9C">一、现象：AI 停了，浏览器却没停</a></li>
+<li><a href="#%E4%BA%8C%E6%A0%B9%E5%9B%A0%E5%B8%B8%E9%A9%BB-daemon-%E9%81%87%E4%B8%8A%E5%B9%B6%E5%8F%91-session">二、根因：常驻 daemon 遇上并发 session</a></li>
+<li><a href="#%E4%B8%89%E5%85%88%E7%A1%AE%E8%AE%A4%E4%B8%8D%E8%A6%81%E4%B8%8A%E6%9D%A5%E5%B0%B1-kill">三、先确认，不要上来就 kill</a></li>
+<li><a href="#%E5%9B%9B%E4%B8%89%E5%B1%82%E6%B8%85%E7%90%86%E5%AE%98%E6%96%B9%E5%85%B3%E9%97%AD%E6%B8%A9%E5%92%8C%E7%BB%88%E6%AD%A2%E5%BC%BA%E5%88%B6%E6%B8%85%E7%90%86">四、三层清理：官方关闭、温和终止、强制清理</a></li>
+<li><a href="#%E4%BA%94%E6%80%8E%E6%A0%B7%E4%BF%9D%E8%AF%81%E4%B8%8D%E8%AF%AF%E4%BC%A4%E6%99%AE%E9%80%9A-chrome">五、怎样保证不误伤普通 Chrome</a></li>
+<li><a href="#%E5%85%AD%E4%BB%8E%E6%BA%90%E5%A4%B4%E9%A2%84%E9%98%B2%E8%AE%A9%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E9%97%AD%E7%8E%AF">六、从源头预防：让生命周期闭环</a></li>
+<li><a href="#%E4%B8%83%E5%8F%AF%E7%9B%B4%E6%8E%A5%E6%94%B6%E8%97%8F%E7%9A%84%E6%8E%92%E6%9F%A5%E6%B8%85%E5%8D%95">七、可直接收藏的排查清单</a></li>
+</ul>
+<h2 id="一、现象：AI-停了，浏览器却没停"><a href="#一、现象：AI-停了，浏览器却没停" class="headerlink" title="一、现象：AI 停了，浏览器却没停"></a>一、现象：AI 停了，浏览器却没停</h2><p>典型场景是这样的：</p>
+<ul>
+<li>你让 Claude Code 或 Codex 通过 skill、MCP、shell 工具打开网页；</li>
+<li>自动化任务创建了多个命名 session，甚至并行跑了多个子 agent；</li>
+<li>任务完成或会话终止后，终端已经安静；</li>
+<li>但“活动监视器”里仍有多组 Chrome、Chrome Helper、GPU、Renderer 或 agent-browser 进程；</li>
+<li>合上几次窗口也没用，Mac 继续发热，内存和 CPU 占用居高不下。</li>
+</ul>
+<p>最迷惑的一点是：这些进程通常没有可见窗口。你看到的普通 Chrome 标签页可能只有几个，但后台自动化 Chrome 使用的是独立临时用户目录，它们和日常浏览器不是同一组实例。</p>
+<p>因此，“我已经关掉 Chrome 窗口了”并不能证明自动化浏览器已经退出。</p>
+<h2 id="二、根因：常驻-daemon-遇上并发-session"><a href="#二、根因：常驻-daemon-遇上并发-session" class="headerlink" title="二、根因：常驻 daemon 遇上并发 session"></a>二、根因：常驻 daemon 遇上并发 session</h2><p>以本机安装的 <code>agent-browser 0.27.0</code> 为例，官方说明明确写了两件事：</p>
+<ul>
+<li>它采用 client-daemon 架构，Rust CLI 负责接收命令，Rust daemon 通过 CDP 控制 Chrome；</li>
+<li>daemon 会在第一次命令时自动启动，并在后续命令之间保持运行，以换取更快的响应。</li>
+</ul>
+<p>与此同时，官方 session 文档也说明：每个 session 都有独立的浏览器实例、Cookie、存储、历史记录和认证状态。</p>
+<p>这两点放到多 agent 场景里，就形成了下面的链路：</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/02-framework-process-tree.png" alt="Claude Code、Codex 到后台 Chrome 的进程与会话链路"></p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Claude Code / Codex</span><br><span class="line">        │</span><br><span class="line"></span><br><span class="line">        ├─ Agent A → session A → daemon A → Chrome A → Renderer / GPU / Network</span><br><span class="line"></span><br><span class="line">        ├─ Agent B → session B → daemon B → Chrome B → Renderer / GPU / Network</span><br><span class="line"></span><br><span class="line">        └─ Agent C → session C → daemon C → Chrome C → Renderer / GPU / Network</span><br></pre></td></tr></table></figure>
+
+<p>单看一组并不可怕。真正吃资源的是“多组浏览器进程树一起常驻”。一个 Chrome 主进程还会派生渲染、GPU、网络等子进程，所以 8 个遗留实例在活动监视器里看起来可能远不止 8 行。</p>
+<h3 id="CDP-是不是罪魁祸首？"><a href="#CDP-是不是罪魁祸首？" class="headerlink" title="CDP 是不是罪魁祸首？"></a>CDP 是不是罪魁祸首？</h3><p>不是。</p>
+<p>CDP（Chrome DevTools Protocol）只是自动化工具与 Chrome 之间的控制协议。它负责导航、点击、读取 DOM、截图等操作，但不会替调用方决定“任务什么时候算结束”。</p>
+<p>真正缺失的是这条生命周期：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">创建 session → 使用浏览器 → 任务成功或失败 → 关闭 session → 回收 daemon 和 Chrome</span><br></pre></td></tr></table></figure>
+
+<p>如果最后两步没有执行，前面的资源就可能继续留在后台。</p>
+<blockquote>
+<p><strong>关键判断：</strong> 不是 AI “还在思考”，而是 AI 启动的外部进程已经脱离了当前对话的可见范围。</p>
+</blockquote>
+<h2 id="三、先确认，不要上来就-kill"><a href="#三、先确认，不要上来就-kill" class="headerlink" title="三、先确认，不要上来就 kill"></a>三、先确认，不要上来就 kill</h2><p>清理前先分清三件事：有多少活动 session、有哪些 agent-browser daemon、哪些 Chrome 使用了 agent-browser 的临时用户目录。</p>
+<h3 id="1-查看-agent-browser-自己记录的活动-session"><a href="#1-查看-agent-browser-自己记录的活动-session" class="headerlink" title="1. 查看 agent-browser 自己记录的活动 session"></a>1. 查看 agent-browser 自己记录的活动 session</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">agent-browser session list</span><br></pre></td></tr></table></figure>
+
+<p>如果版本支持 JSON：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">agent-browser session list --json</span><br></pre></td></tr></table></figure>
+
+<p>这一步最可信，因为它从工具自己的会话视角回答“现在认为谁还活着”。</p>
+<h3 id="2-查看-daemon-和自动化-Chrome"><a href="#2-查看-daemon-和自动化-Chrome" class="headerlink" title="2. 查看 daemon 和自动化 Chrome"></a>2. 查看 daemon 和自动化 Chrome</h3><p>macOS 上可以使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pgrep -fl <span class="string">&#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;</span></span><br><span class="line"></span><br><span class="line">pgrep -fl <span class="string">&#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>第二条命令的关键不是进程名“Google Chrome”，而是启动参数中的：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--user-data-dir=.../agent-browser-chrome-...</span><br></pre></td></tr></table></figure>
+
+<p>它说明这个 Chrome 使用的是 agent-browser 创建的隔离用户目录，而不是你日常使用的默认 Chrome Profile。</p>
+<h3 id="3-按-CPU、内存和运行时间查看完整进程树"><a href="#3-按-CPU、内存和运行时间查看完整进程树" class="headerlink" title="3. 按 CPU、内存和运行时间查看完整进程树"></a>3. 按 CPU、内存和运行时间查看完整进程树</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ps -axo pid,ppid,%cpu,%mem,rss,etime,<span class="built_in">command</span> \</span><br><span class="line">  | grep -E <span class="string">&#x27;[a]gent-browser-darwin|[a]gent-browser-chrome-&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>字段含义：</p>
+<ul>
+<li><code>PID</code>：当前进程编号，后续终止时使用。</li>
+<li><code>PPID</code>：父进程编号，用来判断 daemon 与 Chrome 的父子关系。</li>
+<li><code>%CPU</code>：CPU 占用，观察它是否持续让机器发热。</li>
+<li><code>%MEM</code> &#x2F; <code>RSS</code>：内存占用，确认多个实例是否不断叠加。</li>
+<li><code>ETIME</code>：已运行时间，判断它是否早已超过当前 AI 任务时长。</li>
+<li><code>COMMAND</code>：完整启动命令，确认是否带有 agent-browser 特征参数。</li>
+</ul>
+<p>不要只看 <code>~/.agent-browser</code> 下有没有 <code>.pid</code>、<code>.sock</code> 文件。它们可能只是过期的 sidecar 文件，并不等于进程仍然存活。进程是否活着，最终以 <code>session list</code>、<code>ps</code> 和 <code>pgrep</code> 为准。</p>
+<h2 id="四、三层清理：官方关闭、温和终止、强制清理"><a href="#四、三层清理：官方关闭、温和终止、强制清理" class="headerlink" title="四、三层清理：官方关闭、温和终止、强制清理"></a>四、三层清理：官方关闭、温和终止、强制清理</h2><p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/03-flowchart-cleanup.png" alt="从官方关闭到强制清理的安全操作流程"></p>
+<h3 id="第一层：让-agent-browser-自己收尾"><a href="#第一层：让-agent-browser-自己收尾" class="headerlink" title="第一层：让 agent-browser 自己收尾"></a>第一层：让 agent-browser 自己收尾</h3><p>优先执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">agent-browser close --all</span><br></pre></td></tr></table></figure>
+
+<p>然后清理过期的 pid、socket、version 等 sidecar 文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">agent-browser doctor --offline --quick</span><br></pre></td></tr></table></figure>
+
+<p>当前版本的 <code>doctor</code> 会自动清理陈旧的 daemon sidecar 文件；<code>--fix</code> 还可能执行重装 Chrome、清理旧状态等破坏性修复，因此日常排查先不要加 <code>--fix</code>。</p>
+<p>再次验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">agent-browser session list</span><br><span class="line"></span><br><span class="line">pgrep -fl <span class="string">&#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;</span></span><br><span class="line"></span><br><span class="line">pgrep -fl <span class="string">&#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果没有输出，说明已经清干净。</p>
+<h3 id="第二层：发送-TERM，让进程有机会优雅退出"><a href="#第二层：发送-TERM，让进程有机会优雅退出" class="headerlink" title="第二层：发送 TERM，让进程有机会优雅退出"></a>第二层：发送 TERM，让进程有机会优雅退出</h3><p>只有官方关闭失败时再执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pgrep -f <span class="string">&#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;</span> \</span><br><span class="line">  | xargs -n 1 <span class="built_in">kill</span> -TERM 2&gt;/dev/null || <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">pgrep -f <span class="string">&#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;</span> \</span><br><span class="line">  | xargs -n 1 <span class="built_in">kill</span> -TERM 2&gt;/dev/null || <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p><code>TERM</code> 会给进程处理退出、关闭文件和回收子进程的机会。执行后等 3 秒，再跑一次检查命令。</p>
+<h3 id="第三层：只对仍残留的目标使用-KILL"><a href="#第三层：只对仍残留的目标使用-KILL" class="headerlink" title="第三层：只对仍残留的目标使用 KILL"></a>第三层：只对仍残留的目标使用 KILL</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pgrep -f <span class="string">&#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;</span> \</span><br><span class="line">  | xargs -n 1 <span class="built_in">kill</span> -KILL 2&gt;/dev/null || <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">pgrep -f <span class="string">&#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;</span> \</span><br><span class="line">  | xargs -n 1 <span class="built_in">kill</span> -KILL 2&gt;/dev/null || <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p><code>KILL</code> 不允许进程执行清理逻辑，只适合处理已经卡死、无法响应 <code>TERM</code> 的残留。正在进行的自动化、下载、表单填写和未保存状态都会立即丢失。</p>
+<h3 id="仓库里放一个可重复使用的脚本"><a href="#仓库里放一个可重复使用的脚本" class="headerlink" title="仓库里放一个可重复使用的脚本"></a>仓库里放一个可重复使用的脚本</h3><p>本文配套脚本已放在：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scripts_py/agent_browser_cleanup.sh</span><br></pre></td></tr></table></figure>
+
+<p>使用方式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./scripts_py/agent_browser_cleanup.sh status</span><br><span class="line">./scripts_py/agent_browser_cleanup.sh close</span><br><span class="line">./scripts_py/agent_browser_cleanup.sh force</span><br></pre></td></tr></table></figure>
+
+<p>三条命令依次对应：只查看、官方关闭并清理 sidecar、官方关闭失败后的分级强制清理。</p>
+<h2 id="五、怎样保证不误伤普通-Chrome"><a href="#五、怎样保证不误伤普通-Chrome" class="headerlink" title="五、怎样保证不误伤普通 Chrome"></a>五、怎样保证不误伤普通 Chrome</h2><p>不要使用下面这种“大锤”：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">killall <span class="string">&#x27;Google Chrome&#x27;</span></span><br><span class="line">pkill -f <span class="string">&#x27;Google Chrome&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>它们会把普通 Chrome 窗口和日常标签页一起关掉。</p>
+<p>本文脚本采用两层限制：</p>
+<ol>
+<li>daemon 必须匹配 <code>agent-browser-darwin-arm64</code> 或 <code>agent-browser-darwin-x64</code> 的安装路径；</li>
+<li>Chrome 必须带有 <code>--user-data-dir=.../agent-browser-chrome-...</code> 参数。</li>
+</ol>
+<p>也就是说，它针对的是 agent-browser 创建的隔离 Chrome，不是所有名为 Google Chrome 的进程。</p>
+<p>不过还有一个例外需要注意：如果你主动使用 <code>--cdp</code> 或 <code>--auto-connect</code> 连接了日常 Chrome，那么自动化 session 与普通浏览器之间的边界会变得更近。此时先用 <code>session list</code> 和完整命令行确认，不要直接执行强制清理。</p>
+<h2 id="六、从源头预防：让生命周期闭环"><a href="#六、从源头预防：让生命周期闭环" class="headerlink" title="六、从源头预防：让生命周期闭环"></a>六、从源头预防：让生命周期闭环</h2><p>清理脚本只是灭火器。更好的办法是让每个任务都负责关掉自己打开的浏览器。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/04-comparison-prevention.png" alt="临时救火与长期防护的对比清单"></p>
+<h3 id="1-设置-daemon-空闲自动退出"><a href="#1-设置-daemon-空闲自动退出" class="headerlink" title="1. 设置 daemon 空闲自动退出"></a>1. 设置 daemon 空闲自动退出</h3><p>官方提供了 <code>AGENT_BROWSER_IDLE_TIMEOUT_MS</code>。例如 10 分钟无命令后自动关闭浏览器并退出 daemon：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> AGENT_BROWSER_IDLE_TIMEOUT_MS=600000</span><br></pre></td></tr></table></figure>
+
+<p>长期使用可以写入 <code>~/.zshrc</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;export AGENT_BROWSER_IDLE_TIMEOUT_MS=600000&#x27;</span> &gt;&gt; ~/.zshrc</span><br><span class="line"><span class="built_in">source</span> ~/.zshrc</span><br></pre></td></tr></table></figure>
+
+<p>10 分钟只是一个稳妥起点。频繁执行长任务可以设为 30 分钟；偶尔使用、机器资源紧张时可以设为 3 到 5 分钟。</p>
+<h3 id="2-不要为每一步创建新-session"><a href="#2-不要为每一步创建新-session" class="headerlink" title="2. 不要为每一步创建新 session"></a>2. 不要为每一步创建新 session</h3><p>同一个任务尽量复用一个语义明确的 session：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">agent-browser --session blog-research open https://example.com</span><br><span class="line">agent-browser --session blog-research snapshot -i</span><br><span class="line">agent-browser --session blog-research close</span><br></pre></td></tr></table></figure>
+
+<p>并发任务确实需要隔离时，可以创建多个 session，但每个任务结束后都要单独关闭。</p>
+<h3 id="3-在-shell-脚本里用-trap-兜底"><a href="#3-在-shell-脚本里用-trap-兜底" class="headerlink" title="3. 在 shell 脚本里用 trap 兜底"></a>3. 在 shell 脚本里用 trap 兜底</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> -euo pipefail</span><br><span class="line"></span><br><span class="line">SESSION=<span class="string">&quot;research-$$&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">cleanup</span></span>() &#123;</span><br><span class="line">  agent-browser --session <span class="string">&quot;<span class="variable">$SESSION</span>&quot;</span> close &gt;/dev/null 2&gt;&amp;1 || <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">trap</span> cleanup EXIT INT TERM</span><br><span class="line"></span><br><span class="line">agent-browser --session <span class="string">&quot;<span class="variable">$SESSION</span>&quot;</span> open https://example.com</span><br><span class="line">agent-browser --session <span class="string">&quot;<span class="variable">$SESSION</span>&quot;</span> snapshot -i</span><br></pre></td></tr></table></figure>
+
+<p>无论脚本正常结束、报错，还是收到中断信号，<code>cleanup</code> 都会尝试关闭对应 session。</p>
+<h3 id="4-给-Claude-Code-Codex-的浏览器-skill-加退出规则"><a href="#4-给-Claude-Code-Codex-的浏览器-skill-加退出规则" class="headerlink" title="4. 给 Claude Code &#x2F; Codex 的浏览器 skill 加退出规则"></a>4. 给 Claude Code &#x2F; Codex 的浏览器 skill 加退出规则</h3><p>长期指令里应明确写上：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">浏览器自动化任务结束后，必须关闭本任务创建的 agent-browser session。</span><br><span class="line"></span><br><span class="line">成功、失败、取消和超时都要执行清理；不得依赖用户手动回收后台进程。</span><br><span class="line"></span><br><span class="line">并发任务必须记录各自的 session 名称，只关闭自己创建的 session。</span><br></pre></td></tr></table></figure>
+
+<p>这比“任务结束后记得关浏览器”更有效，因为它定义了成功、失败和取消三条路径。</p>
+<h3 id="5-定期做轻量检查"><a href="#5-定期做轻量检查" class="headerlink" title="5. 定期做轻量检查"></a>5. 定期做轻量检查</h3><p>如果你经常让多个 agent 并发操作网页，可以在结束工作前运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">agent-browser session list</span><br><span class="line">./scripts_py/agent_browser_cleanup.sh status</span><br></pre></td></tr></table></figure>
+
+<p>发现不认识、运行时间异常长的 session，再决定是否关闭。不要把 <code>force</code> 放进高频定时任务，因为它可能打断仍在工作的自动化。</p>
+<h2 id="七、可直接收藏的排查清单"><a href="#七、可直接收藏的排查清单" class="headerlink" title="七、可直接收藏的排查清单"></a>七、可直接收藏的排查清单</h2><p>遇到 Mac 突然发热、内存异常时，按这个顺序走：</p>
+<ul>
+<li>打开“活动监视器”，确认是否有多组无窗口的 Chrome &#x2F; agent-browser。</li>
+<li>运行 <code>agent-browser session list</code>，确认活动 session。</li>
+<li>用 <code>pgrep -fl</code> 或 <code>ps</code> 检查 daemon 与 <code>agent-browser-chrome-</code> 用户目录。</li>
+<li>先执行 <code>agent-browser close --all</code>。</li>
+<li>再执行 <code>agent-browser doctor --offline --quick</code> 清理陈旧 sidecar。</li>
+<li>等待几秒并复查 CPU、内存和进程。</li>
+<li>仍有残留时先 <code>TERM</code>，最后才 <code>KILL</code>。</li>
+<li>设置 <code>AGENT_BROWSER_IDLE_TIMEOUT_MS</code>。</li>
+<li>在每个自动化脚本或 skill 中加入 <code>finally</code> &#x2F; <code>trap</code> 清理。</li>
+<li>避免 <code>killall Google Chrome</code> 这类会误伤普通标签页的命令。</li>
+</ul>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>浏览器自动化最容易被忽略的，不是“怎么打开网页”，而是“谁负责关闭网页背后的整棵进程树”。</p>
+<p>Claude Code 和 Codex 能把网页操作拆成工具调用，却不会天然替所有第三方工具完成生命周期管理。只要调用链中存在 daemon、session 和独立 Chrome，就应该把清理当成任务的一部分，而不是任务结束后的家务。</p>
+<blockquote>
+<p><strong>真正可靠的自动化，不只要能启动，还要能在成功、失败和取消时都干净退出。</strong></p>
+</blockquote>
+<p>如果你的 Mac 也曾在 AI 会话结束后莫名发热，先别急着重启。跑一下本文的检查命令，很可能几分钟就能找到那批“已经下班，但进程还没打卡”的浏览器。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a href="https://github.com/vercel-labs/agent-browser">agent-browser 官方仓库</a></li>
+<li><a href="https://github.com/vercel-labs/agent-browser/blob/main/README.md">agent-browser README：命令、Session 与 Architecture</a></li>
+<li><a href="https://developer.chrome.com/blog/chrome-for-testing/">Chrome for Testing 官方介绍</a></li>
+<li><a href="https://developer.chrome.com/docs/devtools/remote-debugging/">Chrome DevTools：远程调试</a></li>
+</ul>
+]]></description>
+    </item>
+    
+    <item>
+      <guid isPermalink="true">https://blog.pengfanao.top/2026/06/19/agent/LangChain-Agent-02-%E6%9E%B6%E6%9E%84%E7%AF%87-LangChain%E5%86%85%E9%83%A8%E6%80%8E%E4%B9%88%E8%BD%AC%E7%9A%84/</guid>
+      <title>LangChain Agent 系列(二)：LangChain Agent 内部怎么转的？</title>
+      <link>https://blog.pengfanao.top/2026/06/19/agent/LangChain-Agent-02-%E6%9E%B6%E6%9E%84%E7%AF%87-LangChain%E5%86%85%E9%83%A8%E6%80%8E%E4%B9%88%E8%BD%AC%E7%9A%84/</link>
+      <pubDate>Fri, 19 Jun 2026 00:00:00 GMT</pubDate>
+      <category>Agent</category><category>架构</category><category>LangChain</category><category>AI教程</category>
+      <description><![CDATA[<h2 id="上一篇我们讲了-Agent-的”道”——Think-→-Act-→-Observe-循环。这一篇讲”术”——LangChain-是怎么把这套机制实现出来的。"><a href="#上一篇我们讲了-Agent-的”道”——Think-→-Act-→-Observe-循环。这一篇讲”术”——LangChain-是怎么把这套机制实现出来的。" class="headerlink" title="上一篇我们讲了 Agent 的”道”——Think → Act → Observe 循环。这一篇讲”术”——LangChain 是怎么把这套机制实现出来的。"></a>上一篇我们讲了 Agent 的”道”——Think → Act → Observe 循环。这一篇讲”术”——LangChain 是怎么把这套机制实现出来的。</h2><p>如果你读完了第一篇，你已经知道 Agent 的核心思想了：LLM 是大脑，工具是手和眼睛，决策循环让 Agent 不断思考、执行、观察、调整，直到任务完成。</p>
+<p>但概念是概念，代码是代码。LangChain 到底用了哪些类、哪些抽象、哪些设计模式，把这些概念变成了能跑的代码？</p>
+<p>本文拆解 LangChain 的三层包结构和 Agent 核心组件。读完你能看懂 Agent 的每一行代码在做什么。</p>
+<hr>
+<h2 id="三层包结构概览"><a href="#三层包结构概览" class="headerlink" title="三层包结构概览"></a>三层包结构概览</h2><p>先把 LangChain 的整体包结构看清楚。很多人一上来就对着几百个类头大，但其实 LangChain 的包结构有清晰的层次逻辑：</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/arch-three-layers.png"></p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>包 &#x2F; 定位</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>基础抽象层</td>
+<td><code>langchain-core</code></td>
+<td>Runnable 协议、BaseTool、Messages、Callbacks</td>
+</tr>
+<tr>
+<td>经典集成层</td>
+<td><code>langchain-classic</code></td>
+<td>Chains、100+ 工具集成、Agent 实现、Document Loaders</td>
+</tr>
+<tr>
+<td>新版 API</td>
+<td><code>langchain</code> (v1)</td>
+<td>精简设计，Agent 优先</td>
+</tr>
+</tbody></table>
+<p>这三层是 LangChain 的核心架构，每一层有各自的定位：</p>
+<p><strong>基础抽象层（<code>langchain-core</code>）</strong> 是整个 LangChain 生态的地基。它只定义抽象接口和协议——Runnable 该怎么跑、BaseTool 长什么样、Message 有哪几种类型——但不绑定任何具体的模型提供商。这意味着你可以换模型、换工具实现、换拼接方式，只要接口对得上，别的代码不用动。</p>
+<p><strong>经典集成层（<code>langchain-classic</code>）</strong> 是 LangChain 历史最悠久的包，包含了 Chains 编排、100 多个第三方工具集成、各类 Agent 的具体实现、Document Loaders、Vector Stores 等等。注意，在 v1.0 发布后，<code>langchain-classic</code> 已进入维护模式（只修 bug，不添加新功能），活跃的集成开发已迁移到 <code>langchain-openai</code>、<code>langchain-anthropic</code> 等合作包和 <code>langchain-community</code> 中。但作为抽象概念的”经典层”仍然是最好的学习起点——它的代码量和覆盖面能让你看清一个完整的 Agent 生态长什么样。</p>
+<p><strong>新版 API（<code>langchain</code> v1）</strong> 是 LangChain 团队近年推行的新方向。”Agent 优先”意味着 Agent 不再是用 Chain 拼出来的”高级功能”，而是一等公民。v1 版本的 API 设计更精简——创建 Agent 更直观，配置项更集中，对工具和模型的绑定也更清晰。如果你是新项目，官方推荐优先考虑 v1。</p>
+<p>为什么要拆三层？一句话：<strong>解耦</strong>。<code>langchain-core</code> 不依赖任何模型提供商，核心抽象极其稳定；<code>langchain-classic</code> 可以有大量的具体实现和集成，变更频繁也不影响核心抽象；<code>langchain</code> v1 作为”新家”，可以吸取经典层的教训，用更现代的 API 重新出发。</p>
+<hr>
+<h2 id="核心组件拆解"><a href="#核心组件拆解" class="headerlink" title="核心组件拆解"></a>核心组件拆解</h2><p>理清了包结构，我们来看 LangChain Agent 的核心组件。这些组件串在一起，就构成了 Agent 的执行引擎。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/arch-components.png"></p>
+<h3 id="1-Runnable-协议——一切皆-Runnable"><a href="#1-Runnable-协议——一切皆-Runnable" class="headerlink" title="1. Runnable 协议——一切皆 Runnable"></a>1. Runnable 协议——一切皆 Runnable</h3><p>Runnable 是 LangChain 最底层的抽象。它的核心思想很简单：<strong>一切组件都是 Runnable，统一对外暴露 <code>invoke()</code>（同步执行）和 <code>stream()</code>（流式执行）两个执行入口。</strong></p>
+<p>除此之外，Runnable 还提供了 <code>pipe()</code> 方法（即 <code>|</code> 运算符），用于将多个 Runnable 串联成一个管道——这不是执行入口，而是<strong>组合手段</strong>。</p>
+<p>在 LangChain 里，以下这些东西全都是 Runnable：</p>
+<ul>
+<li><strong>LLM</strong>（比如 <code>ChatOpenAI</code>）是一个 Runnable——调用 <code>invoke()</code> 就发一次请求</li>
+<li><strong>Prompt 模板</strong>（<code>ChatPromptTemplate</code>）是一个 Runnable——调用 <code>invoke()</code> 就填充变量生成最终 prompt</li>
+<li><strong>Tool</strong>（<code>BaseTool</code>）是一个 Runnable——调用 <code>invoke()</code> 就执行工具逻辑</li>
+<li><strong>Agent 本身</strong> 也是一个 Runnable——调用 <code>invoke()</code> 就跑完整条 ReAct 循环</li>
+</ul>
+<p>这意味着你可以用 <code>|</code> 管道符把 Runnable 串起来，像 Unix 管道一样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">prompt | llm | output_parser</span><br></pre></td></tr></table></figure>
+
+<p>Agent 内部就是靠这种管道把 Prompt、LLM、OutputParser 串联起来的。你不需要在代码里手动编排每一步——LangChain 帮你把组件之间的数据流转处理好了。</p>
+<h3 id="2-BaseTool——工具的统一接口"><a href="#2-BaseTool——工具的统一接口" class="headerlink" title="2. BaseTool——工具的统一接口"></a>2. BaseTool——工具的统一接口</h3><p>第一篇我们说了”工具是 Agent 的手和眼睛”，在 LangChain 里，工具都被抽象成 <code>BaseTool</code>。每个 BaseTool 有四个核心属性：</p>
+<ul>
+<li><strong><code>name</code></strong>：工具的唯一标识名。LLM 用这个名字来引用工具，比如 <code>&quot;read_file&quot;</code>。</li>
+<li><strong><code>description</code></strong>：工具的功能描述。LLM 读这个描述来决策”当前应该用哪个工具”。描述写得越准确，LLM 选工具越不容易出错。</li>
+<li><strong><code>args_schema</code></strong>：工具参数的 Pydantic 类型定义。有了它，LLM 就知道调用 <code>read_file</code> 需要传一个 <code>file_path: str</code>，类型不对 LangChain 会自动拦截。</li>
+<li><strong><code>_run()</code></strong>：工具的实际执行逻辑。你写的业务代码就放在这里。</li>
+</ul>
+<p>以 <code>read_file</code> 工具为例，它的结构大概是这样的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> langchain_core.tools <span class="keyword">import</span> BaseTool</span><br><span class="line"><span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel, Field</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ReadFileInput</span>(<span class="title class_ inherited__">BaseModel</span>):</span><br><span class="line">    file_path: <span class="built_in">str</span> = Field(description=<span class="string">&quot;要读取的文件路径&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ReadFileTool</span>(<span class="title class_ inherited__">BaseTool</span>):</span><br><span class="line">    name: <span class="built_in">str</span> = <span class="string">&quot;read_file&quot;</span></span><br><span class="line">    description: <span class="built_in">str</span> = <span class="string">&quot;读取指定路径的文件内容&quot;</span></span><br><span class="line">    args_schema: <span class="built_in">type</span>[BaseModel] = ReadFileInput</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_run</span>(<span class="params">self, file_path: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">        <span class="keyword">with</span> <span class="built_in">open</span>(file_path, <span class="string">&quot;r&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">            <span class="keyword">return</span> f.read()</span><br></pre></td></tr></table></figure>
+
+<p>LLM 看到这个工具的 <code>name</code> 和 <code>description</code>，就知道”当用户要我读文件时，调用 <code>read_file</code> 工具，传一个 <code>file_path</code>“。<code>args_schema</code> 里的 Field 描述（<code>&quot;要读取的文件路径&quot;</code>）会一并发给 LLM，帮助它生成正确的参数值。</p>
+<h3 id="3-Prompt-模板——Agent-的”任务说明书”"><a href="#3-Prompt-模板——Agent-的”任务说明书”" class="headerlink" title="3. Prompt 模板——Agent 的”任务说明书”"></a>3. Prompt 模板——Agent 的”任务说明书”</h3><p>Agent 的 prompt 跟普通 LLM 的 prompt 不一样。普通 prompt 就是一段话，Agent 的 prompt 是一个<strong>组装出来的复合结构</strong>，包含四个部分：</p>
+<ol>
+<li><strong>System prompt</strong>：定义角色。比如 “你是一个代码助手，可以用 Shell、文件操作等工具完成任务。遇到问题时先分析，再选择工具执行。”</li>
+<li><strong>Tool descriptions</strong>：可用工具的列表——每个工具的 <code>name</code> + <code>description</code> + <code>args_schema</code>。LLM 靠这段文本来决定”现在应该用哪个工具，传什么参数”。</li>
+<li><strong>User input</strong>：用户的原始输入，比如 “统计 .py 文件行数”。</li>
+<li><strong>Scratchpad</strong>：一个占位符（<code>MessagesPlaceholder</code>），用来存放历史步骤。每完成一轮 Think→Act→Observe，Agent 会把最新的 AgentAction 和 Observation 填进去，让 LLM 知道”到目前为止发生了什么”。</li>
+</ol>
+<p><code>MessagesPlaceholder</code> 是 Agent prompt 的核心机关。它不是写死的文本，而是一个<strong>每轮循环都会被更新的空位</strong>。第一轮它可能是空的；第二轮它就包含了”上一轮我调用了什么工具、返回了什么结果”。LLM 基于这个不断更新的上下文来决定下一轮该做什么。</p>
+<h3 id="4-AgentAction-与-AgentFinish——每步只有两种可能"><a href="#4-AgentAction-与-AgentFinish——每步只有两种可能" class="headerlink" title="4. AgentAction 与 AgentFinish——每步只有两种可能"></a>4. AgentAction 与 AgentFinish——每步只有两种可能</h3><p>Agent 每一步的输出，经过 OutputParser 解析后，只有两种结构化结果：</p>
+<ul>
+<li><strong><code>AgentAction</code></strong>：Agent 决定再调用一个工具。包含两个字段：<ul>
+<li><code>tool</code>：要调用的工具名，比如 <code>&quot;run_shell&quot;</code></li>
+<li><code>tool_input</code>：传给工具的参数，比如 <code>&#123;&quot;command&quot;: &quot;ls *.py&quot;&#125;</code></li>
+</ul>
+</li>
+<li><strong><code>AgentFinish</code></strong>：Agent 认为任务已完成，返回最终答案。包含：<ul>
+<li><code>return_values</code>：一个字典，通常键是 <code>&quot;output&quot;</code>，值就是给用户的回答</li>
+</ul>
+</li>
+</ul>
+<p>OutputParser 的职责就是把 LLM 原始文本输出解析成这两种结构之一。LLM 的输出可能是这样的文本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Action: run_shell</span><br><span class="line">Action Input: &#123;&quot;command&quot;: &quot;ls *.py&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>OutputParser 需要把它解析成 <code>AgentAction(tool=&quot;run_shell&quot;, tool_input=&#123;&quot;command&quot;: &quot;ls *.py&quot;&#125;)</code>。</p>
+<p>或者 LLM 认为任务完成了，输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Final Answer: 共 3 个 Python 文件，合计 214 行代码</span><br></pre></td></tr></table></figure>
+
+<p>OutputParser 就解析成 <code>AgentFinish(return_values=&#123;&quot;output&quot;: &quot;共 3 个 Python 文件，合计 214 行代码&quot;&#125;)</code>。</p>
+<p>这个二选一的设计非常简洁——Agent 每步要么再动手，要么收工。AgentExecutor 拿到结果后判断类型：如果是 <code>AgentAction</code>，就执行对应的工具；如果是 <code>AgentFinish</code>，就停止循环返回答案。</p>
+<h3 id="5-Callbacks——横向贯穿的钩子机制"><a href="#5-Callbacks——横向贯穿的钩子机制" class="headerlink" title="5. Callbacks——横向贯穿的钩子机制"></a>5. Callbacks——横向贯穿的钩子机制</h3><p>Callback 不属于”纵向串行”的组件，而是一个<strong>横向贯穿</strong>的钩子系统：它在 Agent 执行过程的各个节点插入钩子，让你能拦截和观察每一步。</p>
+<p>核心的 callback 钩子包括：</p>
+<ul>
+<li><strong>LLM 相关</strong>：<code>on_llm_start</code>、<code>on_llm_end</code>、<code>on_llm_error</code>——在 LLM 调用前后触发</li>
+<li><strong>Tool 相关</strong>：<code>on_tool_start</code>、<code>on_tool_end</code>、<code>on_tool_error</code>——在工具执行前后触发</li>
+<li><strong>Agent 相关</strong>：<code>on_agent_action</code>、<code>on_agent_finish</code>——在 Agent 决策点和结束点触发</li>
+</ul>
+<p>这些钩子的用途很广：</p>
+<ul>
+<li><strong>打印日志</strong>：AgentExecutor 的 <code>verbose=True</code> 就是靠 Callback 实现的——每一步的 Think、Act、Observe 都能看到完整输出。</li>
+<li><strong>流式输出 token</strong>：<code>on_llm_new_token</code> 钩子让你逐 token 推送内容，实现打字机效果。</li>
+<li><strong>写入监控</strong>：记录每次 LLM 调用的耗时、工具执行的成功率，方便后期分析。</li>
+</ul>
+<p>有了 Callback，你不需要修改 Agent 的核心逻辑，就能在关键节点插入自己的业务代码——这是一个典型的观察者模式。</p>
+<hr>
+<h2 id="Agent-类型一览"><a href="#Agent-类型一览" class="headerlink" title="Agent 类型一览"></a>Agent 类型一览</h2><p>LangChain 提供了多种 Agent 类型，它们的主要区别在于<strong>如何让 LLM 表达”我要用哪个工具”</strong>。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/arch-agent-types.png"></p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>特点</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ReAct</td>
+<td>经典推理+行动循环，文本解析 tool 调用</td>
+<td>模型不支持原生 tool calling 时</td>
+</tr>
+<tr>
+<td>Tool Calling</td>
+<td>通用 tool-calling 接口，跨模型</td>
+<td>推荐首选，大多数场景</td>
+</tr>
+<tr>
+<td>OpenAI Tools</td>
+<td>用 OpenAI 原生 function calling</td>
+<td>仅 OpenAI 模型</td>
+</tr>
+<tr>
+<td>Structured Chat</td>
+<td>支持多参数复杂工具的聊天 Agent</td>
+<td>工具参数结构复杂时</td>
+</tr>
+<tr>
+<td>JSON &#x2F; XML</td>
+<td>用 JSON&#x2F;XML 格式强制结构化输出</td>
+<td>需要严格输出格式时</td>
+</tr>
+</tbody></table>
+<p>这些类型的本质差异在于：<strong>LLM 如何输出”我要调用什么工具、传什么参数”这个决策。</strong></p>
+<p><strong>ReAct</strong> 是最早的实现方式——它在 prompt 里告诉 LLM：”如果你要用工具，请严格按以下格式输出：<code>Action: 工具名\nAction Input: 参数</code>“。然后 OutputParser 用正则从文本里提取。这种方式最灵活，不依赖模型能力，但解析可能出错——LLM 要是没严格按格式来，正则就匹配不上。</p>
+<p><strong>Tool Calling &#x2F; OpenAI Tools</strong> 则是利用模型的原生 function calling 能力。LLM 不再用文本表达工具调用，而是直接返回结构化的 <code>tool_calls</code> 对象——工具名、参数全部是结构化的，不靠文本解析。这种方式更可靠，也是当前推荐的主流做法。Tool Calling Agent 的优点在于它是跨模型的统一接口——ChatAnthropic、ChatVertexAI 等非 OpenAI 模型也可以用。</p>
+<p><strong>JSON &#x2F; XML Agent</strong> 让 LLM 按严格的 JSON 或 XML Schema 输出决策。相比于 ReAct 的正则解析，结构化输出更鲁棒，但 prompt 更长，token 消耗更高。</p>
+<p><strong>Structured Chat Agent</strong> 则是在聊天场景中支持多参数复杂工具的调用，适合工具函数签名比较复杂的场景。</p>
+<p><strong>选型建议</strong>：如果你的模型支持原生 tool calling（目前大部分主流模型都支持），直接用 <strong>Tool Calling Agent</strong>。如果模型不支持或你用的是本地小模型，降级到 <strong>ReAct</strong>。</p>
+<hr>
+<h2 id="完整链路走一遍"><a href="#完整链路走一遍" class="headerlink" title="完整链路走一遍"></a>完整链路走一遍</h2><p>现在我们把所有组件串起来，用第一篇的同一个例子——“统计目录下 <code>.py</code> 文件的行数”——完整走一遍 LangChain 的执行链路。</p>
+<p><img src="https://pfa-oss-example.oss-cn-hangzhou.aliyuncs.com/blog/arch-execution-chain.png"></p>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>发生的事</th>
+<th>LangChain 层面</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户输入</td>
+<td>“统计当前目录下所有 .py 文件行数”</td>
+<td><code>executor.invoke(&#123;&quot;input&quot;: &quot;统计当前目录下所有 .py 文件行数&quot;&#125;)</code></td>
+</tr>
+<tr>
+<td>Prompt 组装</td>
+<td>System prompt + 工具列表 + 用户输入 + scratchpad（本轮为空）</td>
+<td><code>ChatPromptTemplate</code> 把四部分拼好，<code>MessagesPlaceholder</code> 占着 scratchpad 的位置</td>
+</tr>
+<tr>
+<td>LLM 推理</td>
+<td>LLM 读取完整 prompt，判断需要先列出所有 .py 文件</td>
+<td><code>ChatOpenAI(model=&quot;gpt-4o&quot;)</code> 执行推理，输出结构化 tool_calls</td>
+</tr>
+<tr>
+<td>输出解析</td>
+<td>LLM 输出的是 tool_calls，解析成 AgentAction（如果是 ReAct 则解析文本格式）</td>
+<td><code>OutputParser</code> 解析输出 → <code>AgentAction(tool=&quot;run_shell&quot;, tool_input=&#123;&quot;command&quot;: &quot;ls *.py&quot;&#125;)</code></td>
+</tr>
+<tr>
+<td>Tool 执行</td>
+<td>实际执行 shell 命令</td>
+<td><code>run_shell._run(command=&quot;ls *.py&quot;)</code> → 返回 <code>&quot;a.py\nb.py\nutils.py&quot;</code></td>
+</tr>
+<tr>
+<td>历史回填</td>
+<td>把本轮的 Action 和 Observation 写入 scratchpad</td>
+<td>创建 <code>AgentStep(action=..., observation=...)</code>，填入 <code>MessagesPlaceholder</code></td>
+</tr>
+<tr>
+<td>进入下一轮</td>
+<td>LLM 看到本轮结果 + 历史，决定下一步：统计行数</td>
+<td>LLM 推理 → OutputParser 输出新 AgentAction</td>
+</tr>
+<tr>
+<td>Tool 执行</td>
+<td>执行 wc -l 命令</td>
+<td><code>run_shell._run(command=&quot;wc -l *.py&quot;)</code> → 返回统计结果</td>
+</tr>
+<tr>
+<td>历史回填</td>
+<td>再次写入 scratchpad</td>
+<td>又一个 AgentStep 追加到 MessagesPlaceholder</td>
+</tr>
+<tr>
+<td>下一轮</td>
+<td>LLM 判定信息已足够，任务完成</td>
+<td>OutputParser → <code>AgentFinish(return_values=&#123;&quot;output&quot;: &quot;共 3 个 Python 文件，合计 214 行代码&quot;&#125;)</code></td>
+</tr>
+<tr>
+<td>返回答案</td>
+<td>AgentExecutor 检测到 AgentFinish，停止循环</td>
+<td><code>executor.invoke()</code> 返回最终结果给用户</td>
+</tr>
+</tbody></table>
+<p>注意这套流程里几个关键的设计：</p>
+<ul>
+<li><strong>Prompt 的 scratchpad 是动态增长的</strong>。每轮 Think→Act→Observe 后，新的 AgentStep 追加上去，LLM 始终能看到”从开始到现在发生了什么”，这就是 ReAct 循环的”记忆”。</li>
+<li><strong>OutputParser 决定了循环的走向</strong>。它解析出来是 AgentAction 就继续执行工具，解析出来是 AgentFinish 就停止。这相当于循环的”交通指挥灯”。</li>
+<li><strong>AgentExecutor 是整条链路的总调度</strong>。它不参与推理，不执行工具——它的职责就是：组装 prompt → 调 LLM → 解析输出 → 调工具 → 回填历史 → 判断继续还是停止 → 循环。</li>
+</ul>
+<blockquote>
+<p><strong>一点说明</strong>：<code>AgentExecutor</code> 在 LangChain v1.0 中已进入维护模式，官方推荐的新方案是基于 LangGraph 的 <code>create_agent()</code>。但 <code>AgentExecutor</code> 的概念模型——调度器 + 循环 + 组件管道——完全适用于新方案。理解了这个模型，你自然就理解了新 API 在做什么。</p>
+</blockquote>
+<hr>
+<h2 id="用一段话串联所有组件"><a href="#用一段话串联所有组件" class="headerlink" title="用一段话串联所有组件"></a>用一段话串联所有组件</h2><p>我们把这些概念串起来的视角再回顾一遍：</p>
+<blockquote>
+<p><strong>Runnable</strong> 是最外层协议，保证每个组件都有统一的 <code>invoke()</code> 入口。AgentExecutor 这个总调度器，内部用管道把 <strong>Prompt 模板</strong> → <strong>LLM</strong> → <strong>OutputParser</strong> 串联起来。每次循环，Prompt 模板组装 System prompt + Tool descriptions（来自 <strong>BaseTool</strong> 的 name&#x2F;description&#x2F;args_schema）+ User input + Scratchpad（通过 <strong>MessagesPlaceholder</strong> 动态填充历史步骤）。LLM 推理后，<strong>OutputParser</strong> 把结果解析成两种之一：<strong>AgentAction</strong>（继续调工具，包含 tool 名和参数）或 <strong>AgentFinish</strong>（任务完成，返回最终答案）。如果拿到 AgentAction，AgentExecutor 就找到对应的 <strong>BaseTool</strong> 执行 <code>_run()</code>，把结果作为 Observation 回填到 Scratchpad，然后进入下一轮。<strong>Callbacks</strong> 在整个流程中横向贯穿，在每个关键节点触发钩子——你不需要改核心代码就能插入日志、流式输出、监控逻辑。循环直到 OutputParser 吐出 AgentFinish，最终答案返回给用户。</p>
+</blockquote>
+<hr>
+<h2 id="下篇预告"><a href="#下篇预告" class="headerlink" title="下篇预告"></a>下篇预告</h2><p>本文拆解了 LangChain Agent 的内部实现：</p>
+<ol>
+<li><strong>三层包结构</strong>——<code>langchain-core</code> 定义抽象，<code>langchain-classic</code> 提供实现，<code>langchain v1</code> 是未来方向</li>
+<li><strong>五大核心组件</strong>——Runnable 协议、BaseTool、Prompt 模板、AgentAction&#x2F;AgentFinish、Callbacks——分别承担了协议、工具、记忆、决策、监控的职责</li>
+<li><strong>Agent 类型选择</strong>——优先 Tool Calling，降级 ReAct</li>
+<li><strong>完整执行链路</strong>——从 <code>executor.invoke()</code> 到最终答案，每一步对应的 LangChain 概念</li>
+</ol>
+<p>但读完一篇可能还不够过瘾。下一篇文章，我们<strong>直接上手写代码</strong>——从零搭建一个可以读写文件、执行命令的代码助手 Agent。你会看到不到 50 行代码，Agent 就真的跑起来了。</p>
+<hr>
+<p><em>LangChain Agent 系列文章：</em></p>
+<ul>
+<li>(一) <a href="/2026/06/17/agent/LangChain-Agent-01-%E6%A6%82%E5%BF%B5%E7%AF%87-Agent%E6%98%AF%E4%BB%80%E4%B9%88/">Agent 是什么？</a></li>
+<li>(二) LangChain Agent 内部怎么转的？（本文）</li>
+<li>(三) <a href="/2026/06/22/agent/LangChain-Agent-03-%E5%AE%9E%E6%88%98%E7%AF%87-%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA%E4%BB%A3%E7%A0%81%E5%8A%A9%E6%89%8BAgent/">从零搭建代码助手 Agent</a></li>
+</ul>
+]]></description>
+    </item>
+    
+  </channel>
+</rss>

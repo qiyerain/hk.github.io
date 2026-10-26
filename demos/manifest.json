@@ -1,0 +1,21 @@
+{
+  "syncedAt": "2026-10-24T05:24:58.264Z",
+  "demos": [
+    {
+      "slug": "dsh-architecture",
+      "entry": "index.html",
+      "sourceName": "dsh-architecture.html",
+      "bytes": 838423,
+      "files": 1,
+      "sha256": "e9551054dd0bfd62ec876595dff593e9197f21dda6e498ee23e64bfccedde79a"
+    },
+    {
+      "slug": "learn-harness",
+      "entry": "index.html",
+      "sourceName": "learn-harness",
+      "bytes": 115848,
+      "files": 4,
+      "sha256": "6399a8659b4434140066942ba5a82b6d057aa4bdf91d5389b06cb5c193e3fa4d"
+    }
+  ]
+}

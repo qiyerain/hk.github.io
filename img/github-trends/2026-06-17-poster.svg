@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <defs>
+    <linearGradient id="p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#020617"/><stop offset="0.55" stop-color="#111827"/><stop offset="1" stop-color="#064e3b"/></linearGradient>
+  </defs>
+  <rect width="1200" height="1500" fill="url(#p)"/>
+  <g opacity="0.18" stroke="#e2e8f0" fill="none"><circle cx="930" cy="250" r="220"/><circle cx="930" cy="250" r="140"/><path d="M120 1130 C 280 980, 470 1030, 620 870 S 930 650, 1080 760"/><path d="M120 300 H430 V470 H730 V640 H1050"/></g>
+  <g font-family="Arial Unicode MS, PingFang SC, sans-serif">
+    <text x="86" y="150" font-size="42" fill="#67e8f9">2026 / 06 / 17</text>
+    <text x="86" y="285" font-size="94" font-weight="700" fill="#f8fafc">每日 GitHub</text>
+    <text x="86" y="395" font-size="94" font-weight="700" fill="#f8fafc">趋势</text>
+    <rect x="86" y="470" width="760" height="4" fill="#22c55e"/>
+    <text x="86" y="570" font-size="40" fill="#cbd5e1">Agent 工具链、语音生成、LLM 推理</text>
+    <g transform="translate(86 690)">
+      <rect width="1028" height="118" rx="26" fill="#0f172a" stroke="#334155"/>
+      <text x="34" y="72" font-size="38" fill="#f8fafc">Panniantong / Agent-Reach</text><text x="760" y="72" font-size="34" fill="#38bdf8">+2,025</text>
+      <rect y="150" width="1028" height="118" rx="26" fill="#0f172a" stroke="#334155"/>
+      <text x="34" y="222" font-size="38" fill="#f8fafc">OpenBMB / VoxCPM</text><text x="760" y="222" font-size="34" fill="#38bdf8">+408</text>
+      <rect y="300" width="1028" height="118" rx="26" fill="#0f172a" stroke="#334155"/>
+      <text x="34" y="372" font-size="38" fill="#f8fafc">vLLM / zvec / Fara</text><text x="760" y="372" font-size="34" fill="#38bdf8">Infra</text>
+    </g>
+    <text x="86" y="1325" font-size="32" fill="#94a3b8">GitHub Trending Daily · AI / Agent / RAG / DevTools</text>
+  </g>
+</svg>

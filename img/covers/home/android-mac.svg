@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Android 投屏 Mac">
+  <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#b5d3cf" stroke-opacity=".08"/></pattern></defs>
+  <rect width="1200" height="675" fill="#101c20"/><rect width="1200" height="675" fill="url(#grid)"/>
+  <rect x="72" y="68" width="66" height="6" fill="#8cdfe7"/>
+  <text x="72" y="126" fill="#8cdfe7" font-size="25" font-weight="700" font-family="Arial,sans-serif">TOOLING / SCREEN</text>
+  <text x="72" y="245" fill="#f5f8f5" font-size="70" font-weight="700" >Android 投屏 Mac</text>
+  <path d="M72 302 H1128" stroke="#7c9291" stroke-opacity=".5"/>
+  <path d="M382 438 h58 m-16 -13 16 13 -16 13" fill="none" stroke="#8cdfe7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M755 438 h58 m-16 -13 16 13 -16 13" fill="none" stroke="#8cdfe7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><g>
+    <rect x="72" y="365" width="310" height="145" rx="8" fill="#1a292e" stroke="#60767a" stroke-opacity=".55"/>
+    <rect x="72" y="365" width="310" height="5" fill="#8cdfe7"/>
+    <text x="98" y="407" fill="#8cdfe7" font-size="24" font-weight="700" >01</text>
+    <text x="98" y="465" fill="#f5f8f5" font-size="34" font-weight="700" >Android · USB</text>
+  </g><g>
+    <rect x="445" y="365" width="310" height="145" rx="8" fill="#1a292e" stroke="#60767a" stroke-opacity=".55"/>
+    <rect x="445" y="365" width="310" height="5" fill="#8cdfe7"/>
+    <text x="471" y="407" fill="#8cdfe7" font-size="24" font-weight="700" >02</text>
+    <text x="471" y="465" fill="#f5f8f5" font-size="40" font-weight="700" >ADB 调试</text>
+  </g><g>
+    <rect x="818" y="365" width="310" height="145" rx="8" fill="#1a292e" stroke="#60767a" stroke-opacity=".55"/>
+    <rect x="818" y="365" width="310" height="5" fill="#8cdfe7"/>
+    <text x="844" y="407" fill="#8cdfe7" font-size="24" font-weight="700" >03</text>
+    <text x="844" y="465" fill="#f5f8f5" font-size="34" font-weight="700" >scrcpy · Mac</text>
+  </g>
+  <text x="72" y="637" fill="#9caeaf" font-size="22" font-weight="600" font-family="Arial,sans-serif">CONNECT  /  AUTHORIZE  /  MIRROR</text>
+  <circle cx="1118" cy="618" r="9" fill="#8cdfe7"/>
+</svg>

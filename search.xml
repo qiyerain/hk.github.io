@@ -256,6 +256,189 @@ source 要指向真正支撑这条断言的位置。挂一个文件开头当”�
       </tags>
   </entry>
   <entry>
+    <title>Mac 发热？AI 可能忘了关浏览器</title>
+    <url>/2026/06/21/agent/Claude-Code-Codex-agent-browser-%E6%AE%8B%E7%95%99%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/</url>
+    <content><![CDATA[
+Claude Code、Codex 明明已经停下来了，Mac 风扇却还在转，内存也迟迟不降。问题可能不在当前会话，而在一批没有正常收尾的 agent-browser daemon 与自动化 Chrome。
+
+这次我在本机清理了 8 组遗留的 agent-browser &#x2F; Chrome 后台实例及其子进程。普通 Chrome 标签页没有动，机器热量很快就降了下来。
+这不是一个玄学问题，也不能简单归咎于“Chrome 太吃内存”。真正要理解的是：AI 编程工具、浏览器自动化工具、CDP、daemon 和 session 之间，到底是谁启动了谁，又该由谁负责关掉。
+
+
+30 秒结论先给赶时间的人答案：
+
+agent-browser 采用 CLI + 后台 daemon + Chrome 的架构，daemon 会故意跨命令常驻，以便下一条指令不用重新启动浏览器。
+每个独立 session 都可能拥有自己的浏览器实例。Claude Code、Codex 并发执行多个 agent 或工具任务时，session 数量很容易叠加。
+如果任务异常中断、会话被强制停止，或者调用方忘了执行 agent-browser close，后台进程就可能继续存在。
+CDP 只是控制通道，不是泄漏的根因。根因是 浏览器生命周期没有闭环。
+最优先执行官方收尾命令：agent-browser close --all。只有正常关闭失败，才按特征匹配并发送 TERM，最后才考虑 KILL。
+长期方案是设置空闲超时、复用 session，并要求每个自动化任务在 finally 或 shell trap 中关闭自己的 session。
+
+目录
+一、现象：AI 停了，浏览器却没停
+二、根因：常驻 daemon 遇上并发 session
+三、先确认，不要上来就 kill
+四、三层清理：官方关闭、温和终止、强制清理
+五、怎样保证不误伤普通 Chrome
+六、从源头预防：让生命周期闭环
+七、可直接收藏的排查清单
+
+一、现象：AI 停了，浏览器却没停典型场景是这样的：
+
+你让 Claude Code 或 Codex 通过 skill、MCP、shell 工具打开网页；
+自动化任务创建了多个命名 session，甚至并行跑了多个子 agent；
+任务完成或会话终止后，终端已经安静；
+但“活动监视器”里仍有多组 Chrome、Chrome Helper、GPU、Renderer 或 agent-browser 进程；
+合上几次窗口也没用，Mac 继续发热，内存和 CPU 占用居高不下。
+
+最迷惑的一点是：这些进程通常没有可见窗口。你看到的普通 Chrome 标签页可能只有几个，但后台自动化 Chrome 使用的是独立临时用户目录，它们和日常浏览器不是同一组实例。
+因此，“我已经关掉 Chrome 窗口了”并不能证明自动化浏览器已经退出。
+二、根因：常驻 daemon 遇上并发 session以本机安装的 agent-browser 0.27.0 为例，官方说明明确写了两件事：
+
+它采用 client-daemon 架构，Rust CLI 负责接收命令，Rust daemon 通过 CDP 控制 Chrome；
+daemon 会在第一次命令时自动启动，并在后续命令之间保持运行，以换取更快的响应。
+
+与此同时，官方 session 文档也说明：每个 session 都有独立的浏览器实例、Cookie、存储、历史记录和认证状态。
+这两点放到多 agent 场景里，就形成了下面的链路：
+
+Claude Code / Codex        │        ├─ Agent A → session A → daemon A → Chrome A → Renderer / GPU / Network        ├─ Agent B → session B → daemon B → Chrome B → Renderer / GPU / Network        └─ Agent C → session C → daemon C → Chrome C → Renderer / GPU / Network
+
+单看一组并不可怕。真正吃资源的是“多组浏览器进程树一起常驻”。一个 Chrome 主进程还会派生渲染、GPU、网络等子进程，所以 8 个遗留实例在活动监视器里看起来可能远不止 8 行。
+CDP 是不是罪魁祸首？不是。
+CDP（Chrome DevTools Protocol）只是自动化工具与 Chrome 之间的控制协议。它负责导航、点击、读取 DOM、截图等操作，但不会替调用方决定“任务什么时候算结束”。
+真正缺失的是这条生命周期：
+创建 session → 使用浏览器 → 任务成功或失败 → 关闭 session → 回收 daemon 和 Chrome
+
+如果最后两步没有执行，前面的资源就可能继续留在后台。
+
+关键判断： 不是 AI “还在思考”，而是 AI 启动的外部进程已经脱离了当前对话的可见范围。
+
+三、先确认，不要上来就 kill清理前先分清三件事：有多少活动 session、有哪些 agent-browser daemon、哪些 Chrome 使用了 agent-browser 的临时用户目录。
+1. 查看 agent-browser 自己记录的活动 sessionagent-browser session list
+
+如果版本支持 JSON：
+agent-browser session list --json
+
+这一步最可信，因为它从工具自己的会话视角回答“现在认为谁还活着”。
+2. 查看 daemon 和自动化 ChromemacOS 上可以使用：
+pgrep -fl &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;pgrep -fl &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;
+
+第二条命令的关键不是进程名“Google Chrome”，而是启动参数中的：
+--user-data-dir=.../agent-browser-chrome-...
+
+它说明这个 Chrome 使用的是 agent-browser 创建的隔离用户目录，而不是你日常使用的默认 Chrome Profile。
+3. 按 CPU、内存和运行时间查看完整进程树ps -axo pid,ppid,%cpu,%mem,rss,etime,command \  | grep -E &#x27;[a]gent-browser-darwin|[a]gent-browser-chrome-&#x27;
+
+字段含义：
+
+PID：当前进程编号，后续终止时使用。
+PPID：父进程编号，用来判断 daemon 与 Chrome 的父子关系。
+%CPU：CPU 占用，观察它是否持续让机器发热。
+%MEM &#x2F; RSS：内存占用，确认多个实例是否不断叠加。
+ETIME：已运行时间，判断它是否早已超过当前 AI 任务时长。
+COMMAND：完整启动命令，确认是否带有 agent-browser 特征参数。
+
+不要只看 ~/.agent-browser 下有没有 .pid、.sock 文件。它们可能只是过期的 sidecar 文件，并不等于进程仍然存活。进程是否活着，最终以 session list、ps 和 pgrep 为准。
+四、三层清理：官方关闭、温和终止、强制清理
+第一层：让 agent-browser 自己收尾优先执行：
+agent-browser close --all
+
+然后清理过期的 pid、socket、version 等 sidecar 文件：
+agent-browser doctor --offline --quick
+
+当前版本的 doctor 会自动清理陈旧的 daemon sidecar 文件；--fix 还可能执行重装 Chrome、清理旧状态等破坏性修复，因此日常排查先不要加 --fix。
+再次验证：
+agent-browser session listpgrep -fl &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;pgrep -fl &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;
+
+如果没有输出，说明已经清干净。
+第二层：发送 TERM，让进程有机会优雅退出只有官方关闭失败时再执行：
+pgrep -f &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27; \  | xargs -n 1 kill -TERM 2&gt;/dev/null || truepgrep -f &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27; \  | xargs -n 1 kill -TERM 2&gt;/dev/null || true
+
+TERM 会给进程处理退出、关闭文件和回收子进程的机会。执行后等 3 秒，再跑一次检查命令。
+第三层：只对仍残留的目标使用 KILLpgrep -f &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27; \  | xargs -n 1 kill -KILL 2&gt;/dev/null || truepgrep -f &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27; \  | xargs -n 1 kill -KILL 2&gt;/dev/null || true
+
+KILL 不允许进程执行清理逻辑，只适合处理已经卡死、无法响应 TERM 的残留。正在进行的自动化、下载、表单填写和未保存状态都会立即丢失。
+仓库里放一个可重复使用的脚本本文配套脚本已放在：
+scripts_py/agent_browser_cleanup.sh
+
+使用方式：
+./scripts_py/agent_browser_cleanup.sh status./scripts_py/agent_browser_cleanup.sh close./scripts_py/agent_browser_cleanup.sh force
+
+三条命令依次对应：只查看、官方关闭并清理 sidecar、官方关闭失败后的分级强制清理。
+五、怎样保证不误伤普通 Chrome不要使用下面这种“大锤”：
+killall &#x27;Google Chrome&#x27;pkill -f &#x27;Google Chrome&#x27;
+
+它们会把普通 Chrome 窗口和日常标签页一起关掉。
+本文脚本采用两层限制：
+
+daemon 必须匹配 agent-browser-darwin-arm64 或 agent-browser-darwin-x64 的安装路径；
+Chrome 必须带有 --user-data-dir=.../agent-browser-chrome-... 参数。
+
+也就是说，它针对的是 agent-browser 创建的隔离 Chrome，不是所有名为 Google Chrome 的进程。
+不过还有一个例外需要注意：如果你主动使用 --cdp 或 --auto-connect 连接了日常 Chrome，那么自动化 session 与普通浏览器之间的边界会变得更近。此时先用 session list 和完整命令行确认，不要直接执行强制清理。
+六、从源头预防：让生命周期闭环清理脚本只是灭火器。更好的办法是让每个任务都负责关掉自己打开的浏览器。
+
+1. 设置 daemon 空闲自动退出官方提供了 AGENT_BROWSER_IDLE_TIMEOUT_MS。例如 10 分钟无命令后自动关闭浏览器并退出 daemon：
+export AGENT_BROWSER_IDLE_TIMEOUT_MS=600000
+
+长期使用可以写入 ~/.zshrc：
+echo &#x27;export AGENT_BROWSER_IDLE_TIMEOUT_MS=600000&#x27; &gt;&gt; ~/.zshrcsource ~/.zshrc
+
+10 分钟只是一个稳妥起点。频繁执行长任务可以设为 30 分钟；偶尔使用、机器资源紧张时可以设为 3 到 5 分钟。
+2. 不要为每一步创建新 session同一个任务尽量复用一个语义明确的 session：
+agent-browser --session blog-research open https://example.comagent-browser --session blog-research snapshot -iagent-browser --session blog-research close
+
+并发任务确实需要隔离时，可以创建多个 session，但每个任务结束后都要单独关闭。
+3. 在 shell 脚本里用 trap 兜底set -euo pipefailSESSION=&quot;research-$$&quot;cleanup() &#123;  agent-browser --session &quot;$SESSION&quot; close &gt;/dev/null 2&gt;&amp;1 || true&#125;trap cleanup EXIT INT TERMagent-browser --session &quot;$SESSION&quot; open https://example.comagent-browser --session &quot;$SESSION&quot; snapshot -i
+
+无论脚本正常结束、报错，还是收到中断信号，cleanup 都会尝试关闭对应 session。
+4. 给 Claude Code &#x2F; Codex 的浏览器 skill 加退出规则长期指令里应明确写上：
+浏览器自动化任务结束后，必须关闭本任务创建的 agent-browser session。成功、失败、取消和超时都要执行清理；不得依赖用户手动回收后台进程。并发任务必须记录各自的 session 名称，只关闭自己创建的 session。
+
+这比“任务结束后记得关浏览器”更有效，因为它定义了成功、失败和取消三条路径。
+5. 定期做轻量检查如果你经常让多个 agent 并发操作网页，可以在结束工作前运行：
+agent-browser session list./scripts_py/agent_browser_cleanup.sh status
+
+发现不认识、运行时间异常长的 session，再决定是否关闭。不要把 force 放进高频定时任务，因为它可能打断仍在工作的自动化。
+七、可直接收藏的排查清单遇到 Mac 突然发热、内存异常时，按这个顺序走：
+
+打开“活动监视器”，确认是否有多组无窗口的 Chrome &#x2F; agent-browser。
+运行 agent-browser session list，确认活动 session。
+用 pgrep -fl 或 ps 检查 daemon 与 agent-browser-chrome- 用户目录。
+先执行 agent-browser close --all。
+再执行 agent-browser doctor --offline --quick 清理陈旧 sidecar。
+等待几秒并复查 CPU、内存和进程。
+仍有残留时先 TERM，最后才 KILL。
+设置 AGENT_BROWSER_IDLE_TIMEOUT_MS。
+在每个自动化脚本或 skill 中加入 finally &#x2F; trap 清理。
+避免 killall Google Chrome 这类会误伤普通标签页的命令。
+
+最后浏览器自动化最容易被忽略的，不是“怎么打开网页”，而是“谁负责关闭网页背后的整棵进程树”。
+Claude Code 和 Codex 能把网页操作拆成工具调用，却不会天然替所有第三方工具完成生命周期管理。只要调用链中存在 daemon、session 和独立 Chrome，就应该把清理当成任务的一部分，而不是任务结束后的家务。
+
+真正可靠的自动化，不只要能启动，还要能在成功、失败和取消时都干净退出。
+
+如果你的 Mac 也曾在 AI 会话结束后莫名发热，先别急着重启。跑一下本文的检查命令，很可能几分钟就能找到那批“已经下班，但进程还没打卡”的浏览器。
+参考资料
+agent-browser 官方仓库
+agent-browser README：命令、Session 与 Architecture
+Chrome for Testing 官方介绍
+Chrome DevTools：远程调试
+
+]]></content>
+      <categories>
+        <category>Agent</category>
+      </categories>
+      <tags>
+        <tag>Claude Code</tag>
+        <tag>Codex</tag>
+        <tag>agent-browser</tag>
+        <tag>Chrome</tag>
+        <tag>CDP</tag>
+        <tag>macOS</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Claude Code 从零到上手——安装、模型配置、Skill 与效率工具全指南</title>
     <url>/2026/06/10/agent/Claude%20Code%20%E4%BB%8E%E9%9B%B6%E5%88%B0%E4%B8%8A%E6%89%8B/</url>
     <content><![CDATA[目录
@@ -499,189 +682,6 @@ Claude Code Skills 详解
         <tag>AI Agent</tag>
         <tag>MCP</tag>
         <tag>开发工具</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Mac 发热？AI 可能忘了关浏览器</title>
-    <url>/2026/06/21/agent/Claude-Code-Codex-agent-browser-%E6%AE%8B%E7%95%99%E8%BF%9B%E7%A8%8B%E6%8E%92%E6%9F%A5/</url>
-    <content><![CDATA[
-Claude Code、Codex 明明已经停下来了，Mac 风扇却还在转，内存也迟迟不降。问题可能不在当前会话，而在一批没有正常收尾的 agent-browser daemon 与自动化 Chrome。
-
-这次我在本机清理了 8 组遗留的 agent-browser &#x2F; Chrome 后台实例及其子进程。普通 Chrome 标签页没有动，机器热量很快就降了下来。
-这不是一个玄学问题，也不能简单归咎于“Chrome 太吃内存”。真正要理解的是：AI 编程工具、浏览器自动化工具、CDP、daemon 和 session 之间，到底是谁启动了谁，又该由谁负责关掉。
-
-
-30 秒结论先给赶时间的人答案：
-
-agent-browser 采用 CLI + 后台 daemon + Chrome 的架构，daemon 会故意跨命令常驻，以便下一条指令不用重新启动浏览器。
-每个独立 session 都可能拥有自己的浏览器实例。Claude Code、Codex 并发执行多个 agent 或工具任务时，session 数量很容易叠加。
-如果任务异常中断、会话被强制停止，或者调用方忘了执行 agent-browser close，后台进程就可能继续存在。
-CDP 只是控制通道，不是泄漏的根因。根因是 浏览器生命周期没有闭环。
-最优先执行官方收尾命令：agent-browser close --all。只有正常关闭失败，才按特征匹配并发送 TERM，最后才考虑 KILL。
-长期方案是设置空闲超时、复用 session，并要求每个自动化任务在 finally 或 shell trap 中关闭自己的 session。
-
-目录
-一、现象：AI 停了，浏览器却没停
-二、根因：常驻 daemon 遇上并发 session
-三、先确认，不要上来就 kill
-四、三层清理：官方关闭、温和终止、强制清理
-五、怎样保证不误伤普通 Chrome
-六、从源头预防：让生命周期闭环
-七、可直接收藏的排查清单
-
-一、现象：AI 停了，浏览器却没停典型场景是这样的：
-
-你让 Claude Code 或 Codex 通过 skill、MCP、shell 工具打开网页；
-自动化任务创建了多个命名 session，甚至并行跑了多个子 agent；
-任务完成或会话终止后，终端已经安静；
-但“活动监视器”里仍有多组 Chrome、Chrome Helper、GPU、Renderer 或 agent-browser 进程；
-合上几次窗口也没用，Mac 继续发热，内存和 CPU 占用居高不下。
-
-最迷惑的一点是：这些进程通常没有可见窗口。你看到的普通 Chrome 标签页可能只有几个，但后台自动化 Chrome 使用的是独立临时用户目录，它们和日常浏览器不是同一组实例。
-因此，“我已经关掉 Chrome 窗口了”并不能证明自动化浏览器已经退出。
-二、根因：常驻 daemon 遇上并发 session以本机安装的 agent-browser 0.27.0 为例，官方说明明确写了两件事：
-
-它采用 client-daemon 架构，Rust CLI 负责接收命令，Rust daemon 通过 CDP 控制 Chrome；
-daemon 会在第一次命令时自动启动，并在后续命令之间保持运行，以换取更快的响应。
-
-与此同时，官方 session 文档也说明：每个 session 都有独立的浏览器实例、Cookie、存储、历史记录和认证状态。
-这两点放到多 agent 场景里，就形成了下面的链路：
-
-Claude Code / Codex        │        ├─ Agent A → session A → daemon A → Chrome A → Renderer / GPU / Network        ├─ Agent B → session B → daemon B → Chrome B → Renderer / GPU / Network        └─ Agent C → session C → daemon C → Chrome C → Renderer / GPU / Network
-
-单看一组并不可怕。真正吃资源的是“多组浏览器进程树一起常驻”。一个 Chrome 主进程还会派生渲染、GPU、网络等子进程，所以 8 个遗留实例在活动监视器里看起来可能远不止 8 行。
-CDP 是不是罪魁祸首？不是。
-CDP（Chrome DevTools Protocol）只是自动化工具与 Chrome 之间的控制协议。它负责导航、点击、读取 DOM、截图等操作，但不会替调用方决定“任务什么时候算结束”。
-真正缺失的是这条生命周期：
-创建 session → 使用浏览器 → 任务成功或失败 → 关闭 session → 回收 daemon 和 Chrome
-
-如果最后两步没有执行，前面的资源就可能继续留在后台。
-
-关键判断： 不是 AI “还在思考”，而是 AI 启动的外部进程已经脱离了当前对话的可见范围。
-
-三、先确认，不要上来就 kill清理前先分清三件事：有多少活动 session、有哪些 agent-browser daemon、哪些 Chrome 使用了 agent-browser 的临时用户目录。
-1. 查看 agent-browser 自己记录的活动 sessionagent-browser session list
-
-如果版本支持 JSON：
-agent-browser session list --json
-
-这一步最可信，因为它从工具自己的会话视角回答“现在认为谁还活着”。
-2. 查看 daemon 和自动化 ChromemacOS 上可以使用：
-pgrep -fl &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;pgrep -fl &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;
-
-第二条命令的关键不是进程名“Google Chrome”，而是启动参数中的：
---user-data-dir=.../agent-browser-chrome-...
-
-它说明这个 Chrome 使用的是 agent-browser 创建的隔离用户目录，而不是你日常使用的默认 Chrome Profile。
-3. 按 CPU、内存和运行时间查看完整进程树ps -axo pid,ppid,%cpu,%mem,rss,etime,command \  | grep -E &#x27;[a]gent-browser-darwin|[a]gent-browser-chrome-&#x27;
-
-字段含义：
-
-PID：当前进程编号，后续终止时使用。
-PPID：父进程编号，用来判断 daemon 与 Chrome 的父子关系。
-%CPU：CPU 占用，观察它是否持续让机器发热。
-%MEM &#x2F; RSS：内存占用，确认多个实例是否不断叠加。
-ETIME：已运行时间，判断它是否早已超过当前 AI 任务时长。
-COMMAND：完整启动命令，确认是否带有 agent-browser 特征参数。
-
-不要只看 ~/.agent-browser 下有没有 .pid、.sock 文件。它们可能只是过期的 sidecar 文件，并不等于进程仍然存活。进程是否活着，最终以 session list、ps 和 pgrep 为准。
-四、三层清理：官方关闭、温和终止、强制清理
-第一层：让 agent-browser 自己收尾优先执行：
-agent-browser close --all
-
-然后清理过期的 pid、socket、version 等 sidecar 文件：
-agent-browser doctor --offline --quick
-
-当前版本的 doctor 会自动清理陈旧的 daemon sidecar 文件；--fix 还可能执行重装 Chrome、清理旧状态等破坏性修复，因此日常排查先不要加 --fix。
-再次验证：
-agent-browser session listpgrep -fl &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27;pgrep -fl &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27;
-
-如果没有输出，说明已经清干净。
-第二层：发送 TERM，让进程有机会优雅退出只有官方关闭失败时再执行：
-pgrep -f &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27; \  | xargs -n 1 kill -TERM 2&gt;/dev/null || truepgrep -f &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27; \  | xargs -n 1 kill -TERM 2&gt;/dev/null || true
-
-TERM 会给进程处理退出、关闭文件和回收子进程的机会。执行后等 3 秒，再跑一次检查命令。
-第三层：只对仍残留的目标使用 KILLpgrep -f &#x27;/agent-browser/bin/agent-browser-darwin-(arm64|x64)( |$)&#x27; \  | xargs -n 1 kill -KILL 2&gt;/dev/null || truepgrep -f &#x27;[G]oogle Chrome.*--user-data-dir=[^ ]*/agent-browser-chrome-&#x27; \  | xargs -n 1 kill -KILL 2&gt;/dev/null || true
-
-KILL 不允许进程执行清理逻辑，只适合处理已经卡死、无法响应 TERM 的残留。正在进行的自动化、下载、表单填写和未保存状态都会立即丢失。
-仓库里放一个可重复使用的脚本本文配套脚本已放在：
-scripts_py/agent_browser_cleanup.sh
-
-使用方式：
-./scripts_py/agent_browser_cleanup.sh status./scripts_py/agent_browser_cleanup.sh close./scripts_py/agent_browser_cleanup.sh force
-
-三条命令依次对应：只查看、官方关闭并清理 sidecar、官方关闭失败后的分级强制清理。
-五、怎样保证不误伤普通 Chrome不要使用下面这种“大锤”：
-killall &#x27;Google Chrome&#x27;pkill -f &#x27;Google Chrome&#x27;
-
-它们会把普通 Chrome 窗口和日常标签页一起关掉。
-本文脚本采用两层限制：
-
-daemon 必须匹配 agent-browser-darwin-arm64 或 agent-browser-darwin-x64 的安装路径；
-Chrome 必须带有 --user-data-dir=.../agent-browser-chrome-... 参数。
-
-也就是说，它针对的是 agent-browser 创建的隔离 Chrome，不是所有名为 Google Chrome 的进程。
-不过还有一个例外需要注意：如果你主动使用 --cdp 或 --auto-connect 连接了日常 Chrome，那么自动化 session 与普通浏览器之间的边界会变得更近。此时先用 session list 和完整命令行确认，不要直接执行强制清理。
-六、从源头预防：让生命周期闭环清理脚本只是灭火器。更好的办法是让每个任务都负责关掉自己打开的浏览器。
-
-1. 设置 daemon 空闲自动退出官方提供了 AGENT_BROWSER_IDLE_TIMEOUT_MS。例如 10 分钟无命令后自动关闭浏览器并退出 daemon：
-export AGENT_BROWSER_IDLE_TIMEOUT_MS=600000
-
-长期使用可以写入 ~/.zshrc：
-echo &#x27;export AGENT_BROWSER_IDLE_TIMEOUT_MS=600000&#x27; &gt;&gt; ~/.zshrcsource ~/.zshrc
-
-10 分钟只是一个稳妥起点。频繁执行长任务可以设为 30 分钟；偶尔使用、机器资源紧张时可以设为 3 到 5 分钟。
-2. 不要为每一步创建新 session同一个任务尽量复用一个语义明确的 session：
-agent-browser --session blog-research open https://example.comagent-browser --session blog-research snapshot -iagent-browser --session blog-research close
-
-并发任务确实需要隔离时，可以创建多个 session，但每个任务结束后都要单独关闭。
-3. 在 shell 脚本里用 trap 兜底set -euo pipefailSESSION=&quot;research-$$&quot;cleanup() &#123;  agent-browser --session &quot;$SESSION&quot; close &gt;/dev/null 2&gt;&amp;1 || true&#125;trap cleanup EXIT INT TERMagent-browser --session &quot;$SESSION&quot; open https://example.comagent-browser --session &quot;$SESSION&quot; snapshot -i
-
-无论脚本正常结束、报错，还是收到中断信号，cleanup 都会尝试关闭对应 session。
-4. 给 Claude Code &#x2F; Codex 的浏览器 skill 加退出规则长期指令里应明确写上：
-浏览器自动化任务结束后，必须关闭本任务创建的 agent-browser session。成功、失败、取消和超时都要执行清理；不得依赖用户手动回收后台进程。并发任务必须记录各自的 session 名称，只关闭自己创建的 session。
-
-这比“任务结束后记得关浏览器”更有效，因为它定义了成功、失败和取消三条路径。
-5. 定期做轻量检查如果你经常让多个 agent 并发操作网页，可以在结束工作前运行：
-agent-browser session list./scripts_py/agent_browser_cleanup.sh status
-
-发现不认识、运行时间异常长的 session，再决定是否关闭。不要把 force 放进高频定时任务，因为它可能打断仍在工作的自动化。
-七、可直接收藏的排查清单遇到 Mac 突然发热、内存异常时，按这个顺序走：
-
-打开“活动监视器”，确认是否有多组无窗口的 Chrome &#x2F; agent-browser。
-运行 agent-browser session list，确认活动 session。
-用 pgrep -fl 或 ps 检查 daemon 与 agent-browser-chrome- 用户目录。
-先执行 agent-browser close --all。
-再执行 agent-browser doctor --offline --quick 清理陈旧 sidecar。
-等待几秒并复查 CPU、内存和进程。
-仍有残留时先 TERM，最后才 KILL。
-设置 AGENT_BROWSER_IDLE_TIMEOUT_MS。
-在每个自动化脚本或 skill 中加入 finally &#x2F; trap 清理。
-避免 killall Google Chrome 这类会误伤普通标签页的命令。
-
-最后浏览器自动化最容易被忽略的，不是“怎么打开网页”，而是“谁负责关闭网页背后的整棵进程树”。
-Claude Code 和 Codex 能把网页操作拆成工具调用，却不会天然替所有第三方工具完成生命周期管理。只要调用链中存在 daemon、session 和独立 Chrome，就应该把清理当成任务的一部分，而不是任务结束后的家务。
-
-真正可靠的自动化，不只要能启动，还要能在成功、失败和取消时都干净退出。
-
-如果你的 Mac 也曾在 AI 会话结束后莫名发热，先别急着重启。跑一下本文的检查命令，很可能几分钟就能找到那批“已经下班，但进程还没打卡”的浏览器。
-参考资料
-agent-browser 官方仓库
-agent-browser README：命令、Session 与 Architecture
-Chrome for Testing 官方介绍
-Chrome DevTools：远程调试
-
-]]></content>
-      <categories>
-        <category>Agent</category>
-      </categories>
-      <tags>
-        <tag>Claude Code</tag>
-        <tag>Codex</tag>
-        <tag>agent-browser</tag>
-        <tag>Chrome</tag>
-        <tag>CDP</tag>
-        <tag>macOS</tag>
       </tags>
   </entry>
   <entry>
@@ -2732,60 +2732,6 @@ Hexo：静态博客生成器
       </tags>
   </entry>
   <entry>
-    <title>Docker</title>
-    <url>/2024/07/21/%E5%90%8E%E7%AB%AF/Docker/</url>
-    <content><![CDATA[Docker目录
-命令全
-
-
-命令全
-Docker启动
-
-运行交互式的容器docker run -i -t  ubuntu:15.10 /bin/bash-t: 在新容器内指定一个伪终端或终端。-i: 允许你对容器内的标准输入 (STDIN) 进行交互。-d:  我们希望 docker 的服务是在后台运行的，我们可以过 -d 指定容器的运行模式。加了 -d 参数默认不会进入容器，想要进入容器需要使用指令 docker exec（下面会介绍到）。-P:将容器内部使用的网络端口随机映射到我们使用的主机上。
-
-
-简单命令载入ubantu镜像：docker pull ubuntu
-启动容器:docker run -it ubuntu &#x2F;bin&#x2F;bash
-查看所有容器： docker ps -a
-导出容器：docker export 1e560fca3906 &gt; ubuntu.tar
-导入容器快照:可以使用 docker import 从容器快照文件中再导入为镜像，以下实例将快照文件 ubuntu.tar 导入到镜像 test&#x2F;ubuntu:v1:
-$ cat docker/ubuntu.tar | docker import - test/ubuntu:v1$ docker import http://example.com/exampleimage.tgz example/imagerepo
-
-删除容器：docker rm -f 1e560fca3906
-进入容器：
-
-docker exec -it 容器id &#x2F;bin&#x2F;bash
-docker attach 容器id
-
-tip:(1)在使用 -d 参数时，容器启动后会进入后台。可以使用docker attach
-(2)docker exec：推荐大家使用 docker exec 命令，因为此命令会退出容器终端，但不会导致容器的停止。
-
-什么是容器技术、镜像、与宿主机的关系、与虚拟机的不同
-
-容器技术是虚拟化技术的一种，以 Docker 为例，Docker 利用 Linux 的 LXC(LinuX Containers)技术、CGroup(Controll Group)技术 和 AUFS(Advance UnionFileSystem)技术等，通过对进程和资源加以限制，进行调控，隔离出来一套供程序运行的环境。
-我们把这一环境称为 “ 容器 ”，把构建该 “ 容器 ” 的 “ 只读模板 ”，称之为 “ 镜像 ”。
-虽然容器与宿主机在环境上，逻辑上是隔离的，但容器与宿主机共享内核，容器直接依赖于宿主机Linux系统的内核，这与虚拟机不同，后者是在宿主机的操作系统上，虚拟化一套硬件环境，然后在此环境上运行需要的操作系统。
-
-
-分布式与集群
-分布式就是把一个系统拆分开来部署到不同机器，与集群相同的是，两者都需要多台服务器，不同点是分布式并不强调实现相同的业务。
-貌似网上大多数资料，对于集群和分布式的区分，都执着于两者是否实现相同的业务，即不同服务器运行同一份功能就是集群，运行不同功能就是分布式。
-个人看法是，集群强调的是“集”、“统一的概念”，是物理上的、环境上的概念，只要是多台计算机搞在一起就是集群；
-而分布式，更多的是描述应用系统的部署方式，把一个系统拆开部署到不同服务器，就是分布式。
-
-docker启动自动运行
-
-
-设置docker开机自启动systemctl enable dockerdocker中的mysql开机自动启动docker update mysql --restart=always
-]]></content>
-      <categories>
-        <category>后端</category>
-      </categories>
-      <tags>
-        <tag>docker</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Flowable</title>
     <url>/2024/08/01/%E5%90%8E%E7%AB%AF/Flowable/</url>
     <content><![CDATA[Flowable目录
@@ -2897,6 +2843,84 @@ deployment.getId(): c8d37e73-4b94-11ed-8a13-226fd935f263,deployment.getName(): �
 推进流程@Testpublic void completeProcess()&#123;    String processInstanceId=&quot;74388397-4dc5-11ed-9026-226fd935f263&quot;;    Task leaderTask = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();    taskService.complete(leaderTask.getId(), Collections.singletonMap(&quot;approve&quot;,true));    log.info(&quot;==========领导审批完成=====&quot;);&#125;
 
 流程历史@Testpublic void historyProcess()&#123;    String processInstanceId = &quot;1a77bd50-4ec2-11ed-904d-226fd935f263&quot;;    List&lt;HistoricActivityInstance&gt; historicActivityInstanceList = historyService.createHistoricActivityInstanceQuery()        .processInstanceId(processInstanceId).list();    historicActivityInstanceList.forEach(historicActivityInstance -&gt; &#123;        System.out.println(historicActivityInstance.getDurationInMillis());    &#125;);&#125;
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker</title>
+    <url>/2024/07/21/%E5%90%8E%E7%AB%AF/Docker/</url>
+    <content><![CDATA[Docker目录
+命令全
+
+
+命令全
+Docker启动
+
+运行交互式的容器docker run -i -t  ubuntu:15.10 /bin/bash-t: 在新容器内指定一个伪终端或终端。-i: 允许你对容器内的标准输入 (STDIN) 进行交互。-d:  我们希望 docker 的服务是在后台运行的，我们可以过 -d 指定容器的运行模式。加了 -d 参数默认不会进入容器，想要进入容器需要使用指令 docker exec（下面会介绍到）。-P:将容器内部使用的网络端口随机映射到我们使用的主机上。
+
+
+简单命令载入ubantu镜像：docker pull ubuntu
+启动容器:docker run -it ubuntu &#x2F;bin&#x2F;bash
+查看所有容器： docker ps -a
+导出容器：docker export 1e560fca3906 &gt; ubuntu.tar
+导入容器快照:可以使用 docker import 从容器快照文件中再导入为镜像，以下实例将快照文件 ubuntu.tar 导入到镜像 test&#x2F;ubuntu:v1:
+$ cat docker/ubuntu.tar | docker import - test/ubuntu:v1$ docker import http://example.com/exampleimage.tgz example/imagerepo
+
+删除容器：docker rm -f 1e560fca3906
+进入容器：
+
+docker exec -it 容器id &#x2F;bin&#x2F;bash
+docker attach 容器id
+
+tip:(1)在使用 -d 参数时，容器启动后会进入后台。可以使用docker attach
+(2)docker exec：推荐大家使用 docker exec 命令，因为此命令会退出容器终端，但不会导致容器的停止。
+
+什么是容器技术、镜像、与宿主机的关系、与虚拟机的不同
+
+容器技术是虚拟化技术的一种，以 Docker 为例，Docker 利用 Linux 的 LXC(LinuX Containers)技术、CGroup(Controll Group)技术 和 AUFS(Advance UnionFileSystem)技术等，通过对进程和资源加以限制，进行调控，隔离出来一套供程序运行的环境。
+我们把这一环境称为 “ 容器 ”，把构建该 “ 容器 ” 的 “ 只读模板 ”，称之为 “ 镜像 ”。
+虽然容器与宿主机在环境上，逻辑上是隔离的，但容器与宿主机共享内核，容器直接依赖于宿主机Linux系统的内核，这与虚拟机不同，后者是在宿主机的操作系统上，虚拟化一套硬件环境，然后在此环境上运行需要的操作系统。
+
+
+分布式与集群
+分布式就是把一个系统拆分开来部署到不同机器，与集群相同的是，两者都需要多台服务器，不同点是分布式并不强调实现相同的业务。
+貌似网上大多数资料，对于集群和分布式的区分，都执着于两者是否实现相同的业务，即不同服务器运行同一份功能就是集群，运行不同功能就是分布式。
+个人看法是，集群强调的是“集”、“统一的概念”，是物理上的、环境上的概念，只要是多台计算机搞在一起就是集群；
+而分布式，更多的是描述应用系统的部署方式，把一个系统拆开部署到不同服务器，就是分布式。
+
+docker启动自动运行
+
+
+设置docker开机自启动systemctl enable dockerdocker中的mysql开机自动启动docker update mysql --restart=always
+]]></content>
+      <categories>
+        <category>后端</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>并发编程</title>
+    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/Juc%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/</url>
+    <content><![CDATA[Juc并发编程目录
+JUC
+进程和线程
+并行与并发
+
+
+
+
+JUC进程和线程线程作为最小调度单位，进程作为资源分配的最小单位。
+并行与并发
+并发（concurrent）是同一时间应对（dealingwith）多件事情的能力—同一时间段
+并行（parallel）是同一时间动手做（doing）多件事情的能力—–同一时刻
+
 ]]></content>
       <categories>
         <category>Java</category>
@@ -3289,30 +3313,6 @@ IO多路复用是指通过一种机制，使一个进程能够监视多个文件
 静态代理：代理类在编译期就已确定，代理类和目标类实现相同的接口
 JDK动态代理：基于接口，通过Proxy.newProxyInstance()在运行时动态生成代理类
 CGLIB动态代理：基于继承，通过生成目标类的子类来实现代理，不需要接口
-
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>并发编程</title>
-    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/Juc%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/</url>
-    <content><![CDATA[Juc并发编程目录
-JUC
-进程和线程
-并行与并发
-
-
-
-
-JUC进程和线程线程作为最小调度单位，进程作为资源分配的最小单位。
-并行与并发
-并发（concurrent）是同一时间应对（dealingwith）多件事情的能力—同一时间段
-并行（parallel）是同一时间动手做（doing）多件事情的能力—–同一时刻
 
 ]]></content>
       <categories>
@@ -4484,163 +4484,6 @@ negative Prompt  ：paintings, sketches, (worst quality:2), (low quality:2), (no
       </tags>
   </entry>
   <entry>
-    <title>git使用</title>
-    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/git%E4%BD%BF%E7%94%A8/</url>
-    <content><![CDATA[git使用#git代理配置git config --global http.http://github.com.proxy &#x27;http://127.0.0.1:10809&#x27;git config --global https.https://github.com.proxy &#x27;http://127.0.0.1:10809&#x27;
-
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>hexo博客框架</title>
-    <url>/2024/07/23/%E5%90%8E%E7%AB%AF/hexo%E5%85%A5%E9%97%A8/</url>
-    <content><![CDATA[hexo入门目录
-Quick Start
-Create a new post
-Run server
-Generate static files
-Deploy to remote sites
-
-
-
-
-Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick StartCreate a new post$ hexo new &quot;My New Post&quot;
-
-More info: Writing
-Run server$ hexo server
-
-More info: Server
-Generate static files$ hexo generate
-
-More info: Generating
-Deploy to remote sites$ hexo deploy
-
-More info: Deployment
-]]></content>
-      <categories>
-        <category>后端</category>
-      </categories>
-      <tags>
-        <tag>docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>前端部署.md</title>
-    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/%E5%89%8D%E7%AB%AF%E9%83%A8%E7%BD%B2/</url>
-    <content><![CDATA[部署目录
-前端
-node 版本问题
-启动
-
-
-后端
-启动
-jenkins
-Dockfile
-kubernaet
-
-
-docsify部署
-Jenkins部署
-clash安装
-Gpt部署
-翻墙
-tip
-
-
-
-
-前端node 版本问题
-解决方法：在命令行修改环境变量：$env:NODE_OPTIONS&#x3D;”–openssl-legacy-provider”然后 npm run serve或npm run dev
-启动# 安装依赖npm install# 建议不要直接使用 cnpm 安装依赖，会有各种诡异的 bug。可以通过如下操作解决 npm 下载速度慢的问题npm install --registry=https://registry.npmmirror.com# 启动服务npm run dev# 打包npm run build:prod# 查看nginx路径whereis nginx# 查看nginx进程ps -ef |head -1; ps -ef |grep nginx       # 关闭nginx./nginx -s stop #内存情况free -h#重新加载nginx./nginx -s reload
-
-
-后端启动#后台运行nohup java -jar ruoyi-admin.jar &gt; ruoyi-admin-log.out  2&gt;&amp;1 &amp;#查看日志tail -f ruoyi-admin-log.out#查看进程及杀死进程#某端口占用的线程的pid netstat -nlp | grep 端口号netstat -nlp | grep :9181#看当前运行的jar包程序进程号ps -ef | grep xxx.jar或者ps -aux | grep java #杀死进程kill -s 9 24204
-
-jenkins#jenkins#mavenclean  install -U -DskipTests#shellappname=pfa-ruoyi-demoname=$&#123;appname&#125;:1# 注意这是jenkins容器的路径mv /var/jenkins_home/workspace/pfa-ruoyi-demo/ruoyi-admin/target/ruoyi-admin.jar /var/jenkins_context/pfa-ruoyi-demo/dev/$&#123;appname&#125;.jar#查询得到指定名称的容器ID#容器IDARG1=$(docker ps -aqf &quot;name=$&#123;appname&#125;&quot;)#查询得到指定名称的镜像ID#镜像IDARG2=$(docker images -q --filter reference=$&#123;name&#125;)if [  -n &quot;$ARG1&quot; ]; then docker rm -f $(docker stop $ARG1) echo &quot;$name容器停止删除成功.....！！！&quot;fi#如果查询结果不为空，先删除镜像#删除镜像if [  -n &quot;$ARG2&quot; ]; then docker rmi -f $ARG2 echo &quot;$name镜像删除成功.....！！！&quot;fidocker build -t $&#123;name&#125; /var/jenkins_context/pfa-ruoyi-demo/devdocker run --name $&#123;appname&#125; -d -p 8081:8080 $&#123;name&#125;rm -f /var/jenkins_context/pfa-ruoyi-demo/dev/$&#123;appname&#125;.jar
-
-Dockfile# This is a DockerfileFROM java:openjdk-8ADD ./demo1-0.0.1-SNAPSHOT.jar demo1.jarRUN bash -c &#x27;touch demo1.jar&#x27;ENTRYPOINT [&quot;java&quot;,&quot;-jar&quot;,&quot;demo1.jar&quot;]
-
-kubernaet#初始化主节点kubeadm init \--apiserver-advertise-address=10.0.12.3 \--image-repository registry.aliyuncs.com/google_containers \--service-cidr=10.20.0.0/16 \--pod-network-cidr=10.244.0.0/16 \--ignore-preflight-errors=all \--cri-socket=unix:///var/run/cri-dockerd.sock#解决主节点无法找到的问题 使用kubeadm reset --cri-socket=unix:///var/run/cri-dockerd.sock
-
-tip:k8s集群搭建
-docsify部署#安装nodenpm i docsify-cli -g#初始化项目docsify init ./docs#启动docsify serve ./docs#nginx配置server&#123;    listen 80;    listen 443 ssl http2;    server_name update.ff11sf.com;    location / &#123;		#proxy_pass http://localhost:3000/;  改为本机加端口或域名加端口		alias /home/myoutput/docsify/docs/;    	index index.html;    &#125;&#125;#后台启动不停机利用node启动docsify（不推荐）nohup docsify serve ./ &gt;log.out 2&gt;&amp;1  &amp;#关闭docsifypkill -f &quot;docsify&quot;#node后台启动和关闭node#启动nohup  npm run docs:dev &gt;/dev/null 2&gt;&amp;1 &amp; exit#2&gt;&amp;1 解释：将标准错误 2 重定向到标准输出 &amp;1 ，标准输出 &amp;1 再被重定向输入到 runoob.log 文件中。0 – stdin (standard input，标准输入)1 – stdout (standard output，标准输出)2 – stderr (standard error，标准错误输出)#关闭node进程ps -A ps ef| grep nodeps -aux | grep &quot;runoob.sh&quot; kill -9 pid
-
-cloudfair实现内网穿透
-
-GitHub搭建博客论坛：https://www.bilibili.com/video/BV1GM4m1m7ZD/?spm_id_from=333.1007.top_right_bar_window_history.content.click&amp;vd_source=f573094b123fadd0c16f71405046adfa
-内网穿透：https://www.bilibili.com/video/BV1H4421X7Wg/?vd_source=f573094b123fadd0c16f71405046adfa
-
-Jenkins部署#删除maven仓库中*.lastUpdated的文件find /home/maven/repository -name &quot;*.lastUpdated&quot; -exec grep -q &quot;Could not transfer&quot; &#123;&#125; \; -print -exec rm &#123;&#125; \;#maven打包clean install -U -DskipTests
-
-clash安装
-https://little-star.love/posts/f2114751/（详细）
-https://www.jianshu.com/p/4499d1dd3570（简单）
-
-Gpt部署#gpt-webdocker run --name chatgpt-web -d -p 3002:3002 \-e OPENAI_API_KEY=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 \-e TIMEOUT_MS=0 \-e SOCKS_PROXY_HOST=127.0.0.1 \-e SOCKS_PROXY_PORT=7890 \-e HTTPS_PROXY=http://:7890 chenzhaoyu94/chatgpt-web#gpt-academicdocker build -t gpt-academic .docker run --name gpt-academic -d -p 56530:56530 gpt-academic
-
-翻墙#视频https://www.youtube.com/watch?v=wu3YRcwYWXg&amp;t=641ssudo -i#命令https://github.com/KEJIXIAOLU/XUI#安装证书工具curl https://get.acme.sh | sh; apt install socat -y || yum install socat -y; ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt#申请证书~/.acme.sh/acme.sh  --issue -d 你的域名 --standalone -k ec-256 --force --insecure#安装证书~/.acme.sh/acme.sh --install-cert -d 你的域名 --ecc --key-file /etc/x-ui/server.key --fullchain-file /etc/x-ui/server.crt#放行 443 端口        iptables -I INPUT -p tcp --dport 54321 -j ACCEPT
-
-tip#递归创建文件makedir -p xx/xx/xx/xx#查看网卡 ip -a#查看端口占用netstat -anp | grep 8080  #或者 netstat -tlnlp | grep 8080#或者 lsof -i :8080
-
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>安装Linux系统</title>
-    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/%E5%AE%89%E8%A3%85Linux%E7%B3%BB%E7%BB%9F/</url>
-    <content><![CDATA[dell 服务器 重装Linux系统目录
-安装前的准备工作
-进入BIOS界面
-安装centos
-配置固定ip
-
-
-
-
-安装前的准备工作1、8G左右的U盘
-2、镜像下载选择DVD版本的
-3、使用Utralso工具刻入镜像到U盘
-进入BIOS界面1、关闭安全启动，将Secure boot关闭
-2、将SATA operation 改为AHCI
-3、关机，插入u盘重启
-参考链接：https://www.cuanjibang.com/yjzx/51892.html
-安装centos1、重启后选择 Disk connected to front USB, 从U盘启动
-2、出现linux安装界面，进入linux系统安装步骤
-1. 在出现i8042的错误页面，继续等待，一直到滚动错误提示停止，进入一个命令行输入界面；2. 在命令行输入界面，输入ls /dev/sd*列出当前系统所有的存储设备，找到你的U盘启动盘的路径；(重新插拔U盘可判断存储设备的)如 /dev/sdb43. 确认U盘启动盘路径后，输入Reboot重启系统，重新进入安装列表界面；4. 选中install centos 7 列表，按 e 键，进入编辑界面；5.	找到			inst.stage2=hd:LABEL=CentOS\x207\x20x86_64 rd.live.check quiet   	把段修改为：	initrd=initrd.img inst.stage2=hd:/dev/sdb4:/ quiet	就是将hd:和quiet之间的内容修改为U盘的路径，注意要写成/dev/sdb4:/6. 修改之后，直接按Ctrl + X，进入安装界面；如果仍出现上述错误，则说明U盘路径错误，重新确定U盘路径在此安装界面按 e 进入编辑模式
-
-参考链接：:https://blog.csdn.net/qq_41672211/article/details/124660478
-配置固定ip
-vi   &#x2F;etc&#x2F;sysconfig&#x2F;network-scripts&#x2F;ifcfg-ens33
-
-编辑网卡
-
-
-ONBOOT=“yes” 表示启用该网卡IPADDR=192.168.11.11 指定一个静态IPGATEWAY=192.168.1.1 指定网关DNS1=8.8.8.8 连接外网需要配置 域名解析服务器DNS2=223.5.5.5
-
-
-service network restart
-
-]]></content>
-      <categories>
-        <category>Java</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Java Stream流与函数式编程</title>
     <url>/2024/08/01/%E5%90%8E%E7%AB%AF/Webflow/</url>
     <content><![CDATA[Webflow目录
@@ -4959,40 +4802,160 @@ flatMap：一对多转换，T -&gt; Stream，扁平化处理
       </tags>
   </entry>
   <entry>
-    <title>快速搭建一个人博客</title>
-    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</url>
-    <content><![CDATA[快速搭建一个人博客目录
-为什么写博客（文章）？
-使用GeemK搭建一个个人博客
-docsify
-Hexo
-内网穿透
-图床
+    <title>hexo博客框架</title>
+    <url>/2024/07/23/%E5%90%8E%E7%AB%AF/hexo%E5%85%A5%E9%97%A8/</url>
+    <content><![CDATA[hexo入门目录
+Quick Start
+Create a new post
+Run server
+Generate static files
+Deploy to remote sites
 
 
-为什么写博客（文章）？思考、沉淀、表达提升互联网时代留下一点痕迹
-使用GeemK搭建一个个人博客GitHub - Meekdai&#x2F;Gmeek: Gmeek is a Blog All in Github
-https://bloggt.pengfanao.top/视频教学仅需一个Github账号，让文字在互联网中永生 超轻量级个人博客框架Gmeek_哔哩哔哩_bilibili
-docsifypfa的个人笔记https://www.google.com.hk/search?q=docsify
-4、VuePress  一个具有强大功能的 vuepress 主题快速上手
-Hexo一个开源的博客框架，插件库、部署、自定义功能非常方便
-官网：https://hexo.io/zh-cn/docs/writing
-主题：https://docs.anheyu.com/initall.html
-视频讲解
-https://www.bilibili.com/video/BV1G84y1B7NH/?spm_id_from=333.788
-https://blog.heriec.top/2024/05/29/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA-vercel%E4%B8%8Ezeabur%E9%83%A8%E7%BD%B2%E6%8C%82%E8%BD%BD%E8%87%AA%E5%B7%B1%E7%9A%84%E5%9F%9F%E5%90%8D%E5%85%8D%E5%A4%87%E6%A1%88/
-优秀博客网站
-https://www.fomal.cc/social/link/
-https://blog.fiveth.cc/
-https://yixiu.icu/
-内网穿透没有公网IP? 免费域名搭建cloudflare内网穿透，不限流量，不用绑卡支付_哔哩哔哩_bilibili
-图床
+
+
+Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
+Quick StartCreate a new post$ hexo new &quot;My New Post&quot;
+
+More info: Writing
+Run server$ hexo server
+
+More info: Server
+Generate static files$ hexo generate
+
+More info: Generating
+Deploy to remote sites$ hexo deploy
+
+More info: Deployment
 ]]></content>
       <categories>
-        <category>建站</category>
+        <category>后端</category>
       </categories>
       <tags>
-        <tag>博客</tag>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>git使用</title>
+    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/git%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[git使用#git代理配置git config --global http.http://github.com.proxy &#x27;http://127.0.0.1:10809&#x27;git config --global https.https://github.com.proxy &#x27;http://127.0.0.1:10809&#x27;
+
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端部署.md</title>
+    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/%E5%89%8D%E7%AB%AF%E9%83%A8%E7%BD%B2/</url>
+    <content><![CDATA[部署目录
+前端
+node 版本问题
+启动
+
+
+后端
+启动
+jenkins
+Dockfile
+kubernaet
+
+
+docsify部署
+Jenkins部署
+clash安装
+Gpt部署
+翻墙
+tip
+
+
+
+
+前端node 版本问题
+解决方法：在命令行修改环境变量：$env:NODE_OPTIONS&#x3D;”–openssl-legacy-provider”然后 npm run serve或npm run dev
+启动# 安装依赖npm install# 建议不要直接使用 cnpm 安装依赖，会有各种诡异的 bug。可以通过如下操作解决 npm 下载速度慢的问题npm install --registry=https://registry.npmmirror.com# 启动服务npm run dev# 打包npm run build:prod# 查看nginx路径whereis nginx# 查看nginx进程ps -ef |head -1; ps -ef |grep nginx       # 关闭nginx./nginx -s stop #内存情况free -h#重新加载nginx./nginx -s reload
+
+
+后端启动#后台运行nohup java -jar ruoyi-admin.jar &gt; ruoyi-admin-log.out  2&gt;&amp;1 &amp;#查看日志tail -f ruoyi-admin-log.out#查看进程及杀死进程#某端口占用的线程的pid netstat -nlp | grep 端口号netstat -nlp | grep :9181#看当前运行的jar包程序进程号ps -ef | grep xxx.jar或者ps -aux | grep java #杀死进程kill -s 9 24204
+
+jenkins#jenkins#mavenclean  install -U -DskipTests#shellappname=pfa-ruoyi-demoname=$&#123;appname&#125;:1# 注意这是jenkins容器的路径mv /var/jenkins_home/workspace/pfa-ruoyi-demo/ruoyi-admin/target/ruoyi-admin.jar /var/jenkins_context/pfa-ruoyi-demo/dev/$&#123;appname&#125;.jar#查询得到指定名称的容器ID#容器IDARG1=$(docker ps -aqf &quot;name=$&#123;appname&#125;&quot;)#查询得到指定名称的镜像ID#镜像IDARG2=$(docker images -q --filter reference=$&#123;name&#125;)if [  -n &quot;$ARG1&quot; ]; then docker rm -f $(docker stop $ARG1) echo &quot;$name容器停止删除成功.....！！！&quot;fi#如果查询结果不为空，先删除镜像#删除镜像if [  -n &quot;$ARG2&quot; ]; then docker rmi -f $ARG2 echo &quot;$name镜像删除成功.....！！！&quot;fidocker build -t $&#123;name&#125; /var/jenkins_context/pfa-ruoyi-demo/devdocker run --name $&#123;appname&#125; -d -p 8081:8080 $&#123;name&#125;rm -f /var/jenkins_context/pfa-ruoyi-demo/dev/$&#123;appname&#125;.jar
+
+Dockfile# This is a DockerfileFROM java:openjdk-8ADD ./demo1-0.0.1-SNAPSHOT.jar demo1.jarRUN bash -c &#x27;touch demo1.jar&#x27;ENTRYPOINT [&quot;java&quot;,&quot;-jar&quot;,&quot;demo1.jar&quot;]
+
+kubernaet#初始化主节点kubeadm init \--apiserver-advertise-address=10.0.12.3 \--image-repository registry.aliyuncs.com/google_containers \--service-cidr=10.20.0.0/16 \--pod-network-cidr=10.244.0.0/16 \--ignore-preflight-errors=all \--cri-socket=unix:///var/run/cri-dockerd.sock#解决主节点无法找到的问题 使用kubeadm reset --cri-socket=unix:///var/run/cri-dockerd.sock
+
+tip:k8s集群搭建
+docsify部署#安装nodenpm i docsify-cli -g#初始化项目docsify init ./docs#启动docsify serve ./docs#nginx配置server&#123;    listen 80;    listen 443 ssl http2;    server_name update.ff11sf.com;    location / &#123;		#proxy_pass http://localhost:3000/;  改为本机加端口或域名加端口		alias /home/myoutput/docsify/docs/;    	index index.html;    &#125;&#125;#后台启动不停机利用node启动docsify（不推荐）nohup docsify serve ./ &gt;log.out 2&gt;&amp;1  &amp;#关闭docsifypkill -f &quot;docsify&quot;#node后台启动和关闭node#启动nohup  npm run docs:dev &gt;/dev/null 2&gt;&amp;1 &amp; exit#2&gt;&amp;1 解释：将标准错误 2 重定向到标准输出 &amp;1 ，标准输出 &amp;1 再被重定向输入到 runoob.log 文件中。0 – stdin (standard input，标准输入)1 – stdout (standard output，标准输出)2 – stderr (standard error，标准错误输出)#关闭node进程ps -A ps ef| grep nodeps -aux | grep &quot;runoob.sh&quot; kill -9 pid
+
+cloudfair实现内网穿透
+
+GitHub搭建博客论坛：https://www.bilibili.com/video/BV1GM4m1m7ZD/?spm_id_from=333.1007.top_right_bar_window_history.content.click&amp;vd_source=f573094b123fadd0c16f71405046adfa
+内网穿透：https://www.bilibili.com/video/BV1H4421X7Wg/?vd_source=f573094b123fadd0c16f71405046adfa
+
+Jenkins部署#删除maven仓库中*.lastUpdated的文件find /home/maven/repository -name &quot;*.lastUpdated&quot; -exec grep -q &quot;Could not transfer&quot; &#123;&#125; \; -print -exec rm &#123;&#125; \;#maven打包clean install -U -DskipTests
+
+clash安装
+https://little-star.love/posts/f2114751/（详细）
+https://www.jianshu.com/p/4499d1dd3570（简单）
+
+Gpt部署#gpt-webdocker run --name chatgpt-web -d -p 3002:3002 \-e OPENAI_API_KEY=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 \-e TIMEOUT_MS=0 \-e SOCKS_PROXY_HOST=127.0.0.1 \-e SOCKS_PROXY_PORT=7890 \-e HTTPS_PROXY=http://:7890 chenzhaoyu94/chatgpt-web#gpt-academicdocker build -t gpt-academic .docker run --name gpt-academic -d -p 56530:56530 gpt-academic
+
+翻墙#视频https://www.youtube.com/watch?v=wu3YRcwYWXg&amp;t=641ssudo -i#命令https://github.com/KEJIXIAOLU/XUI#安装证书工具curl https://get.acme.sh | sh; apt install socat -y || yum install socat -y; ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt#申请证书~/.acme.sh/acme.sh  --issue -d 你的域名 --standalone -k ec-256 --force --insecure#安装证书~/.acme.sh/acme.sh --install-cert -d 你的域名 --ecc --key-file /etc/x-ui/server.key --fullchain-file /etc/x-ui/server.crt#放行 443 端口        iptables -I INPUT -p tcp --dport 54321 -j ACCEPT
+
+tip#递归创建文件makedir -p xx/xx/xx/xx#查看网卡 ip -a#查看端口占用netstat -anp | grep 8080  #或者 netstat -tlnlp | grep 8080#或者 lsof -i :8080
+
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>安装Linux系统</title>
+    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/%E5%AE%89%E8%A3%85Linux%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[dell 服务器 重装Linux系统目录
+安装前的准备工作
+进入BIOS界面
+安装centos
+配置固定ip
+
+
+
+
+安装前的准备工作1、8G左右的U盘
+2、镜像下载选择DVD版本的
+3、使用Utralso工具刻入镜像到U盘
+进入BIOS界面1、关闭安全启动，将Secure boot关闭
+2、将SATA operation 改为AHCI
+3、关机，插入u盘重启
+参考链接：https://www.cuanjibang.com/yjzx/51892.html
+安装centos1、重启后选择 Disk connected to front USB, 从U盘启动
+2、出现linux安装界面，进入linux系统安装步骤
+1. 在出现i8042的错误页面，继续等待，一直到滚动错误提示停止，进入一个命令行输入界面；2. 在命令行输入界面，输入ls /dev/sd*列出当前系统所有的存储设备，找到你的U盘启动盘的路径；(重新插拔U盘可判断存储设备的)如 /dev/sdb43. 确认U盘启动盘路径后，输入Reboot重启系统，重新进入安装列表界面；4. 选中install centos 7 列表，按 e 键，进入编辑界面；5.	找到			inst.stage2=hd:LABEL=CentOS\x207\x20x86_64 rd.live.check quiet   	把段修改为：	initrd=initrd.img inst.stage2=hd:/dev/sdb4:/ quiet	就是将hd:和quiet之间的内容修改为U盘的路径，注意要写成/dev/sdb4:/6. 修改之后，直接按Ctrl + X，进入安装界面；如果仍出现上述错误，则说明U盘路径错误，重新确定U盘路径在此安装界面按 e 进入编辑模式
+
+参考链接：:https://blog.csdn.net/qq_41672211/article/details/124660478
+配置固定ip
+vi   &#x2F;etc&#x2F;sysconfig&#x2F;network-scripts&#x2F;ifcfg-ens33
+
+编辑网卡
+
+
+ONBOOT=“yes” 表示启用该网卡IPADDR=192.168.11.11 指定一个静态IPGATEWAY=192.168.1.1 指定网关DNS1=8.8.8.8 连接外网需要配置 域名解析服务器DNS2=223.5.5.5
+
+
+service network restart
+
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
@@ -5355,6 +5318,43 @@ CAS：Compare And Swap，无锁原子操作
       <tags>
         <tag>Java</tag>
         <tag>并发</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>快速搭建一个人博客</title>
+    <url>/2024/08/01/%E5%90%8E%E7%AB%AF/%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</url>
+    <content><![CDATA[快速搭建一个人博客目录
+为什么写博客（文章）？
+使用GeemK搭建一个个人博客
+docsify
+Hexo
+内网穿透
+图床
+
+
+为什么写博客（文章）？思考、沉淀、表达提升互联网时代留下一点痕迹
+使用GeemK搭建一个个人博客GitHub - Meekdai&#x2F;Gmeek: Gmeek is a Blog All in Github
+https://bloggt.pengfanao.top/视频教学仅需一个Github账号，让文字在互联网中永生 超轻量级个人博客框架Gmeek_哔哩哔哩_bilibili
+docsifypfa的个人笔记https://www.google.com.hk/search?q=docsify
+4、VuePress  一个具有强大功能的 vuepress 主题快速上手
+Hexo一个开源的博客框架，插件库、部署、自定义功能非常方便
+官网：https://hexo.io/zh-cn/docs/writing
+主题：https://docs.anheyu.com/initall.html
+视频讲解
+https://www.bilibili.com/video/BV1G84y1B7NH/?spm_id_from=333.788
+https://blog.heriec.top/2024/05/29/hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA-vercel%E4%B8%8Ezeabur%E9%83%A8%E7%BD%B2%E6%8C%82%E8%BD%BD%E8%87%AA%E5%B7%B1%E7%9A%84%E5%9F%9F%E5%90%8D%E5%85%8D%E5%A4%87%E6%A1%88/
+优秀博客网站
+https://www.fomal.cc/social/link/
+https://blog.fiveth.cc/
+https://yixiu.icu/
+内网穿透没有公网IP? 免费域名搭建cloudflare内网穿透，不限流量，不用绑卡支付_哔哩哔哩_bilibili
+图床
+]]></content>
+      <categories>
+        <category>建站</category>
+      </categories>
+      <tags>
+        <tag>博客</tag>
       </tags>
   </entry>
   <entry>
@@ -6911,6 +6911,150 @@ cd ~/Downloads/scrcpy-macos-aarch64-v4.1PATH=&quot;$HOME/Downloads/platform-tool
       </tags>
   </entry>
   <entry>
+    <title>HashMap底层原理与扩容</title>
+    <url>/2026/05/25/%E9%9D%A2%E8%AF%95/HashMap%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E4%B8%8E%E6%89%A9%E5%AE%B9/</url>
+    <content><![CDATA[目录
+一句话定位
+一、HashMap 底层结构
+JDK 1.7：数组 + 链表
+JDK 1.8：数组 + 链表 + 红黑树
+
+
+二、核心概念
+哈希函数
+负载因子（Load Factor）
+树化阈值（TREEIFY_THRESHOLD）
+扩容阈值（Threshold）
+
+
+三、put 流程（JDK 1.8）
+完整步骤
+
+
+四、扩容机制（Resize）
+什么时候扩容？
+扩容做了什么？
+JDK 1.7 vs 1.8 扩容对比
+
+
+五、面试高频问题
+Q1：为什么 HashMap 初始容量是 16？
+Q2：为什么负载因子是 0.75？
+Q3：为什么要转红黑树？什么时候转？
+Q4：为什么链表转红黑树阈值是 8？
+
+
+引用
+
+
+HashMap 底层原理与扩容
+一句话定位HashMap 是基于哈希表的 Map 实现，JDK 1.8 后采用「数组 + 链表 + 红黑树」结构，通过哈希函数定位数组索引，链表&#x2F;红黑树解决哈希冲突，通过动态扩容保证性能。
+一、HashMap 底层结构JDK 1.7：数组 + 链表数组（Entry[]）├─ [0] → Entry(key1,value1) → Entry(key2,value2) → null├─ [1] → null├─ [2] → Entry(key3,value3) → null└─ ...
+
+头插法：新节点插入链表头部
+问题：并发扩容时会形成环形链表，导致死循环
+
+JDK 1.8：数组 + 链表 + 红黑树数组（Node[]）├─ [0] → Node → Node → (链表 &lt; 8)├─ [1] → TreeNode ←→ TreeNode ←→ TreeNode (红黑树 ≥ 8)└─ ...
+
+尾插法：新节点插入链表尾部
+树化条件：链表长度 ≥ 8 且数组长度 ≥ 64
+退化条件：红黑树节点 ≤ 6 时转回链表
+
+二、核心概念哈希函数// 1.8 的哈希函数：高16位异或低16位static final int hash(Object key) &#123;    int h;    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);&#125;// 定位数组索引：hash &amp; (length - 1)// 要求 length 必须是 2 的幂，这样相当于取模运算
+
+为什么异或高16位？
+哈希碰撞概率更低，让高位也参与索引计算
+
+
+
+负载因子（Load Factor）默认值：0.75
+static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+作用：决定扩容时机
+为什么 0.75？
+时间和空间的折中：太大哈希碰撞多，太小空间浪费多
+
+
+
+树化阈值（TREEIFY_THRESHOLD）static final int TREEIFY_THRESHOLD = 8;  // 链表转红黑树static final int UNTREEIFY_THRESHOLD = 6; // 红黑树转链表static final int MIN_TREEIFY_CAPACITY = 64; // 最小树化数组容量
+
+扩容阈值（Threshold）threshold = capacity * loadFactor;
+
+三、put 流程（JDK 1.8）完整步骤flowchart TD    A[1. 判断数组是否为空] --&gt;|为空| B[调用 resize 初始化]    A --&gt;|不为空| C[2. 计算哈希值定位索引]    C --&gt; D[3. 判断索引位置是否为空]    D --&gt;|是| E[直接插入新节点]    D --&gt;|否| F&#123;4. 判断 key 是否存在&#125;    F --&gt;|已存在| G[替换 value]    F --&gt;|不存在| H&#123;5. 判断是链表还是红黑树&#125;    H --&gt;|链表| I[遍历链表尾插]    H --&gt;|红黑树| J[红黑树插入]    I --&gt; K&#123;6. 判断是否树化&#125;    K --&gt;|链表长度 ≥8| L[判断数组是否 ≥64]    L --&gt;|是| M[树化]    L --&gt;|否| N[扩容]    K --&gt;|否| O[结束]    J --&gt; O    E --&gt; P&#123;7. 判断是否扩容&#125;    G --&gt; P    M --&gt; P    N --&gt; P    P --&gt;|size ≥ threshold| Q[调用 resize 扩容]    P --&gt;|否| O
+
+四、扩容机制（Resize）什么时候扩容？
+首次 put 时数组为空 → 初始化扩容到默认容量 16
+size ≥ threshold（容量 * 负载因子）→ 扩容
+链表长度 ≥8 但数组长度 &lt;64 → 先扩容代替树化
+
+扩容做了什么？
+新容量 &#x3D; 旧容量 &lt;&lt; 1（2倍）
+重新计算每个节点在新数组中的索引位置
+迁移节点
+
+JDK 1.8 的优化：不用重新 hash，只用看原哈希的高一位
+原容量 16  → 二进制 10000新容量 32  → 二进制 100000判断节点在新数组的索引：原 hash &amp; 16 == 0 → 索引不变原 hash &amp; 16 != 0 → 索引 = 旧索引 + 16
+
+JDK 1.7 vs 1.8 扩容对比
+
+
+维度
+JDK 1.7
+JDK 1.8
+
+
+
+插入方式
+头插法
+尾插法
+
+
+扩容时计算索引
+重新 hash
+看高一位
+
+
+并发问题
+死循环（环形链表）
+数据丢失&#x2F;覆盖
+
+
+五、面试高频问题Q1：为什么 HashMap 初始容量是 16？
+必须是 2 的幂，保证 hash &amp; (length-1) 等价于取模
+16 是经验值：太小易扩容，太大浪费空间
+JDK 源码注释说 “16 seems to work well”
+
+Q2：为什么负载因子是 0.75？
+时间和空间折中
+0.75 是泊松分布计算出的结果：链表长度到8的概率只有亿分之六
+太小频繁扩容，太大哈希碰撞多
+
+Q3：为什么要转红黑树？什么时候转？
+链表查找是 O(n)，红黑树是 O(logn)
+树化条件：
+链表长度 ≥ 8
+数组容量 ≥ 64（如果数组太小，优先扩容）
+
+
+
+Q4：为什么链表转红黑树阈值是 8？
+泊松分布：在负载因子0.75下，链表长度到8的概率约为 0.00000006
+8 是个足够小概率的阈值，不到万不得已不树化
+树化有开销：红黑树节点占空间更大，插入删除更复杂
+
+
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>面试</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>HashMap</tag>
+        <tag>集合</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HashMap线程安全问题与解决方案</title>
     <url>/2026/05/25/%E9%9D%A2%E8%AF%95/HashMap%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</url>
     <content><![CDATA[目录
@@ -7077,150 +7221,6 @@ size++ 不是原子操作
 不允许 key&#x2F;value 为 null
 基本不用了
 
-
-
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>面试</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>HashMap</tag>
-        <tag>集合</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HashMap底层原理与扩容</title>
-    <url>/2026/05/25/%E9%9D%A2%E8%AF%95/HashMap%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E4%B8%8E%E6%89%A9%E5%AE%B9/</url>
-    <content><![CDATA[目录
-一句话定位
-一、HashMap 底层结构
-JDK 1.7：数组 + 链表
-JDK 1.8：数组 + 链表 + 红黑树
-
-
-二、核心概念
-哈希函数
-负载因子（Load Factor）
-树化阈值（TREEIFY_THRESHOLD）
-扩容阈值（Threshold）
-
-
-三、put 流程（JDK 1.8）
-完整步骤
-
-
-四、扩容机制（Resize）
-什么时候扩容？
-扩容做了什么？
-JDK 1.7 vs 1.8 扩容对比
-
-
-五、面试高频问题
-Q1：为什么 HashMap 初始容量是 16？
-Q2：为什么负载因子是 0.75？
-Q3：为什么要转红黑树？什么时候转？
-Q4：为什么链表转红黑树阈值是 8？
-
-
-引用
-
-
-HashMap 底层原理与扩容
-一句话定位HashMap 是基于哈希表的 Map 实现，JDK 1.8 后采用「数组 + 链表 + 红黑树」结构，通过哈希函数定位数组索引，链表&#x2F;红黑树解决哈希冲突，通过动态扩容保证性能。
-一、HashMap 底层结构JDK 1.7：数组 + 链表数组（Entry[]）├─ [0] → Entry(key1,value1) → Entry(key2,value2) → null├─ [1] → null├─ [2] → Entry(key3,value3) → null└─ ...
-
-头插法：新节点插入链表头部
-问题：并发扩容时会形成环形链表，导致死循环
-
-JDK 1.8：数组 + 链表 + 红黑树数组（Node[]）├─ [0] → Node → Node → (链表 &lt; 8)├─ [1] → TreeNode ←→ TreeNode ←→ TreeNode (红黑树 ≥ 8)└─ ...
-
-尾插法：新节点插入链表尾部
-树化条件：链表长度 ≥ 8 且数组长度 ≥ 64
-退化条件：红黑树节点 ≤ 6 时转回链表
-
-二、核心概念哈希函数// 1.8 的哈希函数：高16位异或低16位static final int hash(Object key) &#123;    int h;    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);&#125;// 定位数组索引：hash &amp; (length - 1)// 要求 length 必须是 2 的幂，这样相当于取模运算
-
-为什么异或高16位？
-哈希碰撞概率更低，让高位也参与索引计算
-
-
-
-负载因子（Load Factor）默认值：0.75
-static final float DEFAULT_LOAD_FACTOR = 0.75f;
-
-作用：决定扩容时机
-为什么 0.75？
-时间和空间的折中：太大哈希碰撞多，太小空间浪费多
-
-
-
-树化阈值（TREEIFY_THRESHOLD）static final int TREEIFY_THRESHOLD = 8;  // 链表转红黑树static final int UNTREEIFY_THRESHOLD = 6; // 红黑树转链表static final int MIN_TREEIFY_CAPACITY = 64; // 最小树化数组容量
-
-扩容阈值（Threshold）threshold = capacity * loadFactor;
-
-三、put 流程（JDK 1.8）完整步骤flowchart TD    A[1. 判断数组是否为空] --&gt;|为空| B[调用 resize 初始化]    A --&gt;|不为空| C[2. 计算哈希值定位索引]    C --&gt; D[3. 判断索引位置是否为空]    D --&gt;|是| E[直接插入新节点]    D --&gt;|否| F&#123;4. 判断 key 是否存在&#125;    F --&gt;|已存在| G[替换 value]    F --&gt;|不存在| H&#123;5. 判断是链表还是红黑树&#125;    H --&gt;|链表| I[遍历链表尾插]    H --&gt;|红黑树| J[红黑树插入]    I --&gt; K&#123;6. 判断是否树化&#125;    K --&gt;|链表长度 ≥8| L[判断数组是否 ≥64]    L --&gt;|是| M[树化]    L --&gt;|否| N[扩容]    K --&gt;|否| O[结束]    J --&gt; O    E --&gt; P&#123;7. 判断是否扩容&#125;    G --&gt; P    M --&gt; P    N --&gt; P    P --&gt;|size ≥ threshold| Q[调用 resize 扩容]    P --&gt;|否| O
-
-四、扩容机制（Resize）什么时候扩容？
-首次 put 时数组为空 → 初始化扩容到默认容量 16
-size ≥ threshold（容量 * 负载因子）→ 扩容
-链表长度 ≥8 但数组长度 &lt;64 → 先扩容代替树化
-
-扩容做了什么？
-新容量 &#x3D; 旧容量 &lt;&lt; 1（2倍）
-重新计算每个节点在新数组中的索引位置
-迁移节点
-
-JDK 1.8 的优化：不用重新 hash，只用看原哈希的高一位
-原容量 16  → 二进制 10000新容量 32  → 二进制 100000判断节点在新数组的索引：原 hash &amp; 16 == 0 → 索引不变原 hash &amp; 16 != 0 → 索引 = 旧索引 + 16
-
-JDK 1.7 vs 1.8 扩容对比
-
-
-维度
-JDK 1.7
-JDK 1.8
-
-
-
-插入方式
-头插法
-尾插法
-
-
-扩容时计算索引
-重新 hash
-看高一位
-
-
-并发问题
-死循环（环形链表）
-数据丢失&#x2F;覆盖
-
-
-五、面试高频问题Q1：为什么 HashMap 初始容量是 16？
-必须是 2 的幂，保证 hash &amp; (length-1) 等价于取模
-16 是经验值：太小易扩容，太大浪费空间
-JDK 源码注释说 “16 seems to work well”
-
-Q2：为什么负载因子是 0.75？
-时间和空间折中
-0.75 是泊松分布计算出的结果：链表长度到8的概率只有亿分之六
-太小频繁扩容，太大哈希碰撞多
-
-Q3：为什么要转红黑树？什么时候转？
-链表查找是 O(n)，红黑树是 O(logn)
-树化条件：
-链表长度 ≥ 8
-数组容量 ≥ 64（如果数组太小，优先扩容）
-
-
-
-Q4：为什么链表转红黑树阈值是 8？
-泊松分布：在负载因子0.75下，链表长度到8的概率约为 0.00000006
-8 是个足够小概率的阈值，不到万不得已不树化
-树化有开销：红黑树节点占空间更大，插入删除更复杂
 
 
 ]]></content>

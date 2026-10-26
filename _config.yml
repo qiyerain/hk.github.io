@@ -3,8 +3,8 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site  en
-title: 小遨的个人博客
-subtitle: '是小遨呀'
+title: hk的个人博客
+subtitle: '是hk呀'
 description: '一个分享科技、读书、互联网相关的博客网站，记录学习与成长的过程'
 keywords: 博客,技术,编程,Java,前端,后端,学习笔记
 author: pfa
@@ -13,7 +13,7 @@ timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: https://blog.pengfanao.top
+url: https://qiyerain.github.io
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -124,7 +124,7 @@ theme: anzhiyu
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: git
-  repository: https://github.com/wwrtpfa/wwrtpfa.github.io.git
+  repository: https://github.com/qiyerain/qiyerain.github.io.git
   branch: deploy
 
 # Search configuration for local search

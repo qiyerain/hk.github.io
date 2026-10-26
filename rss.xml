@@ -477,7 +477,7 @@
       <title>DeepSeek Harness 学习手册：从 363 个包里找到一条主线</title>
       <link>https://blog.pengfanao.top/2026/10/24/agent/DeepSeek-Harness-%E5%AD%A6%E4%B9%A0%E6%89%8B%E5%86%8C/</link>
       <pubDate>Sat, 24 Oct 2026 05:10:00 GMT</pubDate>
-      <category>DeepSeek Harness</category><category>Cordis</category><category>源码阅读</category><category>Agent</category><category>架构</category>
+      <category>Agent</category><category>架构</category><category>DeepSeek Harness</category><category>Cordis</category><category>源码阅读</category>
       <description><![CDATA[<blockquote>
 <p><strong>读 dsh 源码最难的，不是看不懂某个文件，而是不知道下一个该打开哪个文件。</strong></p>
 </blockquote>
@@ -1073,7 +1073,7 @@
       <title>LangChain Agent 系列(三)：从零搭建代码助手 Agent</title>
       <link>https://blog.pengfanao.top/2026/06/22/agent/LangChain-Agent-03-%E5%AE%9E%E6%88%98%E7%AF%87-%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA%E4%BB%A3%E7%A0%81%E5%8A%A9%E6%89%8BAgent/</link>
       <pubDate>Mon, 22 Jun 2026 00:00:00 GMT</pubDate>
-      <category>Agent</category><category>LangChain</category><category>AI教程</category><category>Python</category><category>实战</category>
+      <category>Python</category><category>LangChain</category><category>Agent</category><category>AI教程</category><category>实战</category>
       <description><![CDATA[<h2 id="终于到动手环节了。"><a href="#终于到动手环节了。" class="headerlink" title="终于到动手环节了。"></a>终于到动手环节了。</h2><p>前两篇讲了 Agent 的概念和架构，这一篇我们从头写一个能读文件、写代码、执行 Shell 的代码助手 Agent。跟着一步步来，大约 20 分钟能跑通。</p>
 <hr>
 <h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p>先装依赖。打开终端，一行搞定：</p>
@@ -1404,7 +1404,7 @@
       <title>LangChain Agent 系列(二)：LangChain Agent 内部怎么转的？</title>
       <link>https://blog.pengfanao.top/2026/06/19/agent/LangChain-Agent-02-%E6%9E%B6%E6%9E%84%E7%AF%87-LangChain%E5%86%85%E9%83%A8%E6%80%8E%E4%B9%88%E8%BD%AC%E7%9A%84/</link>
       <pubDate>Fri, 19 Jun 2026 00:00:00 GMT</pubDate>
-      <category>Agent</category><category>架构</category><category>LangChain</category><category>AI教程</category>
+      <category>LangChain</category><category>Agent</category><category>AI教程</category><category>架构</category>
       <description><![CDATA[<h2 id="上一篇我们讲了-Agent-的”道”——Think-→-Act-→-Observe-循环。这一篇讲”术”——LangChain-是怎么把这套机制实现出来的。"><a href="#上一篇我们讲了-Agent-的”道”——Think-→-Act-→-Observe-循环。这一篇讲”术”——LangChain-是怎么把这套机制实现出来的。" class="headerlink" title="上一篇我们讲了 Agent 的”道”——Think → Act → Observe 循环。这一篇讲”术”——LangChain 是怎么把这套机制实现出来的。"></a>上一篇我们讲了 Agent 的”道”——Think → Act → Observe 循环。这一篇讲”术”——LangChain 是怎么把这套机制实现出来的。</h2><p>如果你读完了第一篇，你已经知道 Agent 的核心思想了：LLM 是大脑，工具是手和眼睛，决策循环让 Agent 不断思考、执行、观察、调整，直到任务完成。</p>
 <p>但概念是概念，代码是代码。LangChain 到底用了哪些类、哪些抽象、哪些设计模式，把这些概念变成了能跑的代码？</p>
 <p>本文拆解 LangChain 的三层包结构和 Agent 核心组件。读完你能看懂 Agent 的每一行代码在做什么。</p>
